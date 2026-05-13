@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+mobile/node_modules/
+
+# Runtime state
+save.json
+mobile/save.json
+
+# Generated builds and previews
+mobile/.expo/
+mobile/dist/
+mobile/preview.log
+mobile/main-menu-screenshot.png
+
+# Browser test profiles / caches
+mobile/chrome-profile-shot*/
+mobile/edge-profile-shot*/
+
+# Logs and temp files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

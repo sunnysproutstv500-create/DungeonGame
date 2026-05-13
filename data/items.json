@@ -1,0 +1,294 @@
+{
+  "small_potion": {
+    "id": "small_potion",
+    "name": "Small Potion",
+    "type": "consumable",
+    "effect": "heal",
+    "value": 20
+  },
+  "big_potion": {
+    "id": "big_potion",
+    "name": "Big Potion",
+    "type": "consumable",
+    "effect": "heal",
+    "value": 40
+  },
+  "warden's seal": {
+    "id": "warden's seal",
+    "name": "Warden's Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "antidote": {
+    "id": "antidote",
+    "name": "Antidote",
+    "type": "consumable",
+    "effect": "cleanse",
+    "value": 0
+  },
+  "focus ring": {
+    "id": "focus ring",
+    "name": "Focus Ring",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "world_shard": {
+    "id": "world_shard",
+    "name": "World Shard",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "champion_emblem": {
+    "id": "champion_emblem",
+    "name": "Champion Emblem",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "guard_key": {
+    "id": "guard_key",
+    "name": "Guard Key",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "warden_badge": {
+    "id": "warden_badge",
+    "name": "Warden's Badge",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "warden_shackle": {
+    "id": "warden_shackle",
+    "name": "Warden's Shackle",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "cipher_fragment": {
+    "id": "cipher_fragment",
+    "name": "Cipher Fragment",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "overseer_code": {
+    "id": "overseer_code",
+    "name": "Overseer Access Code",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "trader_intel": {
+    "id": "trader_intel",
+    "name": "Trader's Intelligence",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "security_clearance": {
+    "id": "security_clearance",
+    "name": "Security Clearance",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "warden_override": {
+    "id": "warden_override",
+    "name": "Warden Override",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "security_route_token": {
+    "id": "security_route_token",
+    "name": "Security Route Authorization",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "ward_route_token": {
+    "id": "ward_route_token",
+    "name": "Ward Route Authorization",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "bent_baton": {
+    "id": "bent_baton",
+    "name": "Bent Baton",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 2
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "training_sword": {
+    "id": "training_sword",
+    "name": "Training Sword",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 1
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "guard_vest": {
+    "id": "guard_vest",
+    "name": "Guard Vest",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 2
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "stabilizer_charm": {
+    "id": "stabilizer_charm",
+    "name": "Stabilizer Charm",
+    "type": "gear",
+    "slot": "trinket",
+    "stats": {
+      "maxHp": 10
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "cracked_lens": {
+    "id": "cracked_lens",
+    "name": "Cracked Lens",
+    "type": "gear",
+    "slot": "trinket",
+    "stats": {
+      "perception": 1
+    },
+    "trait": {
+      "id": "flee_bonus",
+      "text": "Improves flee chance."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "marked_dice": {
+    "id": "marked_dice",
+    "name": "Marked Dice",
+    "type": "gear",
+    "slot": "trinket",
+    "stats": {
+      "perception": 1
+    },
+    "trait": {
+      "id": "bonus_gold",
+      "value": 5,
+      "text": "Gain +5 gold after combat victories."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "shock_baton": {
+    "id": "shock_baton",
+    "name": "Shock Baton",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 4
+    },
+    "trait": {
+      "id": "first_attack_bonus",
+      "value": 2,
+      "text": "First attack each combat deals +2 damage."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "sentry_plate": {
+    "id": "sentry_plate",
+    "name": "Sentry Plate",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 3
+    },
+    "trait": {
+      "id": "first_hit_reduction",
+      "value": 5,
+      "text": "Reduce the first incoming hit each combat by 5."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "large_potion": {
+    "id": "large_potion",
+    "name": "Large Potion",
+    "type": "consumable",
+    "effect": "heal",
+    "value": 65
+  },
+  "phase_edge": {
+    "id": "phase_edge",
+    "name": "Phase Edge",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 6
+    },
+    "trait": {
+      "id": "first_attack_bonus",
+      "value": 4,
+      "text": "First attack each combat deals +4 damage."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "mesh_armor": {
+    "id": "mesh_armor",
+    "name": "Mesh Armor",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 5
+    },
+    "trait": {
+      "id": "first_hit_reduction",
+      "value": 8,
+      "text": "Reduce the first incoming hit each combat by 8."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "floor2_lens": {
+    "id": "floor2_lens",
+    "name": "Calibrated Lens",
+    "type": "gear",
+    "slot": "trinket",
+    "stats": {
+      "perception": 2
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "ranger_cloak": {
+    "id": "ranger_cloak",
+    "name": "Ranger Cloak",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 1,
+      "perception": 2
+    },
+    "trait": {
+      "id": "flee_bonus",
+      "text": "Improves flee chance."
+    },
+    "effect": "none",
+    "value": 0
+  }
+}

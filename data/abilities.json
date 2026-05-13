@@ -1,0 +1,61 @@
+{
+  "power_strike": {
+    "id": "power_strike",
+    "name": "Power Strike",
+    "type": "damage_bonus",
+    "value": 8,
+    "cooldown": 2
+  },
+  "guard": {
+    "id": "guard",
+    "name": "Guard",
+    "type": "damage_reduce",
+    "value": 0.25,
+    "cooldown": 3
+  },
+  "berserk": {
+    "id": "berserk",
+    "name": "Berserk",
+    "type": "berserk",
+    "value": 20,
+    "hpCost": 10,
+    "cooldown": 3
+  },
+  "heal": {
+    "id": "heal",
+    "name": "Heal",
+    "type": "heal",
+    "value": 25,
+    "cooldown": 4
+  },
+  "toxic_slash": {
+    "id": "toxic_slash",
+    "name": "Toxic Slash",
+    "type": "status_attack",
+    "damage": 5,
+    "status": { "type": "poison", "duration": 3, "value": 2 },
+    "cooldown": 3
+  },
+  "shield_break": {
+    "id": "shield_break",
+    "name": "Shield Break",
+    "type": "status_attack",
+    "damage": 6,
+    "status": { "type": "defenseDown", "duration": 2, "value": 3 },
+    "cooldown": 3
+  },
+  "arcane_bolt": {
+    "id": "arcane_bolt",
+    "name": "Arcane Bolt",
+    "type": "damage_bonus",
+    "value": 6,
+    "cooldown": 2
+  },
+  "barrier": {
+    "id": "barrier",
+    "name": "Barrier",
+    "type": "damage_reduce",
+    "value": 0.25,
+    "cooldown": 3
+  }
+}

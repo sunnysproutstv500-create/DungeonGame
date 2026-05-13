@@ -1,0 +1,2561 @@
+{
+  "start_room": {
+      "id": "start_room",
+      "map": {
+        "x": 4,
+        "y": 0,
+      "name": "START",
+      "tag": "event",
+      "connections": [
+        "left_path",
+        "right_path"
+      ]
+    },
+    "title": "The Intake Prison — Processing Cell",
+    "text": "Cold stone. Fluorescent strips flickering in a cracked ceiling. The smell of antiseptic layered over something older — fear, and whatever they use to process new arrivals.\n\nYou come to on a metal bunk. A placard on the wall reads: INTAKE SUBJECT — WORLD-EARTH — 001. Below it, a laminated card explains the competition in bureaucratic language. Ten worlds. Ten-floor gauntlet. Two survive. The rest are processed.\n\nThe Overseers built this prison to eliminate the weakest competitors before Floor 2. Some of the other worlds sent representatives who are already in here. Most of them are already gone.\n\nThe cell door is open. They do that — give you a running start. It makes the data more interesting.\n\nA rusted utility key sits on the floor just inside the door. Left corridor: boot steps, the scrape of body armor. Guard patrol. Right corridor: the sound of breathing that isn't quite right anymore.",
+    "giveItem": "rusted key",
+    "choices": [
+      {
+        "text": "Head left — the guard patrol corridor",
+        "nextScene": "left_path",
+        "effect": {
+          "setRoute": "security"
+        }
+      },
+      {
+        "text": "Head right — the prisoner ward",
+        "nextScene": "right_path",
+        "effect": {
+          "setRoute": "ward"
+        }
+      }
+    ]
+  },
+  "left_path": {
+      "id": "left_path",
+      "map": {
+        "x": 2,
+        "y": 1,
+      "name": "L.PATH",
+      "tag": "event",
+      "connections": [
+        "start_room",
+        "left_crack",
+        "left_path_combat"
+      ]
+    },
+    "type": "event",
+    "title": "Guard Patrol Corridor",
+    "text": "The corridor is narrow, lit by strips that hum at irregular intervals. A guard stands at the far end, back to you, watching through a barred viewport into the cell block beyond. Standard armor. Shock baton on the belt. Military posture.\n\nThey haven't noticed you yet.\n\nTo your left, a section of wall has buckled — a pocket of structural damage where the inner layer has partially caved in. Something pale catches the light inside the crack.",
+    "choices": [
+      {
+        "text": "Rush the guard before they turn around",
+        "nextScene": "left_path_combat"
+      },
+      {
+        "text": "Squeeze into the wall crack first",
+        "nextScene": "left_crack"
+      }
+    ]
+  },
+  "left_crack": {
+    "id": "left_crack",
+    "map": {
+      "x": 1,
+      "y": 2,
+      "name": "CRACK",
+      "tag": "event",
+      "connections": [
+        "left_path",
+        "left_path_combat",
+        "lore_room"
+      ]
+    },
+    "type": "event",
+    "title": "Structural Damage Pocket",
+    "text": "The gap is barely a meter deep — a pocket formed when the ceiling shifted and the inner wall cracked. Someone was here before you. A crude message is scratched into the stone in three languages; in yours it reads: 'WARDEN WAS WORLD-4. DOESN'T REMEMBER. DON'T REMIND IT.'\n\nBelow that, in different handwriting: 'Phase 2 loses patience. Bait it.'\n\nA sealed kit rests in the rubble — someone stashed it here and didn't come back for it. The wall to the left has an older crack — deeper than this one, and someone has recently pried at the edges of an access panel set flush into the stone.",
+    "choices": [
+      {
+        "text": "Take the kit and go face the guard",
+        "nextScene": "left_path_combat",
+        "effect": {
+          "giveItem": "antidote"
+        }
+      },
+      {
+        "text": "Leave the kit — you travel light",
+        "nextScene": "left_path_combat"
+      },
+      {
+        "text": "Push the displaced stone behind the main crack — a hollow clicks open",
+        "effect": {
+          "giveItem": "small_potion",
+          "giveGold": 12
+        },
+        "once": true,
+        "condition": {
+          "perception": 1
+        }
+      },
+      {
+        "text": "Slip into the filing alcove — the access panel has been pried open recently",
+        "condition": {
+          "perception": 2
+        },
+        "nextScene": "lore_room"
+      }
+    ]
+  },
+  "left_path_combat": {
+    "id": "left_path_combat",
+    "map": {
+      "x": 3,
+      "y": 2,
+      "name": "GUARD",
+      "tag": "combat",
+      "connections": [
+        "left_crack",
+        "left_path",
+        "trap_room"
+      ]
+    },
+    "title": "Guard Takedown",
+    "text": "The guard turns at the last second — trained reflex, not luck. The shock baton swings up. They've processed a lot of intake subjects. They expect this.\n\nSo do you.",
+    "combat": {
+      "name": "Intake Guard",
+      "hp": 22,
+      "attack": 8,
+      "defense": 2,
+      "xp": 18,
+      "goldReward": 6,
+      "loot": [
+        "guard_key",
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "bone_armor"
+      ]
+    },
+    "fleeScene": "start_room",
+    "victoryScene": "trap_room",
+    "choices": []
+  },
+  "right_path": {
+    "id": "right_path",
+    "map": {
+      "x": 6,
+      "y": 1,
+      "name": "R.PATH",
+      "tag": "event",
+      "connections": [
+        "start_room",
+        "right_upstream",
+        "right_path_combat"
+      ]
+    },
+    "type": "event",
+    "title": "Prisoner Ward",
+    "text": "The ward runs long — cells on both sides, most empty. The doors were opened when the competition started. The Overseers don't lock things they don't need locked anymore.\n\nNot all the inmates left. Some of them couldn't.\n\nWhatever the facility did to them during processing — the procedures, the intake assessment, whatever 'capability evaluation' actually means — it changed a few of them. The cell bars in the third block have been bent from the inside. Shapes move in the dim light at the end of the ward, making sounds that are almost words.\n\nNear the ward exit, an overturned supply trolley has spilled sealed medical containers across the floor. To the right, a side door leads into a quieter secondary block.",
+    "choices": [
+      {
+        "text": "Move through the main ward toward the supply trolley",
+        "nextScene": "right_path_combat"
+      },
+      {
+        "text": "Take the side door into the secondary block",
+        "nextScene": "right_upstream"
+      }
+    ]
+  },
+  "right_upstream": {
+    "id": "right_upstream",
+    "map": {
+      "x": 7,
+      "y": 2,
+      "name": "BLOCK",
+      "tag": "event",
+      "connections": [
+        "right_path",
+        "right_path_combat",
+        "merchant_room"
+      ]
+    },
+    "type": "event",
+    "title": "Secondary Cell Block",
+    "text": "Quieter here. Lower-risk inmates, according to the signage. The cells are still open but the ward itself is untouched — the mutants in the main block haven't crossed the threshold yet.\n\nOne cell at the end has been converted into a rough infirmary by whoever was here before the competition. Labeled containers, basic instruments, a cot with clean linen. The medical kit on the shelf is intact.\n\nA low rhythmic sound carries through the wall from the main ward. Something large, pacing. Near the far end of the block, past the infirmary cell, a maintenance alcove shows signs of recent activity — someone has set up inside it.",
+    "choices": [
+      {
+        "text": "Take the basic medical kit",
+        "nextScene": "right_path_combat",
+        "effect": {
+          "giveItem": "small_potion"
+        }
+      },
+      {
+        "text": "Take the larger treatment kit from the cabinet",
+        "nextScene": "right_path_combat",
+        "effect": {
+          "giveItem": "big_potion"
+        }
+      },
+      {
+        "text": "Grab everything worth grabbing",
+        "nextScene": "right_path_combat",
+        "effect": {
+          "giveItem": "small_potion",
+          "giveGold": 10
+        }
+      },
+      {
+        "text": "Check the maintenance alcove at the far end — someone has set up there",
+        "nextScene": "merchant_room"
+      }
+    ]
+  },
+  "right_path_combat": {
+    "id": "right_path_combat",
+    "map": {
+      "x": 5,
+      "y": 2,
+      "name": "MUTANT",
+      "tag": "combat",
+      "connections": [
+        "right_path",
+        "right_upstream",
+        "reward_room"
+      ]
+    },
+    "title": "Mutant Encounter",
+    "text": "It comes out of the third cell fast — a prisoner the intake process warped beyond recognition. The muscle development is wrong. The eyes don't track right. It moves like something that used to know how to think and is working from memory.\n\nIt's not specifically hunting you. It's just hungry, and you're there.",
+    "combat": {
+      "name": "Prisoner Mutant",
+      "hp": 35,
+      "attack": 11,
+      "defense": 1,
+      "xp": 28,
+      "goldReward": 8,
+      "loot": [
+        "small_potion",
+        "big_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "frenzy"
+      ]
+    },
+    "fleeScene": "start_room",
+    "victoryScene": "reward_room",
+    "choices": []
+  },
+  "trap_room": {
+    "id": "trap_room",
+    "map": {
+      "x": 3,
+      "y": 3,
+      "name": "TRAP",
+      "tag": "event",
+      "connections": [
+        "left_path_combat",
+        "security_lockdown",
+        "merge_room"
+      ]
+    },
+    "type": "event",
+    "title": "Secured Access Corridor",
+    "text": "Beyond the guard post, the corridor is rigged. Tripwire at shin height — nearly invisible. Pressure tiles in the floor, discolored slightly from the surrounding stone. A motion sensor above the far door, amber light blinking.\n\nOld security infrastructure, still functional. The Overseers left it running.\n\nThrough the reinforced viewport in the far door: a storeroom. Shelving. Sealed containers. Worth reaching if you can manage it.\n\nA control panel is mounted near the entrance — cracked screen, blinking amber. Guard access terminal.",
+    "choices": [
+      {
+        "text": "Sprint straight through — take the hits",
+        "nextScene": "security_lockdown",
+        "effect": {
+          "damage": 22,
+          "applyStatus": {
+            "type": "burn",
+            "duration": 1,
+            "value": 3
+          }
+        }
+      },
+      {
+        "text": "Move carefully, testing each tile",
+        "nextScene": "security_lockdown"
+      },
+      {
+        "text": "Work the control panel — reroute the sensors",
+        "nextScene": "security_lockdown",
+        "effect": {
+          "giveItem": "big_potion"
+        },
+        "condition": {
+          "stat": "level",
+          "operator": ">=",
+          "value": 2
+        }
+      },
+      {
+        "text": "Use the guard's key on the access terminal — full override",
+        "nextScene": "security_lockdown",
+        "effect": {
+          "giveGold": 20,
+          "giveItem": "small_potion"
+        },
+        "requires": {
+          "item": "guard_key"
+        }
+      }
+    ]
+  },
+  "security_lockdown": {
+    "id": "security_lockdown",
+    "map": {
+      "x": 4,
+      "y": 3,
+      "name": "LOCKDN",
+      "tag": "combat",
+      "connections": [
+        "trap_room",
+        "security_records"
+      ]
+    },
+    "title": "Security Lockdown",
+    "text": "The trap corridor ends in a checkpoint cage. The door behind you slams shut before the one ahead opens. Amber lights switch to red. A ceiling speaker clicks once, then a retired security drone drops from its charging rail.\n\nThe prison does not let armed subjects stroll into the junction without one more measurement.",
+    "combat": {
+      "name": "Lockdown Drone",
+      "hp": 34,
+      "attack": 10,
+      "defense": 3,
+      "xp": 32,
+      "goldReward": 10,
+      "loot": [
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "quick_strike",
+        "crushing_blow"
+      ]
+    },
+    "fleeScene": "trap_room",
+    "victoryScene": "security_records",
+    "choices": []
+  },
+  "security_records": {
+    "id": "security_records",
+    "map": {
+      "x": 2,
+      "y": 4,
+      "name": "RECORD",
+      "tag": "event",
+      "connections": [
+        "security_lockdown",
+        "barracks_checkpoint"
+      ]
+    },
+    "type": "event",
+    "title": "Security Records Office",
+    "text": "Past the checkpoint cage, the corridor opens into a records office. Metal cabinets line the walls. Half the drawers are open, spilling intake files across the floor. The files are not prisoner records. They are performance predictions.\n\nEarth-001 is stamped across one folder. The page inside lists your estimated survival time in minutes.\n\nA second door leads deeper into staff-only territory. The lock has already accepted your presence. The facility wants to keep measuring you.",
+    "choices": [
+      {
+        "text": "Cross-reference the Warden access logs and move on",
+        "nextScene": "barracks_checkpoint",
+        "effect": {
+          "giveGold": 10
+        }
+      },
+      {
+        "text": "Pocket the emergency dressing from a desk drawer",
+        "effect": {
+          "giveItem": "small_potion"
+        },
+        "once": true
+      }
+    ]
+  },
+  "barracks_checkpoint": {
+    "id": "barracks_checkpoint",
+    "map": {
+      "x": 2,
+      "y": 5,
+      "name": "BARRKS",
+      "tag": "combat",
+      "connections": [
+        "security_records",
+        "armory_lockup"
+      ]
+    },
+    "title": "Barracks Checkpoint",
+    "text": "The barracks door opens onto rows of overturned bunks and wall-mounted weapon racks stripped almost clean. Almost.\n\nA staff enforcer steps from behind the last bunk, visor cracked, baton already humming. They are not surprised to see you. The records office warned them before you arrived.",
+    "combat": {
+      "name": "Barracks Enforcer",
+      "hp": 42,
+      "attack": 13,
+      "defense": 4,
+      "xp": 42,
+      "goldReward": 14,
+      "loot": [
+        "small_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "cleave",
+        "shield_bash",
+        "armor_break"
+      ]
+    },
+    "fleeScene": "security_records",
+    "victoryScene": "armory_lockup",
+    "choices": []
+  },
+  "armory_lockup": {
+    "id": "armory_lockup",
+    "map": {
+      "x": 2,
+      "y": 6,
+      "name": "ARMORY",
+      "tag": "treasure",
+      "connections": [
+        "barracks_checkpoint",
+        "merge_room"
+      ]
+    },
+    "type": "event",
+    "title": "Armory Lockup",
+    "text": "The armory is mostly empty, but the authorization terminal still works. It asks for a living staff signature. The enforcer's cracked visor provides enough biometric residue for the terminal to accept a temporary route authorization.\n\nA drawer clicks open under the console. Inside: a stamped security route token and a short note from someone who tried this path before you. 'Do not go straight to the Warden. Search the junction first.'",
+    "choices": [
+      {
+        "text": "Take the security route authorization and enter the junction",
+        "nextScene": "merge_room",
+        "effect": {
+          "giveItem": "security_route_token",
+          "giveGold": 15
+        }
+      },
+      {
+        "text": "Search the bottom drawer before leaving",
+        "effect": {
+          "giveItem": "bent_baton"
+        },
+        "once": true
+      }
+    ]
+  },
+  "reward_room": {
+    "id": "reward_room",
+    "map": {
+      "x": 5,
+      "y": 3,
+      "name": "LOCKER",
+      "tag": "treasure",
+      "connections": [
+        "right_path_combat",
+        "quarantine_lockdown",
+        "merge_room"
+      ]
+    },
+    "type": "event",
+    "title": "Confiscated Items Locker",
+    "text": "The supply trolley is on its side but the sealed containers are intact. The labels are intake manifest codes — everything confiscated from arriving prisoners during processing.\n\nSome of this was taken from the other world-representatives. You can tell by the markings — one container has script you've never seen, from a world the competition has presumably already finished with. Whatever they brought, it's yours now.\n\nThe locker on the east wall is still locked, but the hasp is bent.",
+    "choices": [
+      {
+        "text": "Take the sealed medical container",
+        "nextScene": "quarantine_lockdown",
+        "effect": {
+          "giveItem": "big_potion"
+        }
+      },
+      {
+        "text": "Take the currency pouch — facility scrip, still spendable",
+        "nextScene": "quarantine_lockdown",
+        "effect": {
+          "giveGold": 35
+        }
+      },
+      {
+        "text": "Pry the locker open — something rattles inside",
+        "nextScene": "quarantine_lockdown",
+        "effect": {
+          "damage": 8,
+          "giveItem": "big_potion",
+          "giveGold": 15
+        }
+      },
+      {
+        "text": "Search the trolley frame — intake manifests sometimes have a secondary compartment",
+        "nextScene": "quarantine_lockdown",
+        "effect": {
+          "giveItem": "antidote",
+          "giveGold": 12
+        },
+        "once": true,
+        "condition": {
+          "perception": 1
+        }
+      }
+    ]
+  },
+  "quarantine_lockdown": {
+    "id": "quarantine_lockdown",
+    "map": {
+      "x": 6,
+      "y": 3,
+      "name": "Q-ZONE",
+      "tag": "combat",
+      "connections": [
+        "reward_room",
+        "ward_observation"
+      ]
+    },
+    "title": "Quarantine Lockdown",
+    "text": "The locker room exit seals before you reach it. White lights flare across the floor in a scanning grid. The warped prisoners in the ward were not the only failed subjects.\n\nA half-processed intake subject pulls itself out of an observation cradle, still dragging restraint cables. Its wrist tag flashes: QUARANTINE BREACH.",
+    "combat": {
+      "name": "Quarantine Breach",
+      "hp": 38,
+      "attack": 12,
+      "defense": 1,
+      "xp": 34,
+      "goldReward": 10,
+      "loot": [
+        "antidote"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "poison_hit",
+        "quick_strike",
+        "frenzy"
+      ]
+    },
+    "fleeScene": "reward_room",
+    "victoryScene": "ward_observation",
+    "choices": []
+  },
+  "ward_observation": {
+    "id": "ward_observation",
+    "map": {
+      "x": 6,
+      "y": 4,
+      "name": "OBSERV",
+      "tag": "event",
+      "connections": [
+        "quarantine_lockdown",
+        "containment_hall"
+      ]
+    },
+    "type": "event",
+    "title": "Observation Theater",
+    "text": "Beyond quarantine, the ward becomes clinical. A tiered observation room overlooks a treatment floor below. The glass is cracked from the inside.\n\nScreens still loop archived footage: prisoners waking, screaming, changing, then being tagged as failed assets. One clip shows the service corridor code projected on a monitor before the feed cuts out.",
+    "choices": [
+      {
+        "text": "Copy the service code fragment and descend to containment",
+        "nextScene": "containment_hall",
+        "effect": {
+          "giveGold": 12
+        }
+      },
+      {
+        "text": "Search the observation desk for supplies",
+        "effect": {
+          "giveItem": "antidote"
+        },
+        "once": true
+      }
+    ]
+  },
+  "containment_hall": {
+    "id": "containment_hall",
+    "map": {
+      "x": 6,
+      "y": 6,
+      "name": "CNTAIN",
+      "tag": "combat",
+      "connections": [
+        "ward_observation",
+        "specimen_records"
+      ]
+    },
+    "title": "Containment Hall",
+    "text": "The containment hall is all reinforced glass and emergency foam. Most cells are empty. One is not.\n\nThe thing inside was halfway through becoming something useful to the Overseers when the lockdown failed. It throws itself through the cracked door before you can pass.",
+    "combat": {
+      "name": "Containment Specimen",
+      "hp": 44,
+      "attack": 14,
+      "defense": 2,
+      "xp": 44,
+      "goldReward": 12,
+      "loot": [
+        "small_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "poison_hit",
+        "frenzy",
+        "crushing_blow"
+      ]
+    },
+    "fleeScene": "ward_observation",
+    "victoryScene": "specimen_records",
+    "choices": []
+  },
+  "specimen_records": {
+    "id": "specimen_records",
+    "map": {
+      "x": 5,
+      "y": 4,
+      "name": "SPCLOG",
+      "tag": "treasure",
+      "connections": [
+        "containment_hall",
+        "merge_room"
+      ]
+    },
+    "type": "event",
+    "title": "Specimen Records Archive",
+    "text": "The records archive is colder than the hall. Specimen files sit in sealed wall slots, each marked by world and viability rating. Earth has no rating yet.\n\nThe central terminal offers a ward route authorization in exchange for confirming the containment breach has been neutralized. It is not asking whether you survived. It can see that part.",
+    "choices": [
+      {
+        "text": "Confirm the breach is neutralized and enter the junction",
+        "nextScene": "merge_room",
+        "effect": {
+          "giveItem": "ward_route_token",
+          "giveGold": 15
+        }
+      },
+      {
+        "text": "Open a refrigerated med slot before leaving",
+        "effect": {
+          "giveItem": "stabilizer_charm"
+        },
+        "once": true
+      }
+    ]
+  },
+  "merge_room": {
+    "id": "merge_room",
+    "map": {
+      "x": 4,
+      "y": 4,
+      "name": "JUNCTN",
+      "tag": "event",
+      "connections": [
+        "armory_lockup",
+        "specimen_records",
+        "warden_trap",
+        "supply_cache",
+        "alchemy_lab",
+        "maintenance_refuge",
+        "peril_room",
+        "secret_room"
+      ]
+    },
+    "title": "Prison Junction",
+    "text": "The junction is a wide security hub — monitoring stations on three walls, most screens dark. One is still active, cycling through facility camera feeds: empty corridors, open cells, a top-down view of the ward you came through.\n\nA second screen shows a competition feed. Text scrolls: 'ACTIVE COMPETITORS — FLOOR 1: 3. FLOORS 2+: 4. ELIMINATED: 3.' Then: 'WORLD-EARTH REPRESENTATIVE ADVANCING. RANK: UNCONFIRMED.'\n\nThree side passages lead off the hub. Ahead, a heavy door marked RESTRICTED ACCESS — WARDEN AUTHORIZATION REQUIRED.\n\nYou check your condition before going further.",
+    "choices": [
+      {
+        "text": "Check the guard break room off the left passage",
+        "nextScene": "warden_trap",
+        "requires": {
+          "route": "security"
+        }
+      },
+      {
+        "text": "Look in the medical station to the right",
+        "nextScene": "supply_cache",
+        "requires": {
+          "route": "security"
+        }
+      },
+      {
+        "text": "Follow the chemical smell from the back passage",
+        "nextScene": "alchemy_lab",
+        "requires": {
+          "route": "ward"
+        }
+      },
+      {
+        "text": "Enter the lit maintenance refuge beside the checkpoint",
+        "nextScene": "maintenance_refuge",
+        "requires": {
+          "route": "ward"
+        }
+      },
+      {
+        "text": "Push through the RESTRICTED ACCESS door with security route authorization",
+        "nextScene": "peril_room",
+        "requires": {
+          "items": [
+            "security_route_token",
+            "security_clearance",
+            "warden_override"
+          ]
+        }
+      },
+      {
+        "text": "Push through the RESTRICTED ACCESS door with ward route authorization",
+        "nextScene": "peril_room",
+        "requires": {
+          "items": [
+            "ward_route_token",
+            "overseer_code"
+          ]
+        }
+      },
+      {
+        "text": "Use the six-digit service code with your route token",
+        "nextScene": "peril_room",
+        "requires": {
+          "items": [
+            "overseer_code"
+          ]
+        }
+      },
+      {
+        "text": "Examine the scored marks on the east wall — a pattern, not damage",
+        "nextScene": "secret_room",
+        "condition": {
+          "perception": 2
+        },
+        "requires": {
+          "route": "ward"
+        }
+      }
+    ]
+  },
+  "warden_trap": {
+    "id": "warden_trap",
+    "map": {
+      "x": 1,
+      "y": 5,
+      "name": "BRKRM",
+      "tag": "treasure",
+      "connections": [
+        "merge_room",
+        "hall_return",
+        "dead_end_passage"
+      ]
+    },
+    "type": "event",
+    "title": "Guard Break Room",
+    "text": "A staff room — lockers, a table with cold rations, a duty roster on the wall. The last shift entry is dated the day the competition started. No entries after.\n\nOne locker hangs open. Another is padlocked. On the table: a forgotten personal kit, small, zipped.\n\nThe floor near the padlocked locker has the faint outline of pressure sensors — maintenance grade. Obvious if you know what to look for. A secondary door at the back, marked SUB-LEVEL ACCESS, stands slightly ajar — cold air rises from below.",
+    "choices": [
+      {
+        "text": "Search the open locker — reach carefully",
+        "effect": {
+          "damage": 6,
+          "giveItem": "small_potion",
+          "giveGold": 10
+        },
+        "once": true
+      },
+      {
+        "text": "Force the padlocked locker — step over the sensor plates",
+        "effect": {
+          "damage": 15,
+          "giveItem": "big_potion"
+        },
+        "once": true
+      },
+      {
+        "text": "Take the kit from the table",
+        "effect": {
+          "giveItem": "antidote"
+        },
+        "once": true
+      },
+      {
+        "text": "Pull the shift captain's clearance tab from the duty terminal",
+        "effect": {
+          "giveItem": "security_clearance"
+        },
+        "once": true
+      },
+      {
+        "text": "Leave the break room",
+        "nextScene": "hall_return"
+      },
+      {
+        "text": "Take the sub-level stairs — check what's below",
+        "nextScene": "dead_end_passage",
+        "once": true
+      }
+    ]
+  },
+  "supply_cache": {
+    "id": "supply_cache",
+    "map": {
+      "x": 3,
+      "y": 5,
+      "name": "SUPPLY",
+      "tag": "treasure",
+      "connections": [
+        "merge_room",
+        "hall_return"
+      ]
+    },
+    "type": "event",
+    "title": "Medical Station",
+    "text": "Institutional white walls gone yellow. Cabinets bolted shut, most locks broken. Someone moved through here quickly and took the obvious things. What's left is still useful.\n\nA treatment log on the cot has been filled out for intake subject W-7-031. The handwriting gets shakier toward the end. The notes stop mid-procedure.\n\nThe supply room behind the partition is sealed but the door lock is stripped.",
+    "choices": [
+      {
+        "text": "Search the remaining cabinets",
+        "effect": {
+          "damage": 8,
+          "giveItem": "guard_vest"
+        },
+        "once": true
+      },
+      {
+        "text": "Force the supply room — stripped lock won't hold",
+        "effect": {
+          "damage": 5,
+          "giveGold": 25,
+          "giveItem": "security_clearance"
+        },
+        "once": true
+      },
+      {
+        "text": "Leave the station",
+        "nextScene": "hall_return"
+      }
+    ]
+  },
+  "alchemy_lab": {
+    "id": "alchemy_lab",
+    "map": {
+      "x": 5,
+      "y": 5,
+      "name": "ALCH",
+      "tag": "treasure",
+      "connections": [
+        "merge_room",
+        "hall_return"
+      ]
+    },
+    "type": "event",
+    "title": "Contraband Stash",
+    "text": "The chemical smell comes from a cavity behind a false wall panel — a stash someone built over time, slowly, probably during intake processing when the guards weren't watching. Improvised equipment. Two sealed vials.\n\nOne labeled CLEAN in block letters. One with no label, amber-colored, faintly warm through the glass.\n\nThe Overseers' sensors don't cover this corner. You checked.",
+    "choices": [
+      {
+        "text": "Drink the CLEAN vial",
+        "effect": {
+          "heal": 25
+        },
+        "once": true
+      },
+      {
+        "text": "Drink the unlabeled amber vial",
+        "effect": {
+          "damage": 20,
+          "giveItem": "big_potion",
+          "giveGold": 18
+        },
+        "once": true
+      },
+      {
+        "text": "Check the false panel edge — a second cavity inside the first",
+        "effect": {
+          "giveItem": "warden_override"
+        },
+        "once": true,
+        "condition": {
+          "perception": 1
+        }
+      },
+      {
+        "text": "Leave without touching anything",
+        "nextScene": "hall_return"
+      }
+    ]
+  },
+  "hall_return": {
+    "id": "hall_return",
+    "map": {
+      "x": 4,
+      "y": 5,
+      "name": "HALL",
+      "tag": "event",
+      "connections": [
+        "warden_trap",
+        "supply_cache",
+        "alchemy_lab",
+        "maintenance_refuge",
+        "merge_room"
+      ]
+    },
+    "title": "Back to the Junction",
+    "text": "You retrace your steps to the security hub. The competition feed is still scrolling on the active monitor. The RESTRICTED ACCESS door ahead hasn't moved. Three competitors still active on this floor — you, and two others you haven't seen yet.",
+    "choices": [
+      {
+        "text": "Return to the junction",
+        "nextScene": "merge_room"
+      }
+    ]
+  },
+  "maintenance_refuge": {
+    "id": "maintenance_refuge",
+    "map": {
+      "x": 6,
+      "y": 5,
+      "name": "REFUGE",
+      "tag": "safe",
+      "connections": [
+        "merge_room",
+        "hall_return"
+      ]
+    },
+    "type": "event",
+    "title": "Maintenance Refuge",
+    "text": "A maintenance alcove has been converted into a tiny refuge: cot, sealed water, a half-working terminal, and a hand-painted line across the threshold. SAFE WHILE LIGHT IS GREEN.\n\nThe light is green. For now.\n\nSomeone used this place to watch the checkpoint door. Notes on the wall explain that the Warden route needs two separate authorizations: staff security clearance and a maintenance override. Bravery does not open Overseer locks.",
+    "choices": [
+      {
+        "text": "Rest on the cot for a few minutes",
+        "effect": {
+          "heal": 20
+        },
+        "once": true
+      },
+      {
+        "text": "Pull the maintenance override from the wall terminal",
+        "effect": {
+          "giveItem": "warden_override"
+        },
+        "once": true
+      },
+      {
+        "text": "Read the warning notes about the Warden door",
+        "once": true,
+        "effect": {
+          "giveItem": "overseer_code"
+        }
+      },
+      {
+        "text": "Return to the junction",
+        "nextScene": "merge_room"
+      }
+    ]
+  },
+  "secret_room": {
+    "id": "secret_room",
+    "map": {
+      "x": 7,
+      "y": 5,
+      "name": "SECRET",
+      "tag": "secret",
+      "connections": [
+        "merge_room"
+      ]
+    },
+    "type": "event",
+    "title": "Hidden Cell Block",
+    "text": "The marks aren't random. It takes a moment to resolve — a hand-width pattern pressed into the stone at regular intervals, forming a frame around a section of wall. You push. The panel swings inward on dry hinges.\n\nA cell beyond, converted into a living space. Neat, organized, occupied for a while. On the wall: a full schematic of the facility's upper block, annotated carefully. A note in the margin reads: 'Warden has two states. Patient and not. The second one is faster but it burns out. Wait it out if you can.'\n\nThe desk holds a personal log. The last entry: 'Day 14. World-4 still running. Getting harder to think clearly. The intake process leaves residue.' It stops there.\n\nA cache is tucked under the cot. Whoever lived here either made it out or didn't need it anymore. Behind the filing cabinet, the stone doesn't sit quite right — a seam runs where there shouldn't be one.",
+    "choices": [
+      {
+        "text": "Take the medical supplies from the cache",
+        "effect": {
+          "giveItem": "big_potion"
+        },
+        "once": true
+      },
+      {
+        "text": "Study the combat schematic — learn the Warden's pattern",
+        "effect": {
+          "giveItem": "cracked_lens"
+        },
+        "once": true
+      },
+      {
+        "text": "Take the currency bundle from the desk",
+        "effect": {
+          "giveGold": 45
+        },
+        "once": true
+      },
+      {
+        "text": "Pick up the focus ring on the windowsill",
+        "effect": {
+          "giveItem": "focus ring"
+        },
+        "once": true
+      },
+      {
+        "text": "Move the filing cabinet — trace the seam in the stone behind it",
+        "condition": {
+          "perception": 2
+        },
+        "once": true,
+        "nextScene": "overseer_antechamber"
+      },
+      {
+        "text": "Seal the panel and return to the junction",
+        "nextScene": "merge_room"
+      }
+    ]
+  },
+  "peril_room": {
+    "id": "peril_room",
+    "map": {
+      "x": 4,
+      "y": 6,
+      "name": "PERIL",
+      "tag": "event",
+      "connections": [
+        "merge_room",
+        "deadly_room",
+        "overseer_antechamber"
+      ]
+    },
+    "type": "event",
+    "title": "Security Lockdown Corridor",
+    "text": "The RESTRICTED door seals behind you with a magnetic click. Overhead lights shift to red. A recorded voice begins: 'Unauthorized access detected. Initiating lockdown protocol.'\n\nHeavy security grates begin descending from the ceiling on both ends of the corridor — slow but inevitable. Between them: a checkpoint door with a keypad. On the floor near the far grate, a sealed supply container sits where someone dropped it in a hurry.\n\nThe grates have maybe thirty seconds before they're fully down. To the side, barely visible in the red light, is a second door — flush with the wall, no signage, a recessed keypad with a six-digit input panel.",
+    "choices": [
+      {
+        "text": "Present both Warden authorizations at the checkpoint",
+        "nextScene": "deadly_room",
+        "requires": {
+          "items": [
+            "security_clearance",
+            "warden_override"
+          ]
+        }
+      },
+      {
+        "text": "Slide under the far grate and grab the container",
+        "nextScene": "deadly_room",
+        "effect": {
+          "damage": 12,
+          "giveItem": "big_potion"
+        },
+        "requires": {
+          "items": [
+            "security_clearance",
+            "warden_override"
+          ]
+        }
+      },
+      {
+        "text": "Use the staff clearance on the keypad — authorized override",
+        "nextScene": "deadly_room",
+        "effect": {
+          "giveGold": 15
+        },
+        "requires": {
+          "items": [
+            "security_clearance",
+            "warden_override"
+          ]
+        }
+      },
+      {
+        "text": "Brace both grates simultaneously — hold them open long enough",
+        "nextScene": "deadly_room",
+        "effect": {
+          "giveItem": "small_potion"
+        },
+        "condition": {
+          "stat": "hp",
+          "operator": ">=",
+          "value": 70
+        },
+        "requires": {
+          "items": [
+            "security_clearance",
+            "warden_override"
+          ]
+        }
+      },
+      {
+        "text": "Enter the six-digit code on the recessed panel — access the service corridor",
+        "requires": {
+          "item": "overseer_code"
+        },
+        "nextScene": "overseer_antechamber"
+      },
+      {
+        "text": "Retreat to the junction and search for authorizations",
+        "nextScene": "merge_room"
+      }
+    ]
+  },
+  "deadly_room": {
+    "id": "deadly_room",
+    "map": {
+      "x": 4,
+      "y": 7,
+      "name": "ENFRCR",
+      "tag": "combat",
+      "connections": [
+        "peril_room",
+        "boss_room"
+      ]
+    },
+    "title": "Processing Checkpoint",
+    "text": "A staging area beyond the lockdown corridor — wide, built for processing large numbers at once. Strip lighting. Drain channels in the floor. You don't want to think about what for.\n\nNot empty.\n\nA senior enforcer waits at the far end. Larger than the intake guards, armor reinforced at the joints, carrying a shock baton that hums with active charge. They've been watching your progress on the monitors.\n\n'End of the line, Earth-001.' They know your designation. Of course they do. Everything in this facility is logged.",
+    "combat": {
+      "name": "Senior Enforcer",
+      "hp": 50,
+      "attack": 13,
+      "defense": 5,
+      "xp": 65,
+      "goldReward": 22,
+      "loot": [
+        "small_potion",
+        "big_potion",
+        "antidote",
+        "shock_baton"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "cleave",
+        "battle_roar",
+        "crushing_blow"
+      ]
+    },
+    "fleeScene": "merge_room",
+    "victoryScene": "boss_room",
+    "choices": []
+  },
+  "boss_room": {
+    "id": "boss_room",
+    "map": {
+      "x": 4,
+      "y": 8,
+      "name": "BOSS",
+      "tag": "boss",
+      "connections": [
+        "deadly_room",
+        "end_room"
+      ]
+    },
+    "title": "The Warden's Office",
+    "text": "A wide corridor beyond the checkpoint leads to double doors — institutional metal, recently cleaned. A plaque reads: FACILITY DIRECTOR.\n\nThe Warden.\n\nYou know the designation from the competition feed, but the details are classified. Former world-representative. Former competitor. Placed well enough in a previous cycle to survive, but not well enough to go free — so the Overseers kept them and put them to work. That's what rank 3 or 4 gets you. That's what you're trying to avoid.\n\nThe doors open before you touch them.\n\nInside: the furniture has been cleared to the walls, leaving an open floor. The Warden stands at the center. Tall. Composed. They're wearing their world's combat equipment under a layer of Overseer-installed control hardware — slim collar, two bracelet nodes, a cortical sensor at the temple.\n\nThey look at you for a moment. Then: 'You made it further than most do on the first floor.' A pause that feels like a calculation. 'That ends here.'",
+    "combat": {
+      "name": "The Warden",
+      "phaseName": "In Control",
+      "hp": 70,
+      "attack": 18,
+      "defense": 8,
+      "xp": 300,
+      "goldReward": 130,
+      "loot": [
+        "warden_badge",
+        "big_potion",
+        "warden_shackle"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "shield_bash",
+        "armor_break",
+        "heavy_hit"
+      ],
+      "intro": "The Warden does not rush. They advance with the patience of someone who has ended this same fight many times before. The control hardware on their body pulses at a steady interval.",
+      "victoryText": "The composure breaks before the body does. A sound that might be surprise — or recognition. The Warden drops to one knee. The control hardware goes dark: collar, bracelet nodes, all of it.\n\nThey look up. The eyes are clearer now without the Overseers' systems running. 'World... Four...' Then nothing. They settle to the floor.\n\nThe competition continues. The Warden will not be sending any more performance reports.",
+      "phases": [
+        {
+          "phaseName": "Unshackled",
+          "hp": 50,
+          "attack": 19,
+          "defense": 4,
+          "type": "aggressive",
+          "abilities": [
+            "enraged_strike",
+            "sweeping_attack",
+            "armor_break"
+          ],
+          "intro": "The control hardware flickers — then goes to emergency override. Whatever protocol the Overseers installed to keep the Warden compliant just failed. The person underneath, the one who was a competitor once and lost, comes through all at once. The movement changes completely. This is not patience. This is rage that has been waiting a very long time."
+        }
+      ]
+    },
+    "fleeScene": "deadly_room",
+    "victoryScene": "end_room",
+    "choices": []
+  },
+  "end_room": {
+    "id": "end_room",
+    "map": {
+      "x": 4,
+      "y": 9,
+      "name": "EXIT",
+      "tag": "event",
+      "connections": [
+        "boss_room"
+      ]
+    },
+    "title": "Floor Clear — Ascending",
+    "text": "The service elevator at the far end of the facility's upper level responds to your clearance — combat authorization from defeating the Warden, or administrative authorization from the Overseer's evaluation. The lock reads either the same way.\n\nYou step in. The doors close.\n\nThe Overseers' signal cuts through almost immediately, neutral and precise: 'World-Earth representative. Floor 1 performance logged. Method noted. Advancing to Floor 2.'\n\nA pause that feels longer than it should — then: 'Current field: 6 active competitors across all floors. Earth rank: unconfirmed. Competition continues.'\n\nThe elevator rises. The intake prison drops away. Whatever is on Floor 2, it is not a prison. The Overseers built this place to filter the weak. You are not that.\n\nNot yet.",
+    "giveGold": 50,
+    "choices": [
+      {
+        "text": "Step into Floor 2. [FLOOR 1 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
+  },
+  "lore_room": {
+    "id": "lore_room",
+    "map": {
+      "x": 0,
+      "y": 2,
+      "name": "RCORDS",
+      "tag": "secret",
+      "connections": [
+        "left_crack"
+      ]
+    },
+    "title": "Prisoner Processing Records",
+    "text": "A cramped supply alcove behind the crack in the wall, invisible unless you're looking for it. Filing cabinets line three walls — most drawers welded shut or locked, but one is wedged open with a bent piece of rebar.\n\nInside: intake forms. Competitor profiles from the current cycle and at least two previous ones. Evaluation logs annotated in three different writing systems. The administrative machinery of a dungeon that predates your world's entry into the competition by decades.\n\nOne file is thicker than the others. The name is blacked out in red, but the designation is visible: FLOOR 1 OVERSEER — INTAKE DIVISION. The attached performance log is mostly neutral. The final entry is not: 'Subject continues to withhold evaluation protocol disclosure from challengers despite standing requirement. Third notice filed. No corrective action taken. Recommend continued monitoring.'\n\nStapled to the file, on an adhesive strip: a six-digit access code.\n\nYou recognize the format — service corridor authorization. Somewhere in this facility, there is a door this code opens. The Overseers know challengers could find it. They haven't removed it.",
+    "choices": [
+      {
+        "text": "Copy the access code — this could open something",
+        "once": true,
+        "effect": {
+          "giveItem": "overseer_code"
+        }
+      },
+      {
+        "text": "Read the competitor profiles — study the ones who came before you",
+        "once": true
+      },
+      {
+        "text": "Leave the records room",
+        "nextScene": "left_crack"
+      }
+    ]
+  },
+  "merchant_room": {
+    "id": "merchant_room",
+    "map": {
+      "x": 7,
+      "y": 3,
+      "name": "TRADER",
+      "tag": "safe",
+      "connections": [
+        "right_upstream",
+        "rival_room"
+      ]
+    },
+    "title": "Salvage Trader's Alcove",
+    "text": "A World 6 competitor has set up in the maintenance alcove at the end of the secondary block. Former active entrant — delisted after a draw in a previous cycle and reassigned as a neutral observer with limited trading privileges. They've been in this dungeon for two seasons. It shows.\n\nThey look up when you enter. 'Earth. Current cycle.' Not hostile. Not warm.\n\nA folding case is open between them. Items arranged with the precision of someone who has survived a long time by being very careful about everything. They sell. They don't fight. The Overseers consider them useful infrastructure.\n\n'You're the first one to make it this far in your cycle,' they say. 'The others didn't check the side block.'",
+    "choices": [
+      {
+        "text": "Buy a Small Potion (15 gold)",
+        "requires": {
+          "gold": 15
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "small_potion",
+          "spendGold": 15
+        }
+      },
+      {
+        "text": "Buy an Antidote (10 gold)",
+        "requires": {
+          "gold": 10
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "antidote",
+          "spendGold": 10
+        }
+      },
+      {
+        "text": "Buy a Training Sword (25 gold)",
+        "requires": {
+          "gold": 25
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "training_sword",
+          "spendGold": 25
+        }
+      },
+      {
+        "text": "Buy a Guard Vest (30 gold)",
+        "requires": {
+          "gold": 30
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "guard_vest",
+          "spendGold": 30
+        }
+      },
+      {
+        "text": "Ask about the floor's layout — what's ahead",
+        "once": true,
+        "effect": {
+          "giveItem": "trader_intel"
+        }
+      },
+      {
+        "text": "Ask about the previous challengers on this floor",
+        "once": true
+      },
+      {
+        "text": "Ask what this place is and what has to be done",
+        "once": true
+      },
+      {
+        "text": "Ask how the Warden door opens",
+        "once": true
+      },
+      {
+        "text": "Investigate the other competitor at the back of the alcove — you're not alone here",
+        "once": true,
+        "nextScene": "rival_room"
+      },
+      {
+        "text": "Leave the alcove",
+        "nextScene": "right_upstream"
+      }
+    ]
+  },
+  "rival_room": {
+    "id": "rival_room",
+    "map": {
+      "x": 7,
+      "y": 4,
+      "name": "RIVAL",
+      "tag": "combat",
+      "connections": [
+        "merchant_room"
+      ]
+    },
+    "title": "Ward Corridor — Rival Encounter",
+    "text": "Coming around the alcove's inner corridor, you nearly walk into them.\n\nWorld 3 representative. Fast — already in a combat stance before you've fully processed what you're looking at. The competition ID is etched into their equipment: TARION / W3-047 / ACTIVE. They've been here longer than you. Their gear shows it.\n\n'Earth.' They say your world like it's a category. Not hostile. Not friendly. A flat assessment.\n\n'Same floor.' A pause. 'Same checkpoint coming up. Only one authorized passage per competitor.'\n\nThey don't give you time to respond. Competition logic: if you're here, you're in the way.",
+    "combat": {
+      "name": "Tarion, W3 Ranger",
+      "hp": 40,
+      "attack": 14,
+      "defense": 4,
+      "xp": 60,
+      "goldReward": 25,
+      "loot": [
+        "antidote",
+        "small_potion",
+        "warden_override",
+        "ranger_cloak"
+      ],
+      "type": "trickster",
+      "abilities": [
+        "quick_strike",
+        "dodge",
+        "poison_hit"
+      ]
+    },
+    "fleeScene": "merchant_room",
+    "victoryScene": "merchant_room",
+    "choices": []
+  },
+  "dead_end_passage": {
+    "id": "dead_end_passage",
+    "map": {
+      "x": 1,
+      "y": 6,
+      "name": "CELLAR",
+      "tag": "combat",
+      "connections": [
+        "warden_trap",
+        "dead_end_loot"
+      ]
+    },
+    "title": "Sub-Level — Detention Corridor",
+    "text": "The stairs descend into a lower corridor — older than the main facility, stone rather than processed material. The air is cold and stagnant. Emergency lighting only, half the strips dark.\n\nAt the far end: a sentry. Not standard prison staff — older hardware, a security model the facility retired at least a decade ago. It's still running on its original protocols. It has no context for the competition, no concept of the Overseers. It just knows unauthorized access when it detects it.\n\nThe corridor dead-ends behind it. Whatever this section was built for, it's not used anymore.",
+    "combat": {
+      "name": "Rogue Sentry",
+      "hp": 30,
+      "attack": 9,
+      "defense": 5,
+      "xp": 45,
+      "goldReward": 15,
+      "loot": [
+        "small_potion",
+        "sentry_plate"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "shield_bash",
+        "crushing_blow"
+      ]
+    },
+    "fleeScene": "warden_trap",
+    "victoryScene": "dead_end_loot",
+    "choices": []
+  },
+  "dead_end_loot": {
+    "id": "dead_end_loot",
+    "map": {
+      "x": 1,
+      "y": 7,
+      "name": "VAULT",
+      "tag": "treasure",
+      "connections": [
+        "dead_end_passage"
+      ]
+    },
+    "title": "Sub-Level — Detention Vault",
+    "text": "With the sentry down, the corridor end resolves: a single detention cell, long-term, occupied for an extended period and recently vacated. The person who lived here either left when the competition started or was moved.\n\nThe cell is stripped of most personal effects, but they didn't get everything. Wall messages scratched over weeks or months — a count of days, names of other competitors, fragments of notation in a script you can't read. One message is in your language: 'If you found this, you went deeper than most. That's something. Use it.'\n\nUnder the thin mattress, something wrapped in cloth.",
+    "choices": [
+      {
+        "text": "Search the mattress — unwrap what's hidden there",
+        "once": true,
+        "effect": {
+          "giveGold": 20,
+          "giveItem": "warden_override"
+        }
+      },
+      {
+        "text": "Read the wall messages carefully — trace the full count of days",
+        "once": true
+      },
+      {
+        "text": "Head back up to the break room",
+        "nextScene": "warden_trap"
+      }
+    ]
+  },
+  "overseer_antechamber": {
+    "id": "overseer_antechamber",
+    "map": {
+      "x": 5,
+      "y": 6,
+      "name": "SRVWNG",
+      "tag": "event",
+      "connections": [
+        "peril_room",
+        "overseer_chamber"
+      ]
+    },
+    "title": "Service Wing — Restricted Access",
+    "text": "The code works. The door opens — or if you found the hidden passage from the secret cell block, you step through into the same space from a different direction.\n\nThe service wing is different from everything else in this facility. Carpeted floor, worn flat but still there. Climate-controlled air that actually functions. The hum of processing equipment from behind a wall, regular and unhurried.\n\nA sign: FLOOR 1 INTAKE OVERSIGHT — AUTHORIZED PERSONNEL ONLY.\n\nBelow it, handwritten on a laminated card: Evaluation requests acknowledged during active competition windows. Current window: OPEN.\n\nThe door at the end of the corridor is unlocked. Someone has been expecting challengers to reach this point. Or they've been hoping they wouldn't.",
+    "choices": [
+      {
+        "text": "Proceed to the Overseer's office",
+        "nextScene": "overseer_chamber"
+      },
+      {
+        "text": "Turn back to the checkpoint corridor",
+        "nextScene": "peril_room"
+      }
+    ]
+  },
+  "overseer_chamber": {
+    "id": "overseer_chamber",
+    "map": {
+      "x": 5,
+      "y": 7,
+      "name": "OVSEER",
+      "tag": "boss",
+      "connections": [
+        "overseer_antechamber",
+        "evaluation_argument"
+      ]
+    },
+    "title": "The Overseer's Station",
+    "text": "The office is orderly. Systematically maintained in a way that suggests either deep discipline or something very close to obsession.\n\nThe Overseer sits behind a workstation built for monitoring intake assessments — a dozen screens showing facility feeds, competitor tracking data, performance logs. They're smaller than you expected, and older. No collar, no bracelet nodes, no combat hardware of any kind. Administrative uniform, recently pressed.\n\nThey look up when you enter. They don't reach for anything.\n\n'World-Earth representative.' Their voice is level. 'You found the service corridor. Most don't.'\n\nA pause while they pull up a file on the terminal. Your file.\n\n'Under competition protocol, article 7, section B — any challenger who reaches a floor's overseer station before the primary combat clearance may request formal evaluation as an alternative completion method. Most Overseers don't inform challengers of this. I am required to honor requests.'\n\nAnother pause.\n\n'The evaluation is not easy. And it does not spare you from what comes after Floor 1.'",
+    "choices": [
+      {
+        "text": "Invoke Evaluation Protocol 7-B — cite the access code from the records",
+        "requires": {
+          "item": "overseer_code"
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "cipher_fragment",
+          "giveGold": 80
+        },
+        "nextScene": "end_room"
+      },
+      {
+        "text": "Request a formal evaluation — proceed through the standard assessment",
+        "nextScene": "evaluation_argument"
+      },
+      {
+        "text": "Ask what happened to the previous challengers who reached this floor",
+        "once": true
+      },
+      {
+        "text": "Ask what the Overseer actually knows about the competition — and Earth's position",
+        "once": true
+      },
+      {
+        "text": "Turn back — reconsider the combat route",
+        "nextScene": "overseer_antechamber"
+      }
+    ]
+  },
+  "evaluation_argument": {
+    "id": "evaluation_argument",
+    "map": {
+      "x": 5,
+      "y": 8,
+      "name": "EVLARG",
+      "tag": "event",
+      "connections": [
+        "overseer_chamber"
+      ]
+    },
+    "title": "The Evaluation — Formal Assessment",
+    "text": "The Overseer activates a secondary terminal. Three assessment criteria appear on the display: adaptive reasoning under pressure, resource management across uncertain conditions, and systemic compliance awareness.\n\n'These are the standard completion metrics for Floor 1,' they say. 'You have been evaluated against them since you entered the facility. This is the formal request for the results to count toward floor completion rather than raw combat performance.'\n\nThey wait. They've done this before — or they haven't, and this is the first time anyone has made it this far. You can't tell which.\n\n'Address the criteria. Or don't. The choice is yours, and it is the last one you make on this floor either way.'",
+    "choices": [
+      {
+        "text": "Present the documentation from the intake records — the criteria are written in the protocol",
+        "requires": {
+          "item": "overseer_code"
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "cipher_fragment",
+          "giveGold": 60
+        },
+        "nextScene": "end_room"
+      },
+      {
+        "text": "Argue the case: reaching this point demonstrates all three criteria more completely than combat would",
+        "condition": {
+          "perception": 1
+        },
+        "once": true,
+        "effect": {
+          "giveItem": "cipher_fragment",
+          "giveGold": 60
+        },
+        "nextScene": "end_room"
+      },
+      {
+        "text": "Accept the evaluation criteria without contestation — answer honestly what you can",
+        "once": true,
+        "effect": {
+          "giveItem": "cipher_fragment",
+          "giveGold": 30
+        },
+        "nextScene": "end_room"
+      },
+      {
+        "text": "Challenge the Overseer's authority — this protocol was never disclosed to challengers",
+        "once": true,
+        "nextScene": "overseer_antechamber"
+      },
+      {
+        "text": "Turn back and reconsider",
+        "nextScene": "overseer_antechamber"
+      }
+    ]
+  },
+  "floor2_safe_room": {
+    "id": "floor2_safe_room",
+    "map": {
+      "x": 4,
+      "y": 10,
+      "name": "SAFE",
+      "tag": "safe",
+      "connections": [
+        "floor2_red_door",
+        "floor2_blue_door",
+        "floor2_black_door"
+      ]
+    },
+    "type": "safe",
+    "title": "Floor 2 - Transit Safe Room",
+    "text": "The elevator opens into a room that feels deliberately untouched. Clean cot. Working sink. A trader waits behind a reinforced counter, sorting inventory without looking up. Three sealed doors line the far wall: red, blue, and black. The lock panel beside them has one warning: EXIT SELECTION FINAL.",
+    "choices": [
+      {
+        "text": "Rest on the bed before choosing a door",
+        "effect": {
+          "heal": 35
+        },
+        "once": true
+      },
+      {
+        "text": "Buy Large Potion - 35 gold",
+        "requires": {
+          "gold": 35
+        },
+        "effect": {
+          "giveItem": "large_potion",
+          "spendGold": 35
+        },
+        "once": true
+      },
+      {
+        "text": "Buy Phase Edge - 70 gold",
+        "requires": {
+          "gold": 70
+        },
+        "effect": {
+          "giveItem": "phase_edge",
+          "spendGold": 70
+        },
+        "once": true
+      },
+      {
+        "text": "Buy Mesh Armor - 75 gold",
+        "requires": {
+          "gold": 75
+        },
+        "effect": {
+          "giveItem": "mesh_armor",
+          "spendGold": 75
+        },
+        "once": true
+      },
+      {
+        "text": "Buy Calibrated Lens - 60 gold",
+        "requires": {
+          "gold": 60
+        },
+        "effect": {
+          "giveItem": "floor2_lens",
+          "spendGold": 60
+        },
+        "once": true
+      },
+      {
+        "text": "Leave through the red door",
+        "nextScene": "floor2_red_door"
+      },
+      {
+        "text": "Leave through the blue door",
+        "nextScene": "floor2_blue_door"
+      },
+      {
+        "text": "Leave through the black door",
+        "nextScene": "floor2_black_door"
+      }
+    ]
+  },
+  "floor2_red_door": {
+    "id": "floor2_red_door",
+    "map": {
+      "x": 2,
+      "y": 11,
+      "name": "RED",
+      "tag": "event",
+      "connections": [
+        "floor2_pressure_gallery"
+      ]
+    },
+    "title": "Floor 2 - Red Door",
+    "text": "The red door seals behind you with a pressure lock. Heat rolls through the corridor ahead, carrying the smell of scorched dust and machine oil. This route does not charge at you. It waits, full of old systems that can still be used by someone patient enough to read them.",
+    "choices": [
+      {
+        "text": "Advance into the pressure gallery",
+        "nextScene": "floor2_pressure_gallery"
+      }
+    ]
+  },
+  "floor2_pressure_gallery": {
+    "id": "floor2_pressure_gallery",
+    "map": {
+      "x": 2,
+      "y": 12,
+      "name": "PRESS",
+      "tag": "event",
+      "connections": [
+        "floor2_broken_checkpoint",
+        "floor2_supply_fault"
+      ]
+    },
+    "title": "Floor 2 - Pressure Gallery",
+    "text": "A long gallery stretches ahead, its floor divided into metal plates. Some sit a fraction lower than the others. The wall monitors still work, but every display shows a different pressure reading. Someone crossed here recently and marked a narrow route in chalk. Someone else crossed after them and scratched half the marks away.",
+    "choices": [
+      {
+        "text": "Follow the remaining chalk marks toward the checkpoint",
+        "nextScene": "floor2_broken_checkpoint"
+      },
+      {
+        "text": "Search the side maintenance locker",
+        "nextScene": "floor2_supply_fault"
+      },
+      {
+        "text": "Cross directly through the unstable plates",
+        "effect": {
+          "damage": 8,
+          "giveGold": 12
+        },
+        "nextScene": "floor2_broken_checkpoint"
+      }
+    ]
+  },
+  "floor2_broken_checkpoint": {
+    "id": "floor2_broken_checkpoint",
+    "map": {
+      "x": 3,
+      "y": 13,
+      "name": "CHECK",
+      "tag": "event",
+      "connections": [
+        "floor2_pressure_gallery",
+        "floor2_observation_nest",
+        "floor2_service_crawl"
+      ]
+    },
+    "title": "Floor 2 - Broken Checkpoint",
+    "text": "The checkpoint booth has been torn open from the inside. A security scanner sweeps the corridor in a lazy red arc, too damaged to identify you but not damaged enough to ignore. Above the booth, an observation hatch hangs open.",
+    "choices": [
+      {
+        "text": "Time the damaged scanner and slip through",
+        "nextScene": "floor2_service_crawl"
+      },
+      {
+        "text": "Climb into the observation hatch",
+        "nextScene": "floor2_observation_nest"
+      },
+      {
+        "text": "Force the scanner to cycle early",
+        "effect": {
+          "damage": 6,
+          "giveGold": 10
+        },
+        "nextScene": "floor2_service_crawl"
+      }
+    ]
+  },
+  "floor2_observation_nest": {
+    "id": "floor2_observation_nest",
+    "map": {
+      "x": 1,
+      "y": 13,
+      "name": "NEST",
+      "tag": "secret",
+      "connections": [
+        "floor2_broken_checkpoint"
+      ]
+    },
+    "title": "Floor 2 - Observation Nest",
+    "text": "The hatch opens into a cramped watcher station above the checkpoint. Dusty screens show fragments of the three Floor 2 lanes: red systems, blue attrition corridors, black geometry that refuses to hold still. A notebook rests beside the console, written in a competitor's shorthand.",
+    "choices": [
+      {
+        "text": "Study the notebook and take the emergency vial",
+        "effect": {
+          "giveItem": "large_potion"
+        },
+        "once": true
+      },
+      {
+        "text": "Return to the checkpoint below",
+        "nextScene": "floor2_broken_checkpoint"
+      }
+    ]
+  },
+  "floor2_supply_fault": {
+    "id": "floor2_supply_fault",
+    "map": {
+      "x": 0,
+      "y": 12,
+      "name": "FAULT",
+      "tag": "treasure",
+      "connections": [
+        "floor2_pressure_gallery",
+        "floor2_service_crawl"
+      ]
+    },
+    "title": "Floor 2 - Supply Fault",
+    "text": "The maintenance locker is larger inside than it looked from the gallery. A supply lift sits jammed halfway between floors, spilling med-cases and sealed ration bricks into a mesh cage. The lift motor keeps trying to correct itself with a grinding whine.",
+    "choices": [
+      {
+        "text": "Pull the reachable med-case from the cage",
+        "effect": {
+          "giveItem": "big_potion"
+        },
+        "once": true
+      },
+      {
+        "text": "Force the jammed lift for the lower crate",
+        "effect": {
+          "damage": 10,
+          "giveGold": 25
+        },
+        "once": true
+      },
+      {
+        "text": "Use the service door beyond the locker",
+        "nextScene": "floor2_service_crawl"
+      },
+      {
+        "text": "Return to the pressure gallery",
+        "nextScene": "floor2_pressure_gallery"
+      }
+    ]
+  },
+  "floor2_service_crawl": {
+    "id": "floor2_service_crawl",
+    "map": {
+      "x": 3,
+      "y": 14,
+      "name": "CRAWL",
+      "tag": "event",
+      "connections": [
+        "floor2_broken_checkpoint",
+        "floor2_supply_fault",
+        "floor2_rival_cache",
+        "floor2_split_conduit"
+      ]
+    },
+    "title": "Floor 2 - Service Crawl",
+    "text": "The forward route narrows into a service crawlspace lined with hot conduit. Loose tags hang from the pipes, each one stamped with a different world's symbol. The crawl forks around a locked equipment niche before dropping into the conduit split.",
+    "choices": [
+      {
+        "text": "Drop down into the conduit split",
+        "nextScene": "floor2_split_conduit"
+      },
+      {
+        "text": "Pry open the rival-marked equipment niche",
+        "nextScene": "floor2_rival_cache"
+      },
+      {
+        "text": "Crawl through the hot conduit without slowing",
+        "effect": {
+          "damage": 7
+        },
+        "nextScene": "floor2_split_conduit"
+      }
+    ]
+  },
+  "floor2_rival_cache": {
+    "id": "floor2_rival_cache",
+    "map": {
+      "x": 5,
+      "y": 14,
+      "name": "CACHE",
+      "tag": "treasure",
+      "connections": [
+        "floor2_service_crawl"
+      ]
+    },
+    "title": "Floor 2 - Rival Cache",
+    "text": "The niche opens into a hidden cache marked with World-3's angular script. Whoever left it expected to come back after scouting the boss route. They did not. Inside: a field note about the shared boss and a carefully wrapped piece of equipment.",
+    "choices": [
+      {
+        "text": "Take the wrapped armor plate",
+        "effect": {
+          "giveItem": "mesh_armor"
+        },
+        "once": true
+      },
+      {
+        "text": "Read the field note and leave it for later",
+        "effect": {
+          "giveGold": 15
+        },
+        "once": true
+      },
+      {
+        "text": "Return to the service crawl",
+        "nextScene": "floor2_service_crawl"
+      }
+    ]
+  },
+  "floor2_split_conduit": {
+    "id": "floor2_split_conduit",
+    "map": {
+      "x": 3,
+      "y": 15,
+      "name": "SPLIT",
+      "tag": "event",
+      "connections": [
+        "floor2_service_crawl",
+        "floor2_gatehouse"
+      ]
+    },
+    "title": "Floor 2 - Split Conduit",
+    "text": "Two routes continue from the conduit junction. One slopes down into a maintenance bypass where the air is breathable but the footing is bad. The other cuts straight through a sparking transformer corridor, faster and nastier.",
+    "choices": [
+      {
+        "text": "Take the lower maintenance bypass",
+        "nextScene": "floor2_gatehouse"
+      },
+      {
+        "text": "Cut through the sparking transformer corridor",
+        "effect": {
+          "damage": 14,
+          "giveGold": 18
+        },
+        "nextScene": "floor2_gatehouse"
+      }
+    ]
+  },
+  "floor2_gatehouse": {
+    "id": "floor2_gatehouse",
+    "map": {
+      "x": 3,
+      "y": 16,
+      "name": "GATE",
+      "tag": "combat",
+      "connections": [
+        "floor2_split_conduit",
+        "floor2_boss_antechamber"
+      ]
+    },
+    "title": "Floor 2 - Gatehouse",
+    "text": "The lane's systems finally stop pretending to be passive. A gatehouse blocks the final corridor, its shutters half-closed and its defense unit awake behind them. It has been listening to every plate, hatch, and conduit you touched.",
+    "combat": {
+      "name": "Gatehouse Sentry",
+      "hp": 76,
+      "attack": 24,
+      "defense": 6,
+      "xp": 85,
+      "goldReward": 30,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "armor_break",
+        "shield_up"
+      ]
+    },
+    "fleeScene": "floor2_split_conduit",
+    "victoryScene": "floor2_boss_antechamber",
+    "choices": []
+  },
+  "floor2_boss_antechamber": {
+    "id": "floor2_boss_antechamber",
+    "map": {
+      "x": 3,
+      "y": 17,
+      "name": "ANTE",
+      "tag": "event",
+      "connections": [
+        "floor2_gatehouse",
+        "floor2_shared_boss"
+      ]
+    },
+    "title": "Floor 2 - Boss Antechamber",
+    "text": "Beyond the gatehouse, the red lane ends in a circular antechamber. Blue and black door symbols are carved into two sealed side arches, proof that the other routes arrive here too. Ahead, the shared boss door breathes light through its seams.",
+    "choices": [
+      {
+        "text": "Check the emergency cabinet before the boss",
+        "effect": {
+          "heal": 20
+        },
+        "once": true
+      },
+      {
+        "text": "Open the shared boss door",
+        "nextScene": "floor2_shared_boss"
+      }
+    ]
+  },
+  "floor2_blue_door": {
+    "id": "floor2_blue_door",
+    "map": {
+      "x": 8,
+      "y": 11,
+      "name": "BLUE",
+      "tag": "event",
+      "connections": [
+        "floor2_gauntlet_lock"
+      ]
+    },
+    "title": "Floor 2 - Blue Door",
+    "text": "The blue door closes with a soft pneumatic sigh. The corridor beyond is quiet, washed in cold light. Water runs somewhere under the floor grating, and every few steps the tiles click like they are counting your weight. There are no side passages here. Only the line.",
+    "choices": [
+      {
+        "text": "Enter the gauntlet lock",
+        "nextScene": "floor2_gauntlet_lock"
+      }
+    ]
+  },
+  "floor2_gauntlet_lock": {
+    "id": "floor2_gauntlet_lock",
+    "map": {
+      "x": 8,
+      "y": 12,
+      "name": "LOCK",
+      "tag": "event",
+      "connections": [
+        "floor2_blue_door",
+        "floor2_first_crush"
+      ]
+    },
+    "title": "Floor 2 - Gauntlet Lock",
+    "text": "The first chamber is a lock box. The blue door behind you seals, then a second door ahead begins counting down from ten. The room offers no route choice, only preparation time and the certainty that the gauntlet has noticed you.",
+    "choices": [
+      {
+        "text": "Brace as the second door opens",
+        "nextScene": "floor2_first_crush"
+      }
+    ]
+  },
+  "floor2_first_crush": {
+    "id": "floor2_first_crush",
+    "map": {
+      "x": 8,
+      "y": 13,
+      "name": "CRUSH",
+      "tag": "combat",
+      "connections": [
+        "floor2_gauntlet_lock",
+        "floor2_bleeder_hall"
+      ]
+    },
+    "title": "Floor 2 - First Crush",
+    "text": "A compression gate slams down behind you and a heavy frame unfolds from the ceiling. The gauntlet opens with weight, pressure, and a machine built to make backing up impossible.",
+    "combat": {
+      "name": "Crush Frame",
+      "hp": 70,
+      "attack": 25,
+      "defense": 7,
+      "xp": 80,
+      "goldReward": 18,
+      "loot": [],
+      "type": "aggressive",
+      "abilities": [
+        "crushing_blow",
+        "cleave"
+      ]
+    },
+    "fleeScene": "floor2_gauntlet_lock",
+    "victoryScene": "floor2_bleeder_hall",
+    "choices": []
+  },
+  "floor2_bleeder_hall": {
+    "id": "floor2_bleeder_hall",
+    "map": {
+      "x": 8,
+      "y": 14,
+      "name": "BLEED",
+      "tag": "event",
+      "connections": [
+        "floor2_first_crush",
+        "floor2_sentry_line"
+      ]
+    },
+    "title": "Floor 2 - Bleeder Hall",
+    "text": "The hall after the crush frame is lined with needle vents. They hiss in sequence, not enough to kill, enough to take something from you before the next fight. The floor drains are old and red-brown.",
+    "choices": [
+      {
+        "text": "Move through the needle pattern",
+        "effect": {
+          "damage": 8
+        },
+        "nextScene": "floor2_sentry_line"
+      }
+    ]
+  },
+  "floor2_sentry_line": {
+    "id": "floor2_sentry_line",
+    "map": {
+      "x": 8,
+      "y": 15,
+      "name": "LINE",
+      "tag": "combat",
+      "connections": [
+        "floor2_bleeder_hall",
+        "floor2_no_rest_crossing"
+      ]
+    },
+    "title": "Floor 2 - Sentry Line",
+    "text": "Three sentry pylons rotate into alignment down the corridor. They fire in disciplined volleys, forcing you forward between bursts. This lane is not testing cleverness. It is counting endurance.",
+    "combat": {
+      "name": "Sentry Line",
+      "hp": 82,
+      "attack": 23,
+      "defense": 5,
+      "xp": 88,
+      "goldReward": 22,
+      "loot": [
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "shield_bash",
+        "armor_break"
+      ]
+    },
+    "fleeScene": "floor2_bleeder_hall",
+    "victoryScene": "floor2_no_rest_crossing",
+    "choices": []
+  },
+  "floor2_no_rest_crossing": {
+    "id": "floor2_no_rest_crossing",
+    "map": {
+      "x": 8,
+      "y": 16,
+      "name": "NOREST",
+      "tag": "event",
+      "connections": [
+        "floor2_sentry_line",
+        "floor2_double_bind"
+      ]
+    },
+    "title": "Floor 2 - No-Rest Crossing",
+    "text": "A bench waits in the middle of the crossing. The word REST is painted above it in clean white letters. The floor around it is scorched by old impact marks. The joke is not subtle.",
+    "choices": [
+      {
+        "text": "Ignore the bench and keep moving",
+        "nextScene": "floor2_double_bind"
+      },
+      {
+        "text": "Grab the ration pack under the bench without sitting",
+        "effect": {
+          "damage": 6,
+          "giveItem": "small_potion"
+        },
+        "nextScene": "floor2_double_bind"
+      }
+    ]
+  },
+  "floor2_double_bind": {
+    "id": "floor2_double_bind",
+    "map": {
+      "x": 8,
+      "y": 17,
+      "name": "BIND",
+      "tag": "combat",
+      "connections": [
+        "floor2_no_rest_crossing",
+        "floor2_killbox"
+      ]
+    },
+    "title": "Floor 2 - Double Bind",
+    "text": "The next door opens into a narrow chamber with two restraint rigs hanging from rails. They move like predators, one trying to pin your guard, the other trying to punish the opening.",
+    "combat": {
+      "name": "Twin Bind Rigs",
+      "hp": 88,
+      "attack": 26,
+      "defense": 6,
+      "xp": 96,
+      "goldReward": 24,
+      "loot": [],
+      "type": "trickster",
+      "abilities": [
+        "armor_break",
+        "quick_strike",
+        "crushing_blow"
+      ]
+    },
+    "fleeScene": "floor2_no_rest_crossing",
+    "victoryScene": "floor2_killbox",
+    "choices": []
+  },
+  "floor2_killbox": {
+    "id": "floor2_killbox",
+    "map": {
+      "x": 8,
+      "y": 18,
+      "name": "KILLBX",
+      "tag": "combat",
+      "connections": [
+        "floor2_double_bind",
+        "floor2_last_meter"
+      ]
+    },
+    "title": "Floor 2 - Killbox",
+    "text": "The corridor widens into a square chamber with shutters on every wall. They open one by one, releasing a defense pattern that gives you no cover and no time to breathe.",
+    "combat": {
+      "name": "Killbox Pattern",
+      "hp": 94,
+      "attack": 28,
+      "defense": 7,
+      "xp": 105,
+      "goldReward": 26,
+      "loot": [
+        "big_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "frenzy",
+        "cleave",
+        "battle_roar"
+      ]
+    },
+    "fleeScene": "floor2_double_bind",
+    "victoryScene": "floor2_last_meter",
+    "choices": []
+  },
+  "floor2_last_meter": {
+    "id": "floor2_last_meter",
+    "map": {
+      "x": 8,
+      "y": 19,
+      "name": "METER",
+      "tag": "event",
+      "connections": [
+        "floor2_killbox",
+        "floor2_gauntlet_antechamber"
+      ]
+    },
+    "title": "Floor 2 - Last Meter",
+    "text": "The last corridor is short enough to see the end. That makes it worse. Each step triggers a different pressure hammer from the walls, turning the final stretch into a tax paid in bruises.",
+    "choices": [
+      {
+        "text": "Cross the last meter under the hammers",
+        "effect": {
+          "damage": 10
+        },
+        "nextScene": "floor2_gauntlet_antechamber"
+      }
+    ]
+  },
+  "floor2_gauntlet_antechamber": {
+    "id": "floor2_gauntlet_antechamber",
+    "map": {
+      "x": 8,
+      "y": 20,
+      "name": "GANTE",
+      "tag": "event",
+      "connections": [
+        "floor2_last_meter",
+        "floor2_shared_boss"
+      ]
+    },
+    "title": "Floor 2 - Gauntlet Antechamber",
+    "text": "The blue lane finally releases you into an antechamber facing the same boss seal as the other routes. No caches. No clever detours. Just a record of how much you still have left.",
+    "choices": [
+      {
+        "text": "Step through to the shared boss",
+        "nextScene": "floor2_shared_boss"
+      }
+    ]
+  },
+  "floor2_black_door": {
+    "id": "floor2_black_door",
+    "map": {
+      "x": 12,
+      "y": 11,
+      "name": "BLACK",
+      "tag": "secret",
+      "connections": [
+        "floor2_cipher_threshold"
+      ]
+    },
+    "title": "Floor 2 - Black Door",
+    "text": "The black door does not open so much as stop being there. Past it, the hallway is too wide for the space the safe room occupied. The walls carry old markings from worlds that were not supposed to leave records behind. This lane does not raise weapons. It asks questions.",
+    "choices": [
+      {
+        "text": "Step into the cipher threshold",
+        "nextScene": "floor2_cipher_threshold"
+      }
+    ]
+  },
+  "floor2_cipher_threshold": {
+    "id": "floor2_cipher_threshold",
+    "map": {
+      "x": 12,
+      "y": 12,
+      "name": "CIPHER",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_black_door",
+        "floor2_mirror_grid"
+      ]
+    },
+    "title": "Floor 2 - Cipher Threshold",
+    "text": "A sealed arch waits under three rotating glyphs. Each glyph repeats a number in a different base. The trick is not translation; it is noticing that all three describe the same count.",
+    "choices": [
+      {
+        "text": "Align the glyphs to the shared count",
+        "effect": {
+          "giveXP": 12
+        },
+        "nextScene": "floor2_mirror_grid"
+      },
+      {
+        "text": "Force the arch to accept a rough match",
+        "effect": {
+          "damage": 6
+        },
+        "nextScene": "floor2_mirror_grid"
+      }
+    ]
+  },
+  "floor2_mirror_grid": {
+    "id": "floor2_mirror_grid",
+    "map": {
+      "x": 12,
+      "y": 13,
+      "name": "MIRROR",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_cipher_threshold",
+        "floor2_weight_riddle"
+      ]
+    },
+    "title": "Floor 2 - Mirror Grid",
+    "text": "Mirrors hang over a grid of black tiles. The reflected route is wrong in the ordinary way and right in the important one: every safe step appears one tile behind where your eyes expect it.",
+    "choices": [
+      {
+        "text": "Walk the reflected route, not the visible one",
+        "effect": {
+          "giveXP": 14
+        },
+        "nextScene": "floor2_weight_riddle"
+      },
+      {
+        "text": "Trust the floor markings instead of the mirrors",
+        "effect": {
+          "damage": 8
+        },
+        "nextScene": "floor2_weight_riddle"
+      }
+    ]
+  },
+  "floor2_weight_riddle": {
+    "id": "floor2_weight_riddle",
+    "map": {
+      "x": 12,
+      "y": 14,
+      "name": "WEIGHT",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_mirror_grid",
+        "floor2_tone_lock"
+      ]
+    },
+    "title": "Floor 2 - Weight Riddle",
+    "text": "Four plinths rise from the floor. One asks for what you carried in, one for what you lost, one for what you learned, and one for what you refuse to give. Only one is physical.",
+    "choices": [
+      {
+        "text": "Place a ration wrapper on the physical plinth and leave the rest empty",
+        "effect": {
+          "giveXP": 16
+        },
+        "nextScene": "floor2_tone_lock"
+      },
+      {
+        "text": "Load all four plinths with loose debris",
+        "effect": {
+          "damage": 7
+        },
+        "nextScene": "floor2_tone_lock"
+      }
+    ]
+  },
+  "floor2_tone_lock": {
+    "id": "floor2_tone_lock",
+    "map": {
+      "x": 12,
+      "y": 15,
+      "name": "TONE",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_weight_riddle",
+        "floor2_memory_walk"
+      ]
+    },
+    "title": "Floor 2 - Tone Lock",
+    "text": "A door hums in five tones. Four are steady. One tone wavers every time you move. The lock is listening for the sound the room makes when you stop trying to hurry.",
+    "choices": [
+      {
+        "text": "Wait through the full tone cycle before touching the panel",
+        "effect": {
+          "giveXP": 14
+        },
+        "nextScene": "floor2_memory_walk"
+      },
+      {
+        "text": "Match the loudest tone immediately",
+        "effect": {
+          "damage": 5
+        },
+        "nextScene": "floor2_memory_walk"
+      }
+    ]
+  },
+  "floor2_memory_walk": {
+    "id": "floor2_memory_walk",
+    "map": {
+      "x": 12,
+      "y": 16,
+      "name": "MEMORY",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_tone_lock",
+        "floor2_logic_well"
+      ]
+    },
+    "title": "Floor 2 - Memory Walk",
+    "text": "The corridor shows three versions of the room behind you. One is exact, one is flattering, and one includes the mistake you almost made. The exit opens only for the memory that admits the error.",
+    "choices": [
+      {
+        "text": "Choose the memory with the almost-mistake",
+        "effect": {
+          "giveXP": 18
+        },
+        "nextScene": "floor2_logic_well"
+      },
+      {
+        "text": "Choose the perfect version of the room",
+        "effect": {
+          "damage": 9
+        },
+        "nextScene": "floor2_logic_well"
+      }
+    ]
+  },
+  "floor2_logic_well": {
+    "id": "floor2_logic_well",
+    "map": {
+      "x": 12,
+      "y": 17,
+      "name": "LOGIC",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_memory_walk",
+        "floor2_symbol_bridge"
+      ]
+    },
+    "title": "Floor 2 - Logic Well",
+    "text": "A deep circular shaft divides the lane. Three statements burn above it: one true, one false, one useful. The bridge forms under the useful one, because the Overseers care less about truth than function.",
+    "choices": [
+      {
+        "text": "Stand beneath the useful statement",
+        "effect": {
+          "giveXP": 16
+        },
+        "nextScene": "floor2_symbol_bridge"
+      },
+      {
+        "text": "Stand beneath the true statement",
+        "effect": {
+          "damage": 6
+        },
+        "nextScene": "floor2_symbol_bridge"
+      }
+    ]
+  },
+  "floor2_symbol_bridge": {
+    "id": "floor2_symbol_bridge",
+    "map": {
+      "x": 12,
+      "y": 18,
+      "name": "BRIDGE",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_logic_well",
+        "floor2_final_proof"
+      ]
+    },
+    "title": "Floor 2 - Symbol Bridge",
+    "text": "A bridge of symbols assembles in midair, one piece at a time. Some symbols mean weight. Some mean direction. One means survivor, but only when it is upside down.",
+    "choices": [
+      {
+        "text": "Step on the inverted survivor symbol",
+        "effect": {
+          "giveXP": 18
+        },
+        "nextScene": "floor2_final_proof"
+      },
+      {
+        "text": "Step on the upright survivor symbol",
+        "effect": {
+          "damage": 10
+        },
+        "nextScene": "floor2_final_proof"
+      }
+    ]
+  },
+  "floor2_final_proof": {
+    "id": "floor2_final_proof",
+    "map": {
+      "x": 12,
+      "y": 19,
+      "name": "PROOF",
+      "tag": "puzzle",
+      "connections": [
+        "floor2_symbol_bridge",
+        "floor2_puzzle_antechamber"
+      ]
+    },
+    "title": "Floor 2 - Final Proof",
+    "text": "The final puzzle offers no symbols at all. Just a blank panel and a countdown. The proof is not an answer. It is whether you trust the pattern enough to do nothing.",
+    "choices": [
+      {
+        "text": "Let the countdown expire without touching the panel",
+        "effect": {
+          "giveXP": 22,
+          "heal": 10
+        },
+        "nextScene": "floor2_puzzle_antechamber"
+      },
+      {
+        "text": "Press the panel before the countdown ends",
+        "effect": {
+          "damage": 12
+        },
+        "nextScene": "floor2_puzzle_antechamber"
+      }
+    ]
+  },
+  "floor2_puzzle_antechamber": {
+    "id": "floor2_puzzle_antechamber",
+    "map": {
+      "x": 12,
+      "y": 20,
+      "name": "PANTE",
+      "tag": "event",
+      "connections": [
+        "floor2_final_proof",
+        "floor2_shared_boss"
+      ]
+    },
+    "title": "Floor 2 - Puzzle Antechamber",
+    "text": "The black lane ends in a quiet antechamber with no enemies, no traps, and no reward chest. The reward was understanding the floor before it tried to kill you. The shared boss door waits ahead.",
+    "choices": [
+      {
+        "text": "Carry the solved pattern into the shared boss chamber",
+        "nextScene": "floor2_shared_boss"
+      }
+    ]
+  },
+  "floor2_shared_boss": {
+    "id": "floor2_shared_boss",
+    "map": {
+      "x": 4,
+      "y": 18,
+      "name": "F2BOSS",
+      "tag": "boss",
+      "connections": [
+        "floor2_boss_antechamber"
+      ]
+    },
+    "title": "Floor 2 - Shared Boss",
+    "text": "The three Floor 2 lanes converge in a chamber built around a suspended engine core. The boss waits beneath it, shaped by whichever path brought you here but loyal to none of them.",
+    "combat": {
+      "name": "Convergence Warden",
+      "hp": 120,
+      "attack": 27,
+      "defense": 8,
+      "xp": 150,
+      "goldReward": 45,
+      "loot": [
+        "phase_edge",
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "cleave",
+        "crushing_blow",
+        "battle_roar"
+      ]
+    },
+    "fleeScene": "floor2_boss_antechamber",
+    "victoryScene": "the_end",
+    "choices": []
+  },
+  "game_over": {
+    "id": "game_over",
+    "title": "DEFEAT",
+    "text": "The floor rushes up. Vision dims to grey, then black.\n\nThe Overseers' system logs the result. Earth's ranking drops. Somewhere in the competition feed, the active competitor count decrements by one.\n\n...but the competition is not the only thing tracking your performance.",
+    "choices": [
+      {
+        "text": "Accept your fate. [END]",
+        "nextScene": "the_end"
+      }
+    ]
+  },
+  "the_end": {
+    "id": "the_end",
+    "title": "Floor Complete",
+    "text": "The Overseers log your progress. Earth holds its position in the rankings — for now.",
+    "choices": []
+  }
+}

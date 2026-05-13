@@ -1,0 +1,41 @@
+{
+  "fighter": {
+    "id": "fighter",
+    "name": "Fighter",
+    "description": "Front-line bruiser with martial pressure and defensive tools.",
+    "statMods": { "maxHp": 10, "attack": 1, "defense": 1, "perception": 0 },
+    "starterGear": ["training_sword"],
+    "abilityPool": ["power_strike", "guard", "berserk", "shield_break"],
+    "defaultAbilityIds": ["power_strike", "guard"],
+    "unlockCosts": {
+      "berserk": 15,
+      "shield_break": 15
+    }
+  },
+  "mage": {
+    "id": "mage",
+    "name": "Mage",
+    "description": "Fragile caster with focused damage, barriers, and recovery.",
+    "statMods": { "maxHp": -10, "attack": 2, "defense": -1, "perception": 1 },
+    "starterGear": ["cracked_lens"],
+    "abilityPool": ["arcane_bolt", "barrier", "heal", "toxic_slash"],
+    "defaultAbilityIds": ["arcane_bolt", "barrier"],
+    "unlockCosts": {
+      "heal": 12,
+      "toxic_slash": 15
+    }
+  },
+  "rogue": {
+    "id": "rogue",
+    "name": "Rogue",
+    "description": "Evasive scout with perception, dirty tricks, and careful pressure.",
+    "statMods": { "maxHp": 0, "attack": 1, "defense": 0, "perception": 1 },
+    "starterGear": ["marked_dice"],
+    "abilityPool": ["toxic_slash", "guard", "power_strike", "shield_break"],
+    "defaultAbilityIds": ["toxic_slash", "guard"],
+    "unlockCosts": {
+      "power_strike": 12,
+      "shield_break": 15
+    }
+  }
+}
