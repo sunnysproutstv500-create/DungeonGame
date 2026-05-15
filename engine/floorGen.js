@@ -101,9 +101,19 @@ function generateFloor2Config() {
   };
 }
 
+function generateFloor3Config() {
+  return {
+    floor: 3,
+    excludedRooms: [],
+    enemyVariants: {},
+    safeRoom: 'floor3_market',
+  };
+}
+
 function generateFloor(floor) {
   if (floor === 1) return generateFloor1Config();
   if (floor === 2) return generateFloor2Config();
+  if (floor === 3) return generateFloor3Config();
   return {
     floor,
     placeholder: true,
@@ -113,4 +123,4 @@ function generateFloor(floor) {
   };
 }
 
-module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, filterChoices, ENEMY_VARIANTS };
+module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, filterChoices, ENEMY_VARIANTS };

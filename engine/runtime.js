@@ -65,6 +65,14 @@ function describeChoiceEffect(effect, beforePlayer, afterPlayer) {
     if (progress) parts.push(`Progress: ${progress}`);
   }
 
+  if (Array.isArray(effect.giveItems)) {
+    for (const itemId of effect.giveItems) {
+      parts.push(`You obtained ${getItemName(itemId)}.`);
+      const progress = getProgressMessageForItem(itemId);
+      if (progress) parts.push(`Progress: ${progress}`);
+    }
+  }
+
   if (effect.giveGold) {
     parts.push(`You found ${effect.giveGold} gold.`);
   }
@@ -86,6 +94,11 @@ function describeChoiceEffect(effect, beforePlayer, afterPlayer) {
   if (effect.setRoute) {
     const routeName = effect.setRoute === 'security' ? 'security route' : effect.setRoute === 'ward' ? 'ward route' : effect.setRoute;
     parts.push(`You commit to the ${routeName}.`);
+  }
+
+  if (effect.completeContract) {
+    parts.push(`Contract complete: ${effect.completeContract}.`);
+    parts.push(`Contracts completed: ${afterPlayer.contractsCompleted || 0}/5.`);
   }
 
   if (effect.applyStatus) {
@@ -114,13 +127,21 @@ function getChoiceRewardLabel(choice) {
   const effect = choice.effect || {};
   if (effect.heal) rewards.push(`${effect.heal} HP`);
   if (effect.giveItem) rewards.push(formatEffectItem(effect));
+  if (Array.isArray(effect.giveItems)) rewards.push(...effect.giveItems.map(getItemName));
   if (effect.giveGold) rewards.push(`${effect.giveGold} gold`);
   if (effect.giveXP) rewards.push(`${effect.giveXP} XP`);
   if (effect.setRoute) rewards.push(`${effect.setRoute} route`);
+  if (effect.completeContract) rewards.push('contract credit');
   return rewards.length > 0 ? `Reward: ${rewards.join(', ')}` : null;
 }
 
 function getChoiceProgressLabel(choice) {
+  if (choice.condition?.contractsCompleted === 5 && choice.nextScene === 'floor3_boss_portal') {
+    return 'Progress: 5/5 contracts complete. Boss portal unlocked.';
+  }
+  if (choice.condition?.contractsCompleted !== undefined) {
+    return `Progress: unlocks at ${choice.condition.contractsCompleted}/5 contracts.`;
+  }
   const itemProgress = getProgressMessageForItem(choice.effect?.giveItem);
   if (itemProgress) return `Progress: ${itemProgress}`;
   if (choice.requires?.items) return `Requires: ${choice.requires.items.map(getItemName).join(', ')}`;
@@ -133,6 +154,17 @@ function hasItem(player, itemId) {
 }
 
 function buildObjective(player) {
+  if ((player.floor || 1) === 3) {
+    const completed = player.contractsCompleted || 0;
+    const ready = completed >= 5;
+    return {
+      route: 'contracts',
+      goal: ready ? 'Enter the Market Arbiter boss portal' : `Complete contracts ${completed}/5`,
+      missing: ready ? [] : [`${5 - completed} contract${5 - completed === 1 ? '' : 's'} remaining`],
+      ready,
+    };
+  }
+
   const route = player.route || 'unknown';
   if (player.runEnded) {
     return { route, goal: 'Run ended', missing: [], ready: false };
@@ -209,6 +241,18 @@ function buildMapProgress(state) {
     visitedCount: visited.size,
     totalRooms,
     rooms,
+  };
+}
+
+function buildContractProgress(player) {
+  if ((player.floor || 1) !== 3) return null;
+  const completed = player.contractsCompleted || 0;
+  const required = 5;
+  return {
+    completed,
+    required,
+    ready: completed >= required,
+    label: `Contracts ${completed}/${required}`,
   };
 }
 
@@ -291,7 +335,32 @@ function getScene(state) {
 
 function getCombatData(state, scene) {
   if (!scene?.combat) return null;
-  return state.floorConfig?.enemyVariants?.[state.currentSceneId] || scene.combat;
+  const enemyData = state.floorConfig?.enemyVariants?.[state.currentSceneId] || scene.combat;
+  return applyCombatAdvantages(enemyData, state.player);
+}
+
+function applyCombatAdvantages(enemyData, player) {
+  const adjusted = clone(enemyData);
+  const inventory = new Set(player?.inventory || []);
+  adjusted.advantagesApplied = [];
+
+  for (const advantage of adjusted.advantages || []) {
+    if (!inventory.has(advantage.item)) continue;
+    adjusted.advantagesApplied.push(advantage.item);
+    if (advantage.hpDelta) adjusted.hp = Math.max(1, (adjusted.hp || 1) + advantage.hpDelta);
+    if (advantage.attackDelta) adjusted.attack = Math.max(1, (adjusted.attack || 1) + advantage.attackDelta);
+    if (advantage.defenseDelta) adjusted.defense = Math.max(0, (adjusted.defense || 0) + advantage.defenseDelta);
+    if (advantage.removeAbilities?.length) {
+      const removals = new Set(advantage.removeAbilities);
+      adjusted.abilities = (adjusted.abilities || []).filter(id => !removals.has(id));
+      adjusted.phases = (adjusted.phases || []).map(phase => ({
+        ...phase,
+        abilities: (phase.abilities || []).filter(id => !removals.has(id)),
+      }));
+    }
+  }
+
+  return adjusted;
 }
 
 function makeCombatState(enemyData) {
@@ -307,6 +376,7 @@ function makeCombatState(enemyData) {
       loot: [...(enemyData.loot || [])],
       type: enemyData.type || 'aggressive',
       abilities: [...(enemyData.abilities || [])],
+      advantagesApplied: [...(enemyData.advantagesApplied || [])],
       shieldUp: false,
       statusEffects: clone(enemyData.statusEffects || []),
     },
@@ -480,6 +550,7 @@ function getView(state) {
     player: clone(state.player),
     floor: state.player.floor || 1,
     objective: buildObjective(state.player),
+    contractProgress: buildContractProgress(state.player),
     mapProgress: buildMapProgress(state),
     equipment: clone(state.player.equipment || { weapon: null, armor: null, trinket: null }),
     equipmentItems: getEquippedItems(state.player),

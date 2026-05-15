@@ -1,5 +1,5 @@
 const React = require('react');
-const { useMemo, useState } = React;
+const { useEffect, useMemo, useState } = React;
 const {
   SafeAreaView,
   ScrollView,
@@ -381,6 +381,21 @@ function ObjectivePanel({ objective }) {
   );
 }
 
+function ContractBadge({ contractProgress }) {
+  if (!contractProgress) return null;
+  return (
+    <View style={styles.contractBadge}>
+      <Text style={styles.contractBadgeLabel}>Contracts</Text>
+      <Text style={styles.contractBadgeValue}>
+        {contractProgress.completed}/{contractProgress.required}
+      </Text>
+      <Text style={[styles.contractBadgeState, contractProgress.ready && styles.contractBadgeReady]}>
+        {contractProgress.ready ? 'Boss portal open' : 'Contracts remaining'}
+      </Text>
+    </View>
+  );
+}
+
 function MapProgressPanel({ mapProgress }) {
   if (!mapProgress) return null;
   const visibleRooms = (mapProgress.rooms || []).filter(room => room.visited || room.current).slice(-6);
@@ -595,13 +610,50 @@ function CombatPanel({ view, onAction, events }) {
   );
 }
 
-function StartScreen({ playerName, onChangeName, meta, savedRun, setupOptions, selectedAbilityIds, onSelectClass, onToggleAbility, onStart, onContinue, onClearSave, onBuyUpgrade, onBuyAbility }) {
+function HomeScreen({ meta, savedRun, onStartNew, onContinue }) {
+  return (
+    <View style={styles.homeScreen}>
+      <View style={styles.homeFrame}>
+        <View style={styles.homeHero}>
+          <Text style={styles.homeEyebrow}>LitRPG Expedition</Text>
+          <Text style={styles.homeTitle}>Dungeon Depths</Text>
+          <Text style={styles.homeSubtitle}>Descend, adapt, and bring something back.</Text>
+        </View>
+
+        <View style={styles.homeStatusRow}>
+          <View style={styles.homeStatusChip}>
+            <Text style={styles.homeStatusLabel}>Meta Points</Text>
+            <Text style={styles.homeStatusValue}>{meta.currency}</Text>
+          </View>
+          <View style={styles.homeStatusChip}>
+            <Text style={styles.homeStatusLabel}>Saved Run</Text>
+            <Text style={styles.homeStatusValue}>{savedRun ? savedRun.player.name : 'None'}</Text>
+          </View>
+        </View>
+
+        <View style={styles.homeActions}>
+          <ActionButton
+            label={savedRun ? `Continue Run` : 'Continue Run'}
+            onPress={onContinue}
+            disabled={!savedRun}
+          />
+          <ActionButton label="Start New Run" onPress={onStartNew} tone="secondary" />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function SetupScreen({ playerName, onChangeName, meta, savedRun, setupOptions, selectedAbilityIds, onSelectClass, onToggleAbility, onStart, onContinue, onClearSave, onBuyUpgrade, onBuyAbility, onBack }) {
   const cleanName = playerName.trim();
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-      <View style={styles.sceneHeader}>
-        <Text style={styles.floorText}>Expedition Setup</Text>
-        <Text style={styles.title}>Dungeon Depths</Text>
+      <View style={styles.setupHeader}>
+        <View style={styles.setupTitleBlock}>
+          <Text style={styles.floorText}>New Expedition</Text>
+          <Text style={styles.title}>Prepare Your Run</Text>
+        </View>
+        <ActionButton label="Back" onPress={onBack} tone="secondary" />
       </View>
       <View style={styles.startSummary}>
         <View>
@@ -642,7 +694,7 @@ function StartScreen({ playerName, onChangeName, meta, savedRun, setupOptions, s
       </CollapsiblePanel>
 
       <View style={styles.startActionBar}>
-        <ActionButton label="Start Run" onPress={() => onStart(cleanName)} disabled={cleanName.length === 0} />
+        <ActionButton label="Begin Run" onPress={() => onStart(cleanName)} disabled={cleanName.length === 0} />
         <ActionButton
           label={savedRun ? `Continue ${savedRun.player.name}` : 'Continue Saved Run'}
           onPress={onContinue}
@@ -690,12 +742,34 @@ module.exports = function App() {
   const setupOptions = useMemo(() => runtime.getRunSetupOptions(meta, selectedClassId), [meta, selectedClassId]);
   const [playerName, setPlayerName] = useState('Earth-001');
   const [selectedAbilityIds, setSelectedAbilityIds] = useState(() => runtime.getRunSetupOptions(initialMeta).selectedAbilityIds);
+  const [menuScreen, setMenuScreen] = useState('home');
   const [gameState, setGameState] = useState(null);
   const [savedRun, setSavedRun] = useState(() => saveStore.loadSavedRun());
   const [events, setEvents] = useState([]);
   const [saveNotice, setSaveNotice] = useState('');
   const [runRewards, setRunRewards] = useState({ metaEarned: 0 });
   const view = gameState ? runtime.getView(gameState) : null;
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      saveStore.loadMetaAsync(),
+      saveStore.loadSavedRunAsync(),
+    ]).then(([storedMeta, storedRun]) => {
+      if (!active) return;
+      setMeta(storedMeta);
+      setSavedRun(storedRun);
+      setSelectedAbilityIds(current => {
+        const nextOptions = runtime.getRunSetupOptions(storedMeta, selectedClassId);
+        const allowed = new Set(nextOptions.abilities.map(ability => ability.id));
+        const kept = current.filter(id => allowed.has(id)).slice(0, nextOptions.maxAbilities);
+        return kept.length > 0 ? kept : nextOptions.selectedAbilityIds;
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const dispatch = action => {
     const result = runtime.dispatch(gameState, action);
@@ -711,11 +785,11 @@ module.exports = function App() {
       }
     });
     if (nextMeta !== meta) {
-      saveStore.saveMeta(nextMeta);
+      saveStore.saveMetaAsync(nextMeta);
       setMeta(nextMeta);
     }
     if (result.events.some(event => event.type === 'run_ended')) {
-      saveStore.clearSavedRun();
+      saveStore.clearSavedRunAsync();
       setSavedRun(null);
       setSaveNotice('');
     }
@@ -736,7 +810,7 @@ module.exports = function App() {
   const saveRun = () => {
     if (!gameState || view.runEnded) return;
     const snapshot = runtime.createSaveData(gameState);
-    saveStore.saveRunSnapshot(snapshot);
+    saveStore.saveRunSnapshotAsync(snapshot);
     setSavedRun(snapshot);
     setSaveNotice(`Saved: ${snapshot.currentSceneId}`);
     setEvents([{ type: 'save_created', scene: snapshot.currentSceneId }].concat(events).slice(0, 8));
@@ -751,6 +825,7 @@ module.exports = function App() {
 
   const returnToMenu = () => {
     setGameState(null);
+    setMenuScreen('home');
     setEvents([]);
     setSaveNotice('');
   };
@@ -761,7 +836,7 @@ module.exports = function App() {
       setEvents([{ type: purchase.reason }].concat(events).slice(0, 8));
       return;
     }
-    saveStore.saveMeta(purchase.meta);
+    saveStore.saveMetaAsync(purchase.meta);
     setMeta(purchase.meta);
     setSelectedAbilityIds(current => {
       const nextOptions = runtime.getRunSetupOptions(purchase.meta, selectedClassId);
@@ -778,7 +853,7 @@ module.exports = function App() {
       setEvents([{ type: purchase.reason }].concat(events).slice(0, 8));
       return;
     }
-    saveStore.saveMeta(purchase.meta);
+    saveStore.saveMetaAsync(purchase.meta);
     setMeta(purchase.meta);
     const nextOptions = runtime.getRunSetupOptions(purchase.meta, selectedClassId);
     const unlocked = nextOptions.abilities.find(ability => ability.id === abilityId);
@@ -805,27 +880,37 @@ module.exports = function App() {
 
   if (!gameState) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="dark-content" />
-        <StartScreen
-          playerName={playerName}
-          onChangeName={setPlayerName}
-          meta={meta}
-          savedRun={savedRun}
-          setupOptions={setupOptions}
-          selectedAbilityIds={selectedAbilityIds}
-          onSelectClass={selectClass}
-          onToggleAbility={toggleAbility}
-          onStart={startRun}
-          onContinue={continueSavedRun}
-          onBuyUpgrade={buyUpgrade}
-          onBuyAbility={buyAbility}
-          onClearSave={() => {
-            saveStore.clearSavedRun();
-            setSavedRun(null);
-            setSaveNotice('');
-          }}
-        />
+      <SafeAreaView style={menuScreen === 'home' ? styles.homeSafe : styles.safe}>
+        <StatusBar barStyle={menuScreen === 'home' ? 'light-content' : 'dark-content'} />
+        {menuScreen === 'home' ? (
+          <HomeScreen
+            meta={meta}
+            savedRun={savedRun}
+            onStartNew={() => setMenuScreen('setup')}
+            onContinue={continueSavedRun}
+          />
+        ) : (
+          <SetupScreen
+            playerName={playerName}
+            onChangeName={setPlayerName}
+            meta={meta}
+            savedRun={savedRun}
+            setupOptions={setupOptions}
+            selectedAbilityIds={selectedAbilityIds}
+            onSelectClass={selectClass}
+            onToggleAbility={toggleAbility}
+            onStart={startRun}
+            onContinue={continueSavedRun}
+            onBuyUpgrade={buyUpgrade}
+            onBuyAbility={buyAbility}
+            onBack={() => setMenuScreen('home')}
+            onClearSave={() => {
+              saveStore.clearSavedRunAsync();
+              setSavedRun(null);
+              setSaveNotice('');
+            }}
+          />
+        )}
       </SafeAreaView>
     );
   }
@@ -844,6 +929,7 @@ module.exports = function App() {
         </View>
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
           {!view.runEnded && <ObjectivePanel objective={view.objective} />}
+          {!view.runEnded && <ContractBadge contractProgress={view.contractProgress} />}
           {!view.runEnded && <MapProgressPanel mapProgress={view.mapProgress} />}
           {view.runEnded ? (
             <RunEndedPanel view={view} meta={meta} runRewards={runRewards} onMenu={returnToMenu} />
@@ -870,9 +956,94 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f1e8',
   },
+  homeSafe: {
+    flex: 1,
+    backgroundColor: '#101713',
+  },
   shell: {
     flex: 1,
     backgroundColor: '#f5f1e8',
+  },
+  homeScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 18,
+    backgroundColor: '#101713',
+  },
+  homeFrame: {
+    width: '88%',
+    maxWidth: 320,
+    alignSelf: 'flex-start',
+    gap: 18,
+    marginLeft: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#52664e',
+    borderRadius: 8,
+    backgroundColor: '#172018',
+  },
+  homeHero: {
+    minHeight: 260,
+    justifyContent: 'flex-end',
+    gap: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#7a6a45',
+    borderRadius: 8,
+    backgroundColor: '#20251f',
+  },
+  homeEyebrow: {
+    color: '#d9c28a',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  homeTitle: {
+    color: '#fffaf0',
+    fontSize: 33,
+    lineHeight: 38,
+    fontWeight: '900',
+  },
+  homeSubtitle: {
+    color: '#c7d6bd',
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '800',
+  },
+  homeStatusRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  homeStatusChip: {
+    flex: 1,
+    minHeight: 72,
+    justifyContent: 'center',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#52664e',
+    borderRadius: 8,
+    backgroundColor: '#111a15',
+  },
+  homeStatusLabel: {
+    color: '#9fb194',
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  homeStatusValue: {
+    color: '#fffaf0',
+    fontSize: 18,
+    lineHeight: 23,
+    fontWeight: '900',
+    marginTop: 3,
+  },
+  homeActions: {
+    gap: 10,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#fffaf0',
   },
   statsBand: {
     gap: 8,
@@ -932,6 +1103,19 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     marginBottom: 16,
   },
+  setupHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2f4f3d',
+    paddingBottom: 12,
+    marginBottom: 16,
+  },
+  setupTitleBlock: {
+    flex: 1,
+  },
   floorText: {
     color: '#56645c',
     fontSize: 13,
@@ -989,6 +1173,41 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '900',
+  },
+  contractBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#b9a56a',
+    borderRadius: 8,
+    backgroundColor: '#fff7df',
+    marginBottom: 16,
+  },
+  contractBadgeLabel: {
+    color: '#61512a',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  contractBadgeValue: {
+    color: '#211d14',
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: '900',
+  },
+  contractBadgeState: {
+    color: '#6a4e22',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '800',
+  },
+  contractBadgeReady: {
+    color: '#21452f',
   },
   outcomePanel: {
     gap: 4,

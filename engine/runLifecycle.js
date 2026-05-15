@@ -1,6 +1,6 @@
 'use strict';
 
-const MAX_IMPLEMENTED_FLOOR = 2;
+const MAX_IMPLEMENTED_FLOOR = 3;
 
 function ensureRunStats(player) {
   if (!player.runStats) {
@@ -47,6 +47,8 @@ function completeFloor(player, options = {}) {
   player.hp = Math.min(player.maxHp, player.hp + healAmount);
   player.usedChoices = {};
   player.clearedRooms = {};
+  player.completedContracts = [];
+  player.contractsCompleted = 0;
   player.statusEffects = [];
 
   return {
@@ -85,6 +87,8 @@ function resetRunState(player) {
   };
   player.usedChoices = {};
   player.clearedRooms = {};
+  player.completedContracts = [];
+  player.contractsCompleted = 0;
   player.mapData = {};
   player.statusEffects = [];
 }

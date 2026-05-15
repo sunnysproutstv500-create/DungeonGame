@@ -10,6 +10,33 @@ const {
 
 const ITEMS = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/items.json'), 'utf-8'));
 
+function clone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function applyCombatAdvantages(enemyData, player) {
+  const adjusted = clone(enemyData);
+  const inventory = new Set(player?.inventory || []);
+
+  for (const advantage of adjusted.advantages || []) {
+    if (!inventory.has(advantage.item)) continue;
+    if (advantage.message) console.log(`  ${advantage.message}`);
+    if (advantage.hpDelta) adjusted.hp = Math.max(1, (adjusted.hp || 1) + advantage.hpDelta);
+    if (advantage.attackDelta) adjusted.attack = Math.max(1, (adjusted.attack || 1) + advantage.attackDelta);
+    if (advantage.defenseDelta) adjusted.defense = Math.max(0, (adjusted.defense || 0) + advantage.defenseDelta);
+    if (advantage.removeAbilities?.length) {
+      const removals = new Set(advantage.removeAbilities);
+      adjusted.abilities = (adjusted.abilities || []).filter(id => !removals.has(id));
+      adjusted.phases = (adjusted.phases || []).map(phase => ({
+        ...phase,
+        abilities: (phase.abilities || []).filter(id => !removals.has(id)),
+      }));
+    }
+  }
+
+  return adjusted;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 function useItem(player, itemId) {
@@ -221,19 +248,20 @@ function doPhaseTransition(enemy, player, phases, phaseIndex, curPhaseRef) {
 function runCombat(player, enemyData, prompt) {
   if (!player.statusEffects) player.statusEffects = [];
 
-  const phases   = enemyData.phases ? [...enemyData.phases] : [];
+  const combatData = applyCombatAdvantages(enemyData, player);
+  const phases   = combatData.phases ? [...combatData.phases] : [];
   const isBoss   = phases.length > 0;
   let phaseIndex = 0;
-  const curPhase = { value: enemyData }; // mutable ref so doPhaseTransition can update it
+  const curPhase = { value: combatData }; // mutable ref so doPhaseTransition can update it
 
   const enemy = {
-    name:       enemyData.name,
-    hp:         enemyData.hp,
-    maxHp:      enemyData.hp,
-    attack:     enemyData.attack,
-    defense:    enemyData.defense,
-    xpReward:   enemyData.xp,
-    goldReward: enemyData.goldReward,
+    name:       combatData.name,
+    hp:         combatData.hp,
+    maxHp:      combatData.hp,
+    attack:     combatData.attack,
+    defense:    combatData.defense,
+    xpReward:   combatData.xp,
+    goldReward: combatData.goldReward,
     shieldUp:   false,
     statusEffects: [],
   };
@@ -242,7 +270,7 @@ function runCombat(player, enemyData, prompt) {
   if (isBoss) {
     console.log('\n' + '█'.repeat(60));
     console.log(`  ⚔  BOSS FIGHT: ${enemy.name}  ⚔`);
-    if (enemyData.intro) console.log(`\n  ${enemyData.intro}`);
+    if (combatData.intro) console.log(`\n  ${combatData.intro}`);
     console.log('█'.repeat(60));
   } else {
     console.log('\n' + '!'.repeat(60));
@@ -418,8 +446,8 @@ function runCombat(player, enemyData, prompt) {
   clearStatusEffects(player);
   console.log('\n' + '!'.repeat(60));
   console.log(`  Victory! ${enemy.name} has been defeated.`);
-  if (isBoss && enemyData.victoryText) {
-    console.log(`\n  ${enemyData.victoryText}`);
+  if (isBoss && combatData.victoryText) {
+    console.log(`\n  ${combatData.victoryText}`);
   }
   console.log('!'.repeat(60));
 
@@ -427,14 +455,14 @@ function runCombat(player, enemyData, prompt) {
   player.gold += enemy.goldReward;
   console.log(`  +${enemy.goldReward} gold`);
 
-  if (enemyData.loot && enemyData.loot.length > 0) {
+  if (combatData.loot && combatData.loot.length > 0) {
     if (isBoss) {
-      for (const drop of enemyData.loot) {
+      for (const drop of combatData.loot) {
         player.inventory.push(drop);
         console.log(`  Obtained: ${drop}`);
       }
     } else {
-      const drop = enemyData.loot[Math.floor(Math.random() * enemyData.loot.length)];
+      const drop = combatData.loot[Math.floor(Math.random() * combatData.loot.length)];
       player.inventory.push(drop);
       console.log(`  ${enemy.name} dropped: ${drop}`);
     }

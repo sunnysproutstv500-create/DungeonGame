@@ -9,6 +9,15 @@ npm.cmd install
 npm.cmd run web
 ```
 
+To test on Android or iOS with Expo Go SDK 54:
+
+```powershell
+npm.cmd run start -- --lan
+```
+
+Scan the QR code with Expo Go while the phone is on the same Wi-Fi as this computer.
+Saved runs and meta progress use native Async Storage on Android and iOS.
+
 If Expo cannot reach its online services, use:
 
 ```powershell

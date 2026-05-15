@@ -25,6 +25,17 @@ const storage = makeStorage();
 const appSource = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
 assert(appSource.includes('function RunSetupPanel'), 'smoke: start screen uses a combined Run Setup panel');
 assert(appSource.includes('function CollapsiblePanel'), 'smoke: run utility sections are collapsible');
+assert(appSource.includes('function HomeScreen'), 'smoke: app has a dedicated game home screen');
+assert(appSource.includes('Start New Run'), 'smoke: home screen starts a new setup flow');
+assert(appSource.includes('Continue Run'), 'smoke: home screen can continue a saved run');
+assert(appSource.includes('function SetupScreen'), 'smoke: app has a dedicated run setup screen');
+assert(appSource.includes('Begin Run'), 'smoke: setup screen starts the configured run');
+assert(appSource.includes("setMenuScreen('setup')"), 'smoke: start new run navigates to setup screen');
+assert(appSource.includes("setMenuScreen('home')"), 'smoke: setup screen can return to home screen');
+assert(appSource.includes('useEffect'), 'smoke: app loads native save data asynchronously');
+assert(appSource.includes('loadMetaAsync'), 'smoke: app can load meta from native async storage');
+assert(appSource.includes('loadSavedRunAsync'), 'smoke: app can load saved runs from native async storage');
+assert(appSource.includes('saveRunSnapshotAsync'), 'smoke: app saves runs through native async storage');
 assert(appSource.includes('styles.playerIdentity'), 'smoke: player header uses compact identity row');
 assert(appSource.includes('styles.playerStats'), 'smoke: player header uses compact stat row');
 assert(appSource.includes('Character'), 'smoke: start screen groups character setup');
@@ -56,6 +67,9 @@ assert(appSource.includes('Change:'), 'smoke: inventory gear rows label stat cha
 assert(appSource.includes('itemStatLine'), 'smoke: inventory gear rows use compact stat line');
 assert(appSource.includes("event.type === 'gear_trait'"), 'smoke: event log formats gear trait triggers');
 assert(appSource.includes('function ObjectivePanel'), 'smoke: run screen renders objective tracker');
+assert(appSource.includes('function ContractBadge'), 'smoke: run screen renders Floor 3 contract badge');
+assert(appSource.includes('view.contractProgress'), 'smoke: contract badge comes from runtime view');
+assert(appSource.includes('Contracts'), 'smoke: contract badge labels contract progress');
 assert(appSource.includes('function MapProgressPanel'), 'smoke: run screen renders map progress panel');
 assert(appSource.includes('Risk:'), 'smoke: choice rows expose risk labels');
 assert(appSource.includes('Reward:'), 'smoke: choice rows expose reward labels');
@@ -131,9 +145,24 @@ const loadedSnapshot = saveStore.loadSavedRun(storage);
 const restored = runtime.hydrateRun(loadedSnapshot);
 view = runtime.getView(restored);
 
+saveStore.saveRunSnapshotAsync(snapshot, storage).then(saved => {
+  assert(saved === true, 'smoke: async injected storage saves run snapshot');
+});
+saveStore.loadSavedRunAsync(storage).then(asyncLoadedSnapshot => {
+  assert(asyncLoadedSnapshot.currentSceneId === 'left_path_combat', 'smoke: async injected storage loads run snapshot', asyncLoadedSnapshot);
+});
+
 assert(restored.currentSceneId === 'left_path_combat', 'smoke: save/load preserves combat scene', restored);
 assert(view.mode === 'combat' && view.combat.enemy.hp === 36, 'smoke: save/load preserves enemy HP', view.combat);
 assert(view.combat.abilities.some(ability => ability.id === 'power_strike' && ability.currentCooldown > 0), 'smoke: save/load preserves ability cooldown', view.combat.abilities);
+
+let floor3State = runtime.startNewRun({
+  name: 'Floor3Smoke',
+  playerPatch: { floor: 3, contractsCompleted: 3, completedContracts: ['hunt', 'recovery', 'puzzle'] },
+});
+floor3State.currentSceneId = 'floor3_market';
+const floor3View = runtime.getView(floor3State);
+assert(floor3View.contractProgress && floor3View.contractProgress.label === 'Contracts 3/5', 'smoke: Floor 3 runtime exposes contract progress label', floor3View.contractProgress);
 
 const ended = runtime.dispatch(restored, { type: 'end_run' });
 assert(ended.state.player.runEnded === true && ended.events.some(event => event.type === 'run_ended'), 'smoke: combat End Run ends safely', ended);

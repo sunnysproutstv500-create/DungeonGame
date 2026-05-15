@@ -944,8 +944,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 68
-      ? ok(`scene map data: ${mappedIds.length}/68 scenes have map coordinates`)
+    mappedIds.length === 93
+      ? ok(`scene map data: ${mappedIds.length}/93 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -960,7 +960,7 @@ console.log('\n── Map System ──');
       else positions[key] = id;
     }
     dupes === 0
-      ? ok('map coordinates: all 68 rooms have unique (x,y) positions')
+      ? ok('map coordinates: all 93 rooms have unique (x,y) positions')
       : fail('map coordinate collision', `${dupes} duplicates`);
   }
 
@@ -1317,6 +1317,14 @@ console.log('\n── Floor 1 Expansion ──');
       ? ok('floor2_safe_room: trader sells upgraded items and consumables')
       : fail('floor2_safe_room trader inventory', JSON.stringify(upgradedGear));
 
+    const priceOf = itemId => upgradedGear.find(c => c.effect?.giveItem === itemId)?.effect?.spendGold;
+    priceOf('large_potion') >= 25 && priceOf('large_potion') <= 35 &&
+      priceOf('floor2_lens') >= 45 && priceOf('floor2_lens') <= 55 &&
+      priceOf('phase_edge') >= 75 &&
+      priceOf('mesh_armor') >= 80
+      ? ok('floor2_safe_room: trader prices support one meaningful gear purchase')
+      : fail('floor2_safe_room trader price balance', JSON.stringify(upgradedGear.map(c => ({ item: c.effect.giveItem, cost: c.effect.spendGold }))));
+
     const blockedReturns = doorChoices.every(c => {
       const target = scenes[c.nextScene];
       return target && !(target.choices || []).some(next => next.nextScene === 'floor2_safe_room');
@@ -1395,6 +1403,37 @@ console.log('\n── Floor 1 Expansion ──');
     })
       ? ok('floor2 lanes: all current lanes converge on shared boss')
       : fail('floor2 lanes: a lane does not reach shared boss');
+
+    const readoutChoice = (scenes['floor2_rival_cache']?.choices || []).find(c => c.effect?.giveItem === 'f2_tactical_readout');
+    readoutChoice
+      ? ok('floor2 path 1: optional cache can reveal boss tactical readout')
+      : fail('floor2 path 1: no tactical readout reward');
+
+    const path1Rewards = path1Rooms.flatMap(id => scenes[id]?.choices || []).map(c => c.effect?.giveItem).filter(Boolean);
+    path1Rewards.includes('f2_scout_map') && path1Rewards.includes('large_potion') && path1Rewards.includes('mesh_armor')
+      ? ok('floor2 path 1: rewards emphasize scouting, loot, and side rooms')
+      : fail('floor2 path 1 reward identity', JSON.stringify(path1Rewards));
+
+    /World-3|boss|three lanes|readout|scouting/i.test(scenes['floor2_observation_nest']?.text || '') &&
+      /field note|shared boss|route colors|World-3/i.test(scenes['floor2_rival_cache']?.text || '')
+      ? ok('floor2 path 1: room flavor emphasizes scouting and rival notes')
+      : fail('floor2 path 1 flavor missing scouting identity');
+
+    const ITEMS = require('./data/items.json');
+    const path1Choices = path1Rooms.flatMap(id => scenes[id]?.choices || []);
+    const path1Combat = path1Rooms.map(id => scenes[id]?.combat).filter(Boolean);
+    const path1Xp = path1Combat.reduce((sum, combat) => sum + (combat.xp || 0), 0) +
+      path1Choices.reduce((sum, choice) => sum + (choice.effect?.giveXP || 0), 0);
+    const path1Gold = path1Combat.reduce((sum, combat) => sum + (combat.goldReward || 0), 0) +
+      path1Choices.reduce((sum, choice) => sum + (choice.effect?.giveGold || 0), 0);
+    const path1Sustain = path1Combat.flatMap(combat => combat.loot || [])
+      .concat(path1Choices.map(choice => choice.effect?.giveItem).filter(Boolean))
+      .reduce((sum, itemId) => ITEMS[itemId]?.effect === 'heal' ? sum + (ITEMS[itemId].value || 0) : sum, 0) +
+      path1Choices.reduce((sum, choice) => sum + (choice.effect?.heal || 0), 0);
+
+    path1Xp >= 80 && path1Xp <= 130 && path1Gold >= 90 && path1Gold <= 125 && path1Sustain <= 150
+      ? ok('floor2 path 1 balance: moderate XP, strong gold, capped sustain')
+      : fail('floor2 path 1 balance', JSON.stringify({ path1Xp, path1Gold, path1Sustain }));
   }
 
   {
@@ -1444,9 +1483,29 @@ console.log('\n── Floor 1 Expansion ──');
       ? ok('floor2 path 2: combat-heavy gauntlet')
       : fail('floor2 path 2: not enough combat rooms', `got ${combatRooms.length}`);
 
+    const path2Loot = path2Rooms.flatMap(id => scenes[id]?.combat?.loot || []);
+    path2Loot.includes('gauntlet_maul') && path2Loot.includes('war_plate')
+      ? ok('floor2 path 2: combat drops include high-risk gear')
+      : fail('floor2 path 2 high-risk gear rewards', JSON.stringify(path2Loot));
+
+    /no side passages|Only the line/i.test(scenes['floor2_blue_door']?.text || '') &&
+      /earned|survived|record/i.test(scenes['floor2_gauntlet_antechamber']?.text || '')
+      ? ok('floor2 path 2: room flavor emphasizes attrition and survival')
+      : fail('floor2 path 2 flavor missing attrition identity');
+
     path2Rooms.every(id => !((scenes[id]?.choices || []).some(c => c.nextScene === 'floor2_safe_room')))
       ? ok('floor2 path 2: cannot return to safe room')
       : fail('floor2 path 2: a room returns to safe room');
+
+    const path2Choices = path2Rooms.flatMap(id => scenes[id]?.choices || []);
+    const path2Combat = path2Rooms.map(id => scenes[id]?.combat).filter(Boolean);
+    const path2Xp = path2Combat.reduce((sum, combat) => sum + (combat.xp || 0), 0);
+    const path2Gold = path2Combat.reduce((sum, combat) => sum + (combat.goldReward || 0), 0);
+    const path2Attrition = path2Choices.reduce((sum, choice) => sum + (choice.effect?.damage || 0), 0);
+
+    path2Xp >= 340 && path2Xp <= 430 && path2Gold >= 100 && path2Gold <= 130 && path2Attrition >= 34 && path2Attrition <= 45
+      ? ok('floor2 path 2 balance: best XP/gold with real attrition')
+      : fail('floor2 path 2 balance', JSON.stringify({ path2Xp, path2Gold, path2Attrition }));
   }
 
   {
@@ -1497,6 +1556,386 @@ console.log('\n── Floor 1 Expansion ──');
     path3Rooms.every(id => !((scenes[id]?.choices || []).some(c => c.nextScene === 'floor2_safe_room')))
       ? ok('floor2 path 3: cannot return to safe room')
       : fail('floor2 path 3: a room returns to safe room');
+
+    const patternKeyChoice = path3Rooms.flatMap(id => scenes[id]?.choices || []).find(c => c.effect?.giveItem === 'f2_pattern_key');
+    patternKeyChoice
+      ? ok('floor2 path 3: puzzle route grants boss pattern key')
+      : fail('floor2 path 3: no boss pattern key reward');
+
+    const puzzleRelicChoice = path3Rooms.flatMap(id => scenes[id]?.choices || []).find(c => c.effect?.giveItem === 'logic_prism');
+    puzzleRelicChoice
+      ? ok('floor2 path 3: puzzle route grants a standalone relic')
+      : fail('floor2 path 3: no standalone puzzle relic');
+
+    /asks questions|old markings/i.test(scenes['floor2_black_door']?.text || '') &&
+      /proof|pattern|trust/i.test(scenes['floor2_final_proof']?.text || '')
+      ? ok('floor2 path 3: room flavor emphasizes puzzle logic and strange instruction')
+      : fail('floor2 path 3 flavor missing puzzle identity');
+
+    const path3Choices = path3Rooms.flatMap(id => scenes[id]?.choices || []);
+    const path3Xp = path3Choices.reduce((sum, choice) => sum + (choice.effect?.giveXP || 0), 0);
+    const path3Gold = path3Choices.reduce((sum, choice) => sum + (choice.effect?.giveGold || 0), 0);
+    const path3WrongDamage = path3Choices.reduce((sum, choice) => sum + (choice.effect?.damage || 0), 0);
+
+    path3Xp >= 160 && path3Xp <= 200 && path3Gold >= 15 && path3Gold <= 35 && path3WrongDamage >= 55 && path3WrongDamage <= 75
+      ? ok('floor2 path 3 balance: best noncombat XP, low gold, fair mistakes')
+      : fail('floor2 path 3 balance', JSON.stringify({ path3Xp, path3Gold, path3WrongDamage }));
+  }
+
+  {
+    const boss = scenes['floor2_shared_boss'];
+    const combat = boss?.combat;
+
+    boss?.map?.tag === 'boss'
+      ? ok('floor2 shared boss: tagged as boss')
+      : fail('floor2 shared boss: missing boss tag');
+
+    combat?.name === 'Convergence Warden'
+      ? ok('floor2 shared boss: has final boss identity')
+      : fail('floor2 shared boss identity', combat?.name);
+
+    combat?.intro && combat?.victoryText
+      ? ok('floor2 shared boss: has intro and victory text')
+      : fail('floor2 shared boss: missing intro/victory text');
+
+    combat?.phases?.length === 2 &&
+      [combat, ...combat.phases].map(phase => phase.phaseName).join('|') === 'Red Protocol|Blue Protocol|Black Protocol'
+      ? ok('floor2 shared boss: has red, blue, and black protocols')
+      : fail('floor2 shared boss phases', JSON.stringify(combat?.phases));
+
+    combat?.loot?.includes('convergence_core') && combat?.loot?.includes('large_potion')
+      ? ok('floor2 shared boss: drops Floor 2 relic and consumable')
+      : fail('floor2 shared boss loot', JSON.stringify(combat?.loot));
+
+    boss?.victoryScene === 'floor2_clear_room'
+      ? ok('floor2 shared boss: victory leads to Floor 2 clear story scene')
+      : fail('floor2 shared boss victory handoff', boss?.victoryScene);
+
+    scenes['floor2_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 3|deeper|competition continues/i.test(scenes['floor2_clear_room']?.text || '')
+      ? ok('floor2 clear room: story scene hands off to completion')
+      : fail('floor2 clear room: missing story handoff');
+
+    const advantageItems = (combat?.advantages || []).map(entry => entry.item);
+    advantageItems.includes('f2_tactical_readout') && advantageItems.includes('f2_pattern_key')
+      ? ok('floor2 shared boss: defines path-specific advantages')
+      : fail('floor2 shared boss advantages', JSON.stringify(combat?.advantages));
+
+    ['f2_tactical_readout', 'f2_scout_map', 'f2_pattern_key', 'logic_prism', 'gauntlet_maul', 'war_plate', 'convergence_core'].every(id => require('./data/items.json')[id])
+      ? ok('floor2 boss items: marker and relic items exist')
+      : fail('floor2 boss items: missing item definitions');
+  }
+
+  {
+    const market = scenes['floor3_market'];
+    market?.map?.tag === 'safe'
+      ? ok('floor3_market: safe zone market exists')
+      : fail('floor3_market: missing safe market');
+
+    const contractPortals = (market?.choices || []).filter(choice => /^floor3_.*_portal$/.test(choice.nextScene || ''));
+    contractPortals.length >= 5
+      ? ok('floor3_market: offers five contract portals')
+      : fail('floor3_market contract portal count', `got ${contractPortals.length}`);
+
+    const bossPortal = (market?.choices || []).find(choice => choice.nextScene === 'floor3_boss_portal');
+    bossPortal?.condition?.contractsCompleted === 5
+      ? ok('floor3_market: boss portal requires five completed contracts')
+      : fail('floor3_market boss portal gate', JSON.stringify(bossPortal));
+
+    const brokerFlavor = (market?.choices || []).some(choice => /vendor|broker|contract/i.test(choice.text));
+    brokerFlavor && /vendor|market|contract|portal/i.test(market?.text || '')
+      ? ok('floor3_market: vendors and contract brokers are present')
+      : fail('floor3_market: missing vendor/contract flavor');
+
+    /Contract Board|0\/5|Hunt|Recovery|Puzzle unlocks at 1\/5|Escort at 2\/5|Debt at 3\/5|Boss portal at 5\/5/i.test(market?.text || '')
+      ? ok('floor3_market: board text clearly explains contract progress and unlocks')
+      : fail('floor3_market board clarity missing', market?.text);
+
+    ['Mara Voss', 'Tallow Jin', 'Sister Quen', 'Nix Ledger'].every(name => (market?.text || '').includes(name)) &&
+      (market?.choices || []).some(choice => /Mara Voss/i.test(choice.text)) &&
+      (market?.choices || []).some(choice => /Nix Ledger/i.test(choice.text))
+      ? ok('floor3_market: named NPCs give the market a cast')
+      : fail('floor3_market: missing named NPC flavor', market?.text);
+
+    const vendorPurchases = (market?.choices || []).filter(choice => choice.requires?.gold && choice.effect?.spendGold && choice.effect?.giveItem);
+    const vendorItems = vendorPurchases.map(choice => choice.effect.giveItem);
+    ['large_potion', 'antidote', 'market_spike', 'contract_lamellar', 'broker_abacus'].every(itemId => vendorItems.includes(itemId)) &&
+      vendorPurchases.every(choice => choice.nextScene === 'floor3_market')
+      ? ok('floor3_market: vendors sell consumables and Floor 3 gear')
+      : fail('floor3_market vendor inventory', JSON.stringify(vendorPurchases));
+
+    const priceOf = itemId => vendorPurchases.find(choice => choice.effect?.giveItem === itemId)?.effect?.spendGold;
+    priceOf('large_potion') === 40 &&
+      priceOf('antidote') === 18 &&
+      priceOf('market_spike') === 95 &&
+      priceOf('contract_lamellar') === 100 &&
+      priceOf('broker_abacus') === 80
+      ? ok('floor3_market: vendor prices fit Floor 3 economy')
+      : fail('floor3_market vendor prices', JSON.stringify(vendorPurchases.map(choice => ({ item: choice.effect.giveItem, cost: choice.effect.spendGold }))));
+
+    const floor3VendorItems = require('./data/items.json');
+    floor3VendorItems.market_spike?.type === 'gear' &&
+      floor3VendorItems.contract_lamellar?.slot === 'armor' &&
+      floor3VendorItems.broker_abacus?.slot === 'trinket' &&
+      floor3VendorItems.arbiter_clause?.type === 'relic'
+      ? ok('floor3 vendor items: new gear definitions exist')
+      : fail('floor3 vendor item definitions missing');
+
+    const marketAt = count => getAvailableChoices(market, makePlayer({ contractsCompleted: count, gold: 999 }));
+    const openAt = (count, sceneId) => marketAt(count).some(choice => choice.nextScene === sceneId);
+    openAt(0, 'floor3_hunt_portal') &&
+      openAt(0, 'floor3_recovery_portal') &&
+      !openAt(0, 'floor3_puzzle_portal') &&
+      openAt(1, 'floor3_puzzle_portal') &&
+      !openAt(1, 'floor3_escort_portal') &&
+      openAt(2, 'floor3_escort_portal') &&
+      !openAt(2, 'floor3_debt_portal') &&
+      openAt(3, 'floor3_debt_portal')
+      ? ok('floor3_market: contract board unlocks harder jobs as contracts complete')
+      : fail('floor3_market contract board progression', JSON.stringify({
+          zero: marketAt(0).map(choice => choice.nextScene || choice.text),
+          one: marketAt(1).map(choice => choice.nextScene || choice.text),
+          two: marketAt(2).map(choice => choice.nextScene || choice.text),
+          three: marketAt(3).map(choice => choice.nextScene || choice.text),
+        }));
+
+    [1, 3, 5].every(count => marketAt(count).some(choice => choice.effect?.giveXP && /market|Mara|Nix|Quen|Tallow|Arbiter/i.test(choice.text)))
+      ? ok('floor3_market: NPC reaction beats unlock as contract count rises')
+      : fail('floor3_market reactive flavor missing', JSON.stringify({
+          one: marketAt(1).map(choice => choice.text),
+          three: marketAt(3).map(choice => choice.text),
+          five: marketAt(5).map(choice => choice.text),
+        }));
+
+    const premiumAtTwo = marketAt(2).some(choice => choice.effect?.giveItem === 'arbiter_clause');
+    const premiumAtThree = marketAt(3).some(choice => choice.effect?.giveItem === 'arbiter_clause' && choice.requires?.gold === 120);
+    !premiumAtTwo && premiumAtThree
+      ? ok('floor3_market: premium vendor relic unlocks after three contracts')
+      : fail('floor3_market premium vendor unlock', JSON.stringify({ two: marketAt(2).map(c => c.text), three: marketAt(3).map(c => c.text) }));
+  }
+
+  {
+    const contractIds = ['hunt', 'recovery', 'puzzle', 'escort', 'debt'];
+    const completeScenes = contractIds.map(id => scenes[`floor3_${id}_complete`]);
+    const allComplete = completeScenes.every((scene, index) =>
+      scene?.choices?.some(choice =>
+        choice.nextScene === 'floor3_market' &&
+        choice.effect?.completeContract === contractIds[index]
+      )
+    );
+
+    allComplete
+      ? ok('floor3 contracts: each contract can be completed and returns to market')
+      : fail('floor3 contracts: completion scene missing', JSON.stringify(contractIds.filter((id, index) => !completeScenes[index])));
+
+    const contractRewards = completeScenes.flatMap(scene => scene?.choices || []).map(choice => choice.effect || {});
+    contractRewards.some(effect => effect.giveItem === 'contract_mark') &&
+      contractRewards.some(effect => effect.giveXP) &&
+      contractRewards.some(effect => effect.giveGold)
+      ? ok('floor3 contracts: reward mix includes marks, XP, and gold')
+      : fail('floor3 contracts reward mix', JSON.stringify(contractRewards));
+
+    const expectedSeals = ['hunt_seal', 'recovery_seal', 'puzzle_seal', 'escort_seal', 'debt_seal'];
+    expectedSeals.every(itemId => contractRewards.some(effect => (effect.giveItems || []).includes(itemId))) &&
+      expectedSeals.every(itemId => require('./data/items.json')[itemId]?.type === 'key_item')
+      ? ok('floor3 contracts: each contract awards a unique boss-advantage seal')
+      : fail('floor3 contract seals missing', JSON.stringify(contractRewards));
+
+    ['Hunt Seal', 'Recovery Seal', 'Puzzle Seal', 'Escort Seal', 'Debt Seal'].every(name =>
+      completeScenes.some(scene => (scene?.text || '').includes(name)) ||
+      completeScenes.some(scene => (scene?.choices || []).some(choice => choice.text.includes(name)))
+    )
+      ? ok('floor3 contracts: completion text names each boss-advantage seal')
+      : fail('floor3 contract seal flavor missing', completeScenes.map(scene => scene?.text));
+
+    const intermediateRooms = {
+      hunt: 'floor3_hunt_trace',
+      recovery: 'floor3_recovery_vault',
+      puzzle: 'floor3_puzzle_audit',
+      escort: 'floor3_escort_route',
+      debt: 'floor3_debt_counterparty',
+    };
+
+    const allContractsHaveDepth = contractIds.every(id => {
+      const portal = scenes[`floor3_${id}_portal`];
+      const intermediate = scenes[intermediateRooms[id]];
+      const finalRoom = scenes[`floor3_${id}_room`];
+      return portal?.choices?.some(choice => choice.nextScene === intermediateRooms[id]) &&
+        intermediate?.choices?.some(choice => choice.nextScene === finalRoom?.id) &&
+        (intermediate?.choices || []).length >= 2;
+    });
+
+    allContractsHaveDepth
+      ? ok('floor3 contracts: each contract has an intermediate decision room')
+      : fail('floor3 contracts: missing intermediate depth', JSON.stringify(intermediateRooms));
+  }
+
+  {
+    const p = makePlayer({});
+    applyEff(p, { completeContract: 'hunt' });
+    applyEff(p, { completeContract: 'hunt' });
+    applyEff(p, { completeContract: 'puzzle' });
+
+    p.contractsCompleted === 2 &&
+      p.completedContracts.includes('hunt') &&
+      p.completedContracts.includes('puzzle')
+      ? ok('completeContract effect: tracks unique completed contracts')
+      : fail('completeContract effect tracking', JSON.stringify({ contractsCompleted: p.contractsCompleted, completedContracts: p.completedContracts }));
+
+    evaluateCondition({ contractsCompleted: 2 }, p) && !evaluateCondition({ contractsCompleted: 5 }, p)
+      ? ok('contractsCompleted condition: gates choices by completed contract count')
+      : fail('contractsCompleted condition failed');
+  }
+
+  {
+    const readyPlayer = makePlayer({ contractsCompleted: 5, completedContracts: ['hunt', 'recovery', 'puzzle', 'escort', 'debt'] });
+    const blockedPlayer = makePlayer({ contractsCompleted: 4, completedContracts: ['hunt', 'recovery', 'puzzle', 'escort'] });
+    const floor3Market = scenes['floor3_market'] || { choices: [] };
+    const readyChoices = getAvailableChoices(floor3Market, readyPlayer);
+    const blockedChoices = getAvailableChoices(floor3Market, blockedPlayer);
+
+    readyChoices.some(choice => choice.nextScene === 'floor3_boss_portal') &&
+      !blockedChoices.some(choice => choice.nextScene === 'floor3_boss_portal')
+      ? ok('floor3_market: boss portal appears only after five contracts')
+      : fail('floor3_market boss portal filtering', JSON.stringify({ ready: readyChoices.map(c => c.text), blocked: blockedChoices.map(c => c.text) }));
+
+    scenes['floor3_boss']?.victoryScene === 'floor3_clear_room' &&
+      scenes['floor3_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end')
+      ? ok('floor3 boss: victory reaches Floor 3 clear handoff')
+      : fail('floor3 boss handoff missing');
+
+    scenes['floor3_boss']?.combat?.loot?.includes('market_arbiter_ledger') &&
+      require('./data/items.json').market_arbiter_ledger?.type === 'relic'
+      ? ok('floor3 boss: drops unique Market Arbiter relic')
+      : fail('floor3 boss unique relic missing', JSON.stringify(scenes['floor3_boss']?.combat?.loot));
+
+    const bossAdvantages = scenes['floor3_boss']?.combat?.advantages || [];
+    ['hunt_seal', 'recovery_seal', 'puzzle_seal', 'escort_seal', 'debt_seal'].every(itemId => bossAdvantages.some(advantage => advantage.item === itemId))
+      ? ok('floor3 boss: every contract seal creates an Arbiter advantage')
+      : fail('floor3 boss advantages missing', JSON.stringify(bossAdvantages));
+
+    const baseState = runtime.startNewRun({ name: 'ArbiterBase', playerPatch: { floor: 3, inventory: [] } });
+    baseState.currentSceneId = 'floor3_boss';
+    const baseView = runtime.getView(baseState);
+    const advantagedState = runtime.startNewRun({
+      name: 'ArbiterFavored',
+      playerPatch: { floor: 3, inventory: ['hunt_seal', 'recovery_seal', 'puzzle_seal', 'escort_seal', 'debt_seal'] },
+    });
+    advantagedState.currentSceneId = 'floor3_boss';
+    const advantagedView = runtime.getView(advantagedState);
+
+    advantagedView.combat.enemy.maxHp < baseView.combat.enemy.maxHp &&
+      advantagedView.combat.enemy.attack < baseView.combat.enemy.attack &&
+      advantagedView.combat.enemy.defense < baseView.combat.enemy.defense &&
+      !advantagedView.combat.enemy.abilities.includes('armor_break') &&
+      advantagedView.combat.enemy.advantagesApplied.length === 5
+      ? ok('runtime floor3 boss: contract seals weaken the Arbiter')
+      : fail('runtime floor3 boss advantages', JSON.stringify({ base: baseView.combat.enemy, advantaged: advantagedView.combat.enemy }));
+
+    const floor3Rooms = Object.keys(scenes).filter(id => id.startsWith('floor3_') && !['floor3_market', 'floor3_boss', 'floor3_boss_portal', 'floor3_clear_room'].includes(id));
+    const floor3Choices = floor3Rooms.flatMap(id => scenes[id]?.choices || []);
+    const floor3Combats = floor3Rooms.map(id => scenes[id]?.combat).filter(Boolean);
+    const floor3Xp = floor3Combats.reduce((sum, combat) => sum + (combat.xp || 0), 0) +
+      floor3Choices.reduce((sum, choice) => sum + (choice.effect?.giveXP || 0), 0);
+    const floor3Gold = floor3Combats.reduce((sum, combat) => sum + (combat.goldReward || 0), 0) +
+      floor3Choices.reduce((sum, choice) => sum + (choice.effect?.giveGold || 0), 0);
+    const floor3Damage = floor3Choices.reduce((sum, choice) => sum + (choice.effect?.damage || 0), 0);
+
+    floor3Xp >= 640 && floor3Xp <= 780 && floor3Gold >= 180 && floor3Gold <= 250 && floor3Damage >= 90 && floor3Damage <= 125
+      ? ok('floor3 balance: contracts give high XP/gold with meaningful optional damage')
+      : fail('floor3 balance totals', JSON.stringify({ floor3Xp, floor3Gold, floor3Damage }));
+
+    baseView.combat.enemy.maxHp >= 150 && baseView.combat.enemy.attack >= 33 && baseView.combat.enemy.defense >= 9
+      ? ok('floor3 boss balance: Arbiter is a step above Floor 2 boss')
+      : fail('floor3 boss balance too low', JSON.stringify(baseView.combat.enemy));
+
+    /Mara Voss|Tallow Jin|Sister Quen|Nix Ledger|Floor 4|black-market|sponsors|threshold/i.test(scenes['floor3_clear_room']?.text || '')
+      ? ok('floor3 clear room: named NPC payoff and Floor 4 tease are present')
+      : fail('floor3 clear room payoff missing', scenes['floor3_clear_room']?.text);
+  }
+
+  {
+    const marketState = runtime.startNewRun({
+      name: 'MarketPolishProbe',
+      playerPatch: { floor: 3, contractsCompleted: 5, completedContracts: ['hunt', 'recovery', 'puzzle', 'escort', 'debt'] },
+    });
+    marketState.currentSceneId = 'floor3_market';
+    const marketView = runtime.getView(marketState);
+    const bossChoice = marketView.choices.find(choice => choice.nextScene === 'floor3_boss_portal');
+    const reactionChoice = marketView.choices.find(choice => /Arbiter's odds/i.test(choice.text));
+
+    bossChoice?.progressLabel === 'Progress: 5/5 contracts complete. Boss portal unlocked.' &&
+      reactionChoice?.rewardLabel?.includes('20 XP') &&
+      marketView.contractProgress?.completed === 5 &&
+      marketView.contractProgress?.required === 5 &&
+      marketView.objective?.goal === 'Enter the Market Arbiter boss portal'
+      ? ok('runtime Floor 3 market view: contract count, boss unlock, and final reaction are clear')
+      : fail('runtime Floor 3 market clarity', JSON.stringify({ bossChoice, reactionChoice, contractProgress: marketView.contractProgress, objective: marketView.objective }));
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      let guard = 0;
+      while (runtime.getView(next).mode === 'combat' && guard < 20) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+        guard++;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'Floor3FullClear',
+      playerPatch: { floor: 3, hp: 999, maxHp: 999, attack: 999, defense: 99, gold: 300 },
+    });
+    run.currentSceneId = 'floor3_market';
+
+    run = chooseByText(run, /Hunt Contract/);
+    run = chooseByText(run, /marked target/);
+    run = chooseByText(run, /Study the spoor/);
+    run = winCombat(run);
+    run = chooseByText(run, /Claim the Hunt/);
+
+    run = chooseByText(run, /Recovery Contract/);
+    run = chooseByText(run, /Enter the recovery portal/);
+    run = chooseByText(run, /Compare the claim/);
+    run = chooseByText(run, /Lift the sealed case/);
+    run = chooseByText(run, /Claim the Recovery/);
+
+    run = chooseByText(run, /Puzzle Contract/);
+    run = chooseByText(run, /Enter the puzzle portal/);
+    run = chooseByText(run, /Sort the receipts/);
+    run = chooseByText(run, /Mark the repeated payer/);
+    run = chooseByText(run, /Claim the Puzzle/);
+
+    run = chooseByText(run, /Escort Contract/);
+    run = chooseByText(run, /Escort the drone/);
+    run = chooseByText(run, /Recalibrate the drone/);
+    run = winCombat(run);
+    run = chooseByText(run, /Claim the Escort/);
+
+    run = chooseByText(run, /Debt Contract/);
+    run = chooseByText(run, /Enter the debt portal/);
+    run = chooseByText(run, /Interview the recordings/);
+    run = chooseByText(run, /Pay the debt cleanly/);
+    run = chooseByText(run, /Claim the Debt/);
+
+    run = chooseByText(run, /boss portal/);
+    run = chooseByText(run, /Enter the boss portal/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor3_clear_room' &&
+      run.player.contractsCompleted === 5 &&
+      ['hunt_seal', 'recovery_seal', 'puzzle_seal', 'escort_seal', 'debt_seal', 'market_arbiter_ledger'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 3 full playthrough: five contracts unlock and clear the Arbiter')
+      : fail('runtime Floor 3 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, contractsCompleted: run.player.contractsCompleted, inventory: run.player.inventory }));
   }
 
   {
@@ -2104,6 +2543,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
 {
   const f1 = generateFloor(1);
   const f2 = generateFloor(2);
+  const f3 = generateFloor(3);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -2113,9 +2553,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 2 uses real generator')
     : fail('generateFloor floor 2 real config', JSON.stringify(f2));
 
-  MAX_IMPLEMENTED_FLOOR === 2
-    ? ok('run lifecycle: max implemented floor includes Floor 2')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 2', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f3 && f3.floor === 3 && f3.placeholder !== true && Array.isArray(f3.excludedRooms) && f3.safeRoom === 'floor3_market'
+    ? ok('generateFloor: floor 3 uses real market generator')
+    : fail('generateFloor floor 3 real config', JSON.stringify(f3));
+
+  MAX_IMPLEMENTED_FLOOR === 3
+    ? ok('run lifecycle: max implemented floor includes Floor 3')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 3', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -2307,6 +2751,44 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   result.events.some(e => e.type === 'scene_changed' && e.to === 'floor2_safe_room')
     ? ok('runtime.complete_floor: emits scene change to Floor 2 safe room')
     : fail('runtime.complete_floor Floor 2 events', JSON.stringify(result.events));
+}
+
+{
+  const state = runtime.startNewRun({ name: 'Floor2Finisher' });
+  state.player.floor = 2;
+  state.currentSceneId = 'the_end';
+  const result = runtime.dispatch(state, { type: 'complete_floor' });
+  const floorEvent = result.events.find(event => event.type === 'floor_completed');
+
+  floorEvent?.completedFloor === 2 && floorEvent?.nextFloor === 3 && floorEvent?.currencyReward === 30
+    ? ok('runtime.complete_floor: Floor 2 completion awards Floor 2 meta event')
+    : fail('runtime.complete_floor Floor 2 reward event', JSON.stringify(result.events));
+
+  result.state.currentSceneId === 'floor3_market' &&
+    result.state.floorConfig.placeholder !== true &&
+    result.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 2 handoff enters Floor 3 market')
+    : fail('runtime.complete_floor Floor 2 handoff', JSON.stringify({ scene: result.state.currentSceneId, floorConfig: result.state.floorConfig, player: result.state.player, events: result.events }));
+}
+
+{
+  const state = runtime.startNewRun({ name: 'Floor3Finisher' });
+  state.player.floor = 3;
+  state.currentSceneId = 'the_end';
+  const result = runtime.dispatch(state, { type: 'complete_floor' });
+  const floorEvent = result.events.find(event => event.type === 'floor_completed');
+  const runEndEvent = result.events.find(event => event.type === 'run_ended');
+
+  floorEvent?.completedFloor === 3 && floorEvent?.nextFloor === 4 && floorEvent?.currencyReward === 45
+    ? ok('runtime.complete_floor: Floor 3 completion awards Floor 3 meta event')
+    : fail('runtime.complete_floor Floor 3 reward event', JSON.stringify(result.events));
+
+  result.state.player.runEnded === true &&
+    result.state.player.currentRunActive === false &&
+    runEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 4/i.test(runEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 3 handoff ends at Floor 4 under construction')
+    : fail('runtime.complete_floor Floor 3 handoff', JSON.stringify({ player: result.state.player, events: result.events }));
 }
 
 // ── 18. Runtime Combat Actions ────────────────────────────────────────────
@@ -3087,6 +3569,50 @@ console.log('\n── Section 18: Runtime Combat Actions ──');
   result.events.some(e => e.type === 'reward_summary' && e.loot.includes('guard_key') && e.gold > 0)
     ? ok('runtime.combat_attack: emits clear combat reward summary')
     : fail('runtime combat reward summary', JSON.stringify(result.events));
+}
+
+{
+  const baseState = runtime.startNewRun({
+    name: 'BossReader',
+    playerPatch: { floor: 2, inventory: [] },
+  });
+  baseState.currentSceneId = 'floor2_shared_boss';
+  const baseView = runtime.getView(baseState);
+
+  const redState = runtime.startNewRun({
+    name: 'BossReader',
+    playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },
+  });
+  redState.currentSceneId = 'floor2_shared_boss';
+  const redView = runtime.getView(redState);
+
+  redView.combat.enemy.attack < baseView.combat.enemy.attack &&
+    redView.combat.enemy.defense < baseView.combat.enemy.defense &&
+    redView.combat.enemy.advantagesApplied?.includes('f2_tactical_readout')
+    ? ok('runtime floor2 boss: red tactical readout weakens attack and defense')
+    : fail('runtime floor2 boss red advantage', JSON.stringify({ base: baseView.combat.enemy, red: redView.combat.enemy }));
+}
+
+{
+  const baseState = runtime.startNewRun({
+    name: 'PatternReader',
+    playerPatch: { floor: 2, inventory: [] },
+  });
+  baseState.currentSceneId = 'floor2_shared_boss';
+  const baseView = runtime.getView(baseState);
+
+  const blackState = runtime.startNewRun({
+    name: 'PatternReader',
+    playerPatch: { floor: 2, inventory: ['f2_pattern_key'] },
+  });
+  blackState.currentSceneId = 'floor2_shared_boss';
+  const blackView = runtime.getView(blackState);
+
+  blackView.combat.enemy.maxHp < baseView.combat.enemy.maxHp &&
+    !blackView.combat.enemy.abilities.includes('sweeping_attack') &&
+    blackView.combat.enemy.advantagesApplied?.includes('f2_pattern_key')
+    ? ok('runtime floor2 boss: black pattern key weakens HP and removes sweep')
+    : fail('runtime floor2 boss black advantage', JSON.stringify({ base: baseView.combat.enemy, black: blackView.combat.enemy }));
 }
 
 {

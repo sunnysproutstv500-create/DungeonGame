@@ -1577,7 +1577,7 @@
         },
         "effect": {
           "giveItem": "large_potion",
-          "spendGold": 35
+          "spendGold": 30
         },
         "once": true
       },
@@ -1588,7 +1588,7 @@
         },
         "effect": {
           "giveItem": "phase_edge",
-          "spendGold": 70
+          "spendGold": 80
         },
         "once": true
       },
@@ -1599,7 +1599,7 @@
         },
         "effect": {
           "giveItem": "mesh_armor",
-          "spendGold": 75
+          "spendGold": 85
         },
         "once": true
       },
@@ -1610,7 +1610,7 @@
         },
         "effect": {
           "giveItem": "floor2_lens",
-          "spendGold": 60
+          "spendGold": 50
         },
         "once": true
       },
@@ -1727,12 +1727,19 @@
       ]
     },
     "title": "Floor 2 - Observation Nest",
-    "text": "The hatch opens into a cramped watcher station above the checkpoint. Dusty screens show fragments of the three Floor 2 lanes: red systems, blue attrition corridors, black geometry that refuses to hold still. A notebook rests beside the console, written in a competitor's shorthand.",
+    "text": "The hatch opens into a cramped watcher station above the checkpoint. Dusty screens show fragments of the three lanes: red systems, blue attrition corridors, black geometry that refuses to hold still, and the boss chamber where they all converge. A notebook rests beside the console, written in a competitor's scouting shorthand.",
     "choices": [
       {
         "text": "Study the notebook and take the emergency vial",
         "effect": {
           "giveItem": "large_potion"
+        },
+        "once": true
+      },
+      {
+        "text": "Copy the rival's scout map from the screens",
+        "effect": {
+          "giveItem": "f2_scout_map"
         },
         "once": true
       },
@@ -1828,7 +1835,7 @@
       ]
     },
     "title": "Floor 2 - Rival Cache",
-    "text": "The niche opens into a hidden cache marked with World-3's angular script. Whoever left it expected to come back after scouting the boss route. They did not. Inside: a field note about the shared boss and a carefully wrapped piece of equipment.",
+    "text": "The niche opens into a hidden cache marked with World-3's angular script. Whoever left it expected to come back after scouting the boss route. They did not. Inside: a field note about the shared boss, route colors, and a carefully wrapped piece of equipment.",
     "choices": [
       {
         "text": "Take the wrapped armor plate",
@@ -1839,6 +1846,13 @@
       },
       {
         "text": "Read the field note and leave it for later",
+        "effect": {
+          "giveItem": "f2_tactical_readout"
+        },
+        "once": true
+      },
+      {
+        "text": "Strip the cache's emergency gold foil",
         "effect": {
           "giveGold": 15
         },
@@ -1901,7 +1915,7 @@
       "xp": 85,
       "goldReward": 30,
       "loot": [
-        "large_potion"
+        "small_potion"
       ],
       "type": "defensive",
       "abilities": [
@@ -2003,8 +2017,10 @@
       "attack": 25,
       "defense": 7,
       "xp": 80,
-      "goldReward": 18,
-      "loot": [],
+      "goldReward": 22,
+      "loot": [
+        "gauntlet_maul"
+      ],
       "type": "aggressive",
       "abilities": [
         "crushing_blow",
@@ -2033,7 +2049,7 @@
       {
         "text": "Move through the needle pattern",
         "effect": {
-          "damage": 8
+          "damage": 10
         },
         "nextScene": "floor2_sentry_line"
       }
@@ -2059,7 +2075,7 @@
       "attack": 23,
       "defense": 5,
       "xp": 88,
-      "goldReward": 22,
+      "goldReward": 26,
       "loot": [
         "small_potion"
       ],
@@ -2096,7 +2112,7 @@
       {
         "text": "Grab the ration pack under the bench without sitting",
         "effect": {
-          "damage": 6,
+          "damage": 8,
           "giveItem": "small_potion"
         },
         "nextScene": "floor2_double_bind"
@@ -2123,7 +2139,7 @@
       "attack": 26,
       "defense": 6,
       "xp": 96,
-      "goldReward": 24,
+      "goldReward": 28,
       "loot": [],
       "type": "trickster",
       "abilities": [
@@ -2156,9 +2172,10 @@
       "attack": 28,
       "defense": 7,
       "xp": 105,
-      "goldReward": 26,
+      "goldReward": 30,
       "loot": [
-        "big_potion"
+        "big_potion",
+        "war_plate"
       ],
       "type": "aggressive",
       "abilities": [
@@ -2189,7 +2206,7 @@
       {
         "text": "Cross the last meter under the hammers",
         "effect": {
-          "damage": 10
+          "damage": 16
         },
         "nextScene": "floor2_gauntlet_antechamber"
       }
@@ -2254,7 +2271,7 @@
       {
         "text": "Align the glyphs to the shared count",
         "effect": {
-          "giveXP": 12
+          "giveXP": 18
         },
         "nextScene": "floor2_mirror_grid"
       },
@@ -2285,7 +2302,7 @@
       {
         "text": "Walk the reflected route, not the visible one",
         "effect": {
-          "giveXP": 14
+          "giveXP": 20
         },
         "nextScene": "floor2_weight_riddle"
       },
@@ -2316,7 +2333,7 @@
       {
         "text": "Place a ration wrapper on the physical plinth and leave the rest empty",
         "effect": {
-          "giveXP": 16
+          "giveXP": 20
         },
         "nextScene": "floor2_tone_lock"
       },
@@ -2347,7 +2364,7 @@
       {
         "text": "Wait through the full tone cycle before touching the panel",
         "effect": {
-          "giveXP": 14
+          "giveXP": 18
         },
         "nextScene": "floor2_memory_walk"
       },
@@ -2378,7 +2395,7 @@
       {
         "text": "Choose the memory with the almost-mistake",
         "effect": {
-          "giveXP": 18
+          "giveXP": 22
         },
         "nextScene": "floor2_logic_well"
       },
@@ -2409,7 +2426,8 @@
       {
         "text": "Stand beneath the useful statement",
         "effect": {
-          "giveXP": 16
+          "giveXP": 22,
+          "giveItem": "logic_prism"
         },
         "nextScene": "floor2_symbol_bridge"
       },
@@ -2440,7 +2458,7 @@
       {
         "text": "Step on the inverted survivor symbol",
         "effect": {
-          "giveXP": 18
+          "giveXP": 20
         },
         "nextScene": "floor2_final_proof"
       },
@@ -2472,7 +2490,9 @@
         "text": "Let the countdown expire without touching the panel",
         "effect": {
           "giveXP": 22,
-          "heal": 10
+          "heal": 10,
+          "giveItem": "f2_pattern_key",
+          "giveGold": 20
         },
         "nextScene": "floor2_puzzle_antechamber"
       },
@@ -2514,21 +2534,350 @@
       "name": "F2BOSS",
       "tag": "boss",
       "connections": [
-        "floor2_boss_antechamber"
+        "floor2_boss_antechamber",
+        "floor2_clear_room"
       ]
     },
     "title": "Floor 2 - Shared Boss",
-    "text": "The three Floor 2 lanes converge in a chamber built around a suspended engine core. The boss waits beneath it, shaped by whichever path brought you here but loyal to none of them.",
+    "text": "The three Floor 2 lanes converge in a chamber built around a suspended engine core. The boss waits beneath it, shaped by whichever path brought you here but loyal to none of them. Red heat, blue pressure, and black puzzle-light pulse through its armor in sequence.",
     "combat": {
       "name": "Convergence Warden",
-      "hp": 120,
-      "attack": 27,
-      "defense": 8,
-      "xp": 150,
-      "goldReward": 45,
+      "phaseName": "Red Protocol",
+      "hp": 95,
+      "attack": 25,
+      "defense": 10,
+      "xp": 240,
+      "goldReward": 90,
       "loot": [
-        "phase_edge",
+        "convergence_core",
         "large_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "cleave",
+        "crushing_blow",
+        "shield_up"
+      ],
+      "intro": "The suspended engine core opens like an eye. The Convergence Warden drops beneath it, armor lit by three route colors. It does not choose a lane. It chooses all of them.",
+      "victoryText": "The Convergence Warden tries to cycle one more protocol, but the three colors desync. Red heat vents into the floor. Blue pressure cracks the chamber wall. Black puzzle-light resolves into a single answer: survived.\n\nThe engine core folds inward and leaves a dense relic behind. Floor 2 has no more routes to test you with.",
+      "advantages": [
+        {
+          "item": "f2_tactical_readout",
+          "attackDelta": -3,
+          "defenseDelta": -2,
+          "message": "The tactical readout exposes the Red Protocol's timing."
+        },
+        {
+          "item": "f2_pattern_key",
+          "hpDelta": -25,
+          "removeAbilities": [
+            "sweeping_attack"
+          ],
+          "message": "The solved pattern strips the Black Protocol's sweep sequence."
+        }
+      ],
+      "phases": [
+        {
+          "phaseName": "Blue Protocol",
+          "hp": 70,
+          "attack": 29,
+          "defense": 7,
+          "type": "aggressive",
+          "abilities": [
+            "battle_roar",
+            "heavy_hit",
+            "armor_break"
+          ],
+          "intro": "The red heat gutters out. Blue pressure floods the armor, turning the fight into a compressed gauntlet with no space to breathe."
+        },
+        {
+          "phaseName": "Black Protocol",
+          "hp": 55,
+          "attack": 24,
+          "defense": 5,
+          "type": "trickster",
+          "abilities": [
+            "sweeping_attack",
+            "poison_hit",
+            "quick_strike"
+          ],
+          "intro": "The chamber lights cut to black. Symbols bloom across the Warden's plating, each attack arriving one beat before the obvious answer."
+        }
+      ]
+    },
+    "fleeScene": "floor2_boss_antechamber",
+    "victoryScene": "floor2_clear_room",
+    "choices": []
+  },
+  "floor2_clear_room": {
+    "id": "floor2_clear_room",
+    "map": {
+      "x": 4,
+      "y": 19,
+      "name": "F2CLR",
+      "tag": "event",
+      "connections": [
+        "floor2_shared_boss",
+        "the_end"
+      ]
+    },
+    "title": "Floor 2 Clear - Descent Lock",
+    "text": "The Convergence Warden collapses into three fading colors. Red systems vent heat into the walls. Blue pressure doors unlock one after another. Black puzzle-light resolves into a straight line pointing down.\n\nAn elevator rises from beneath the boss chamber, but it does not open like the safe room doors did. A panel reads: FLOOR 2 PERFORMANCE LOGGED. FLOOR 3 ACCESS PREPARED.\n\nThe Overseers' voice follows a beat later: 'World-Earth representative. Floor 2 clear. Route variance recorded. Convergence response survived.'\n\nThe elevator doors part onto darkness and deeper machinery. Floor 3 is below you. The competition continues.",
+    "choices": [
+      {
+        "text": "Step into the elevator toward Floor 3. [FLOOR 2 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
+  },
+  "floor3_market": {
+    "id": "floor3_market",
+    "map": {
+      "x": 0,
+      "y": 30,
+      "name": "F3MKT",
+      "tag": "safe",
+      "connections": [
+        "floor3_hunt_portal",
+        "floor3_recovery_portal",
+        "floor3_puzzle_portal",
+        "floor3_escort_portal",
+        "floor3_debt_portal",
+        "floor3_boss_portal"
+      ]
+    },
+    "title": "Floor 3 - Contract Market",
+    "text": "Floor 3 opens into a market built inside an impossible station. Venders call from stalls made of salvaged dungeon metal while contract brokers sit beneath hanging portal frames, each one selling risk with a smile and a stamped receipt.\n\nMara Voss keeps the red hunt desk with trophy tags pinned to her coat. Tallow Jin sells bottles from a furnace-warm medicine cart. Sister Quen repairs armor under a cracked sanctuary bell, and Nix Ledger runs odds from a booth of clicking brass counters.\n\nContract Board: 0/5 stamped. Hunt and Recovery are open. Puzzle unlocks at 1/5, Escort at 2/5, Debt at 3/5, and the Boss portal at 5/5. The air is safe by rule, not kindness. Weapons are lowered. Prices are high. Every contract portal hums with a different color.",
+    "choices": [
+      {
+        "text": "Visit Tallow Jin - buy a Large Potion (40 gold)",
+        "requires": {
+          "gold": 40
+        },
+        "effect": {
+          "giveItem": "large_potion",
+          "spendGold": 40
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Visit Tallow Jin - buy an Antidote (18 gold)",
+        "requires": {
+          "gold": 18
+        },
+        "effect": {
+          "giveItem": "antidote",
+          "spendGold": 18
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Visit Mara Voss - buy a Market Spike (95 gold)",
+        "requires": {
+          "gold": 95
+        },
+        "effect": {
+          "giveItem": "market_spike",
+          "spendGold": 95
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Visit Sister Quen - buy Contract Lamellar (100 gold)",
+        "requires": {
+          "gold": 100
+        },
+        "effect": {
+          "giveItem": "contract_lamellar",
+          "spendGold": 100
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Visit Nix Ledger - buy a Broker Abacus (80 gold)",
+        "requires": {
+          "gold": 80
+        },
+        "effect": {
+          "giveItem": "broker_abacus",
+          "spendGold": 80
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Visit Nix Ledger - buy the Arbiter Clause relic (120 gold)",
+        "condition": {
+          "contractsCompleted": 3
+        },
+        "requires": {
+          "gold": 120
+        },
+        "effect": {
+          "giveItem": "arbiter_clause",
+          "spendGold": 120
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      },
+      {
+        "text": "Ask Nix Ledger about contract portals",
+        "effect": {
+          "giveXP": 10
+        },
+        "once": true
+      },
+      {
+        "text": "Hear Mara Voss call your first mark good enough to risk better work",
+        "condition": {
+          "contractsCompleted": 1
+        },
+        "effect": {
+          "giveXP": 10
+        },
+        "once": true
+      },
+      {
+        "text": "Hear Sister Quen warn the market is starting to bet on you",
+        "condition": {
+          "contractsCompleted": 3
+        },
+        "effect": {
+          "giveXP": 15
+        },
+        "once": true
+      },
+      {
+        "text": "Hear Nix Ledger quote the Arbiter's odds after five contracts",
+        "condition": {
+          "contractsCompleted": 5
+        },
+        "effect": {
+          "giveXP": 20
+        },
+        "once": true
+      },
+      {
+        "text": "Accept the Hunt Contract portal",
+        "nextScene": "floor3_hunt_portal"
+      },
+      {
+        "text": "Accept the Recovery Contract portal",
+        "nextScene": "floor3_recovery_portal"
+      },
+      {
+        "text": "Accept the Puzzle Contract portal",
+        "condition": {
+          "contractsCompleted": 1
+        },
+        "nextScene": "floor3_puzzle_portal"
+      },
+      {
+        "text": "Accept the Escort Contract portal",
+        "condition": {
+          "contractsCompleted": 2
+        },
+        "nextScene": "floor3_escort_portal"
+      },
+      {
+        "text": "Accept the Debt Contract portal",
+        "condition": {
+          "contractsCompleted": 3
+        },
+        "nextScene": "floor3_debt_portal"
+      },
+      {
+        "text": "Enter the boss portal after completing five contracts",
+        "condition": {
+          "contractsCompleted": 5
+        },
+        "nextScene": "floor3_boss_portal"
+      }
+    ]
+  },
+  "floor3_hunt_portal": {
+    "id": "floor3_hunt_portal",
+    "map": {
+      "x": -3,
+      "y": 31,
+      "name": "HPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_hunt_trace"
+      ]
+    },
+    "title": "Floor 3 - Hunt Portal",
+    "text": "The hunt broker stamps your wrist with a red sigil. The portal opens onto a room that smells like hot iron and old trophies.",
+    "choices": [
+      {
+        "text": "Step through to hunt the marked target",
+        "nextScene": "floor3_hunt_trace"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_hunt_trace": {
+    "id": "floor3_hunt_trace",
+    "map": {
+      "x": -3,
+      "y": 32,
+      "name": "HTRACE",
+      "tag": "event",
+      "connections": [
+        "floor3_hunt_portal",
+        "floor3_hunt_room"
+      ]
+    },
+    "title": "Contract - Hunt Trace",
+    "text": "The trophy room is empty except for heat-scratches across the floor and fresh iron filings in the corners. The beast is circling the room behind the room.",
+    "choices": [
+      {
+        "text": "Study the spoor before forcing the second door",
+        "effect": {
+          "giveXP": 15
+        },
+        "nextScene": "floor3_hunt_room"
+      },
+      {
+        "text": "Kick the second door open before it finishes circling",
+        "effect": {
+          "damage": 10
+        },
+        "nextScene": "floor3_hunt_room"
+      }
+    ]
+  },
+  "floor3_hunt_room": {
+    "id": "floor3_hunt_room",
+    "map": {
+      "x": -3,
+      "y": 33,
+      "name": "HUNT",
+      "tag": "combat",
+      "connections": [
+        "floor3_hunt_trace",
+        "floor3_hunt_complete"
+      ]
+    },
+    "title": "Contract - Hunt",
+    "text": "A brass hunting floor unfolds under your feet. The target waits in the center, all plated shoulders and contract tags hammered into its hide.",
+    "combat": {
+      "name": "Marked Ironbeast",
+      "hp": 105,
+      "attack": 30,
+      "defense": 8,
+      "xp": 130,
+      "goldReward": 35,
+      "loot": [
+        "small_potion"
       ],
       "type": "aggressive",
       "abilities": [
@@ -2537,9 +2886,664 @@
         "battle_roar"
       ]
     },
-    "fleeScene": "floor2_boss_antechamber",
-    "victoryScene": "the_end",
+    "fleeScene": "floor3_hunt_portal",
+    "victoryScene": "floor3_hunt_complete",
     "choices": []
+  },
+  "floor3_hunt_complete": {
+    "id": "floor3_hunt_complete",
+    "map": {
+      "x": -3,
+      "y": 34,
+      "name": "HDONE",
+      "tag": "event",
+      "connections": [
+        "floor3_hunt_room",
+        "floor3_market"
+      ]
+    },
+    "title": "Contract Complete - Hunt",
+    "text": "The hunt sigil burns cold, then turns into a stamped mark. A Hunt Seal forms under it, red-edged and sharp enough to make the Arbiter's future ledger bleed. Somewhere in the market, Mara Voss updates your tally.",
+    "choices": [
+      {
+        "text": "Claim the Hunt Contract mark and return",
+        "effect": {
+          "completeContract": "hunt",
+          "giveItem": "contract_mark",
+          "giveItems": [
+            "hunt_seal"
+          ],
+          "giveGold": 25,
+          "giveXP": 25
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_recovery_portal": {
+    "id": "floor3_recovery_portal",
+    "map": {
+      "x": -1,
+      "y": 31,
+      "name": "RPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_recovery_vault"
+      ]
+    },
+    "title": "Floor 3 - Recovery Portal",
+    "text": "The recovery broker slides a claim slip under the portal frame. 'Bring back the sealed case. Do not open the sealed case. Everyone opens the sealed case.'",
+    "choices": [
+      {
+        "text": "Enter the recovery portal",
+        "nextScene": "floor3_recovery_vault"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_recovery_vault": {
+    "id": "floor3_recovery_vault",
+    "map": {
+      "x": -1,
+      "y": 32,
+      "name": "RVAULT",
+      "tag": "event",
+      "connections": [
+        "floor3_recovery_portal",
+        "floor3_recovery_room"
+      ]
+    },
+    "title": "Contract - Recovery Vault",
+    "text": "The first vault door is already open. That is the trap. Two claim tags hang from the handle, one legal and one forged.",
+    "choices": [
+      {
+        "text": "Compare the claim tags before touching the lock",
+        "effect": {
+          "giveXP": 15
+        },
+        "nextScene": "floor3_recovery_room"
+      },
+      {
+        "text": "Tear off both tags and take the risk",
+        "effect": {
+          "damage": 8,
+          "giveGold": 10
+        },
+        "nextScene": "floor3_recovery_room"
+      }
+    ]
+  },
+  "floor3_recovery_room": {
+    "id": "floor3_recovery_room",
+    "map": {
+      "x": -1,
+      "y": 33,
+      "name": "RECOV",
+      "tag": "treasure",
+      "connections": [
+        "floor3_recovery_vault",
+        "floor3_recovery_complete"
+      ]
+    },
+    "title": "Contract - Recovery",
+    "text": "The portal drops you into a vault aisle where every lock is already open except the one you need. The sealed case sits behind a trap mesh that tightens whenever you breathe too fast.",
+    "choices": [
+      {
+        "text": "Lift the sealed case slowly through the mesh",
+        "effect": {
+          "giveXP": 35
+        },
+        "nextScene": "floor3_recovery_complete"
+      },
+      {
+        "text": "Rip the case free before the mesh closes",
+        "effect": {
+          "damage": 18,
+          "giveGold": 30
+        },
+        "nextScene": "floor3_recovery_complete"
+      }
+    ]
+  },
+  "floor3_recovery_complete": {
+    "id": "floor3_recovery_complete",
+    "map": {
+      "x": -1,
+      "y": 34,
+      "name": "RDONE",
+      "tag": "event",
+      "connections": [
+        "floor3_recovery_room",
+        "floor3_market"
+      ]
+    },
+    "title": "Contract Complete - Recovery",
+    "text": "The sealed case vanishes from your hands and reappears on a broker's desk in the market. A Recovery Seal replaces it, stamped with proof the Arbiter cannot claim every asset on the floor.",
+    "choices": [
+      {
+        "text": "Claim the Recovery Contract mark and return",
+        "effect": {
+          "completeContract": "recovery",
+          "giveItem": "contract_mark",
+          "giveItems": [
+            "recovery_seal"
+          ],
+          "giveGold": 20,
+          "giveXP": 30
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_puzzle_portal": {
+    "id": "floor3_puzzle_portal",
+    "map": {
+      "x": 1,
+      "y": 31,
+      "name": "PPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_puzzle_audit"
+      ]
+    },
+    "title": "Floor 3 - Puzzle Portal",
+    "text": "The puzzle broker says nothing. They only point to a portal filled with stacked receipts, each one folded into a different answer.",
+    "choices": [
+      {
+        "text": "Enter the puzzle portal",
+        "nextScene": "floor3_puzzle_audit"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_puzzle_audit": {
+    "id": "floor3_puzzle_audit",
+    "map": {
+      "x": 1,
+      "y": 32,
+      "name": "PAUDIT",
+      "tag": "puzzle",
+      "connections": [
+        "floor3_puzzle_portal",
+        "floor3_puzzle_room"
+      ]
+    },
+    "title": "Contract - Puzzle Audit",
+    "text": "Receipts drift like paper birds. Four are lies, one is a duplicate, and the room waits to see whether you count money or motive.",
+    "choices": [
+      {
+        "text": "Sort the receipts by signature pressure",
+        "effect": {
+          "giveXP": 25
+        },
+        "nextScene": "floor3_puzzle_room"
+      },
+      {
+        "text": "Sort them by the largest number first",
+        "effect": {
+          "damage": 8
+        },
+        "nextScene": "floor3_puzzle_room"
+      }
+    ]
+  },
+  "floor3_puzzle_room": {
+    "id": "floor3_puzzle_room",
+    "map": {
+      "x": 1,
+      "y": 33,
+      "name": "PUZZ",
+      "tag": "puzzle",
+      "connections": [
+        "floor3_puzzle_audit",
+        "floor3_puzzle_complete"
+      ]
+    },
+    "title": "Contract - Puzzle",
+    "text": "A contract ledger hangs open in midair. Five debts, five names, five impossible totals. The answer is not who owes the most. It is who paid twice.",
+    "choices": [
+      {
+        "text": "Mark the repeated payer and balance the ledger",
+        "effect": {
+          "giveXP": 70
+        },
+        "nextScene": "floor3_puzzle_complete"
+      },
+      {
+        "text": "Erase the largest debt",
+        "effect": {
+          "damage": 12
+        },
+        "nextScene": "floor3_puzzle_complete"
+      }
+    ]
+  },
+  "floor3_puzzle_complete": {
+    "id": "floor3_puzzle_complete",
+    "map": {
+      "x": 1,
+      "y": 34,
+      "name": "PDONE",
+      "tag": "event",
+      "connections": [
+        "floor3_puzzle_room",
+        "floor3_market"
+      ]
+    },
+    "title": "Contract Complete - Puzzle",
+    "text": "The ledger closes itself and prints your answer onto a Puzzle Seal. The mark hums with balanced columns, ready to cancel one of the Arbiter's nastier clauses.",
+    "choices": [
+      {
+        "text": "Claim the Puzzle Contract mark and return",
+        "effect": {
+          "completeContract": "puzzle",
+          "giveItem": "contract_mark",
+          "giveItems": [
+            "puzzle_seal"
+          ],
+          "giveXP": 50
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_escort_portal": {
+    "id": "floor3_escort_portal",
+    "map": {
+      "x": 3,
+      "y": 31,
+      "name": "EPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_escort_route"
+      ]
+    },
+    "title": "Floor 3 - Escort Portal",
+    "text": "The escort broker gestures to a flickering maintenance drone. 'Keep it functioning until the contract site verifies delivery.' The drone looks already offended by reality.",
+    "choices": [
+      {
+        "text": "Escort the drone through the portal",
+        "nextScene": "floor3_escort_route"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_escort_route": {
+    "id": "floor3_escort_route",
+    "map": {
+      "x": 3,
+      "y": 32,
+      "name": "EROUTE",
+      "tag": "event",
+      "connections": [
+        "floor3_escort_portal",
+        "floor3_escort_room"
+      ]
+    },
+    "title": "Contract - Escort Route",
+    "text": "The drone projects two delivery routes. One is longer and lit. One is shorter and full of claw marks. It recommends the claw marks with corporate confidence.",
+    "choices": [
+      {
+        "text": "Recalibrate the drone and take the longer lit route",
+        "effect": {
+          "giveXP": 15,
+          "heal": 8
+        },
+        "nextScene": "floor3_escort_room"
+      },
+      {
+        "text": "Take the claw-mark shortcut before the route changes",
+        "effect": {
+          "damage": 12,
+          "giveGold": 12
+        },
+        "nextScene": "floor3_escort_room"
+      }
+    ]
+  },
+  "floor3_escort_room": {
+    "id": "floor3_escort_room",
+    "map": {
+      "x": 3,
+      "y": 33,
+      "name": "ESCORT",
+      "tag": "combat",
+      "connections": [
+        "floor3_escort_route",
+        "floor3_escort_complete"
+      ]
+    },
+    "title": "Contract - Escort",
+    "text": "The drone rolls into a service corridor and immediately attracts two hostile pylons. It emits one sad confirmation tone and hides behind you.",
+    "combat": {
+      "name": "Contract Pylons",
+      "hp": 88,
+      "attack": 28,
+      "defense": 6,
+      "xp": 120,
+      "goldReward": 25,
+      "loot": [
+        "big_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "shield_bash",
+        "armor_break"
+      ]
+    },
+    "fleeScene": "floor3_escort_portal",
+    "victoryScene": "floor3_escort_complete",
+    "choices": []
+  },
+  "floor3_escort_complete": {
+    "id": "floor3_escort_complete",
+    "map": {
+      "x": 3,
+      "y": 34,
+      "name": "EDONE",
+      "tag": "event",
+      "connections": [
+        "floor3_escort_room",
+        "floor3_market"
+      ]
+    },
+    "title": "Contract Complete - Escort",
+    "text": "The drone reaches its delivery square and prints your Escort Seal with insulting slowness. Its route data remains inside the mark, waiting to misdirect the Arbiter's orders.",
+    "choices": [
+      {
+        "text": "Claim the Escort Contract mark and return",
+        "effect": {
+          "completeContract": "escort",
+          "giveItem": "contract_mark",
+          "giveItems": [
+            "escort_seal"
+          ],
+          "giveGold": 25,
+          "giveXP": 30
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_debt_portal": {
+    "id": "floor3_debt_portal",
+    "map": {
+      "x": 5,
+      "y": 31,
+      "name": "DPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_debt_counterparty"
+      ]
+    },
+    "title": "Floor 3 - Debt Portal",
+    "text": "The debt broker smiles like a closed knife. 'This one is simple. Someone owes the market. Make the books stop noticing.'",
+    "choices": [
+      {
+        "text": "Enter the debt portal",
+        "nextScene": "floor3_debt_counterparty"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_debt_counterparty": {
+    "id": "floor3_debt_counterparty",
+    "map": {
+      "x": 5,
+      "y": 32,
+      "name": "DCOUNT",
+      "tag": "event",
+      "connections": [
+        "floor3_debt_portal",
+        "floor3_debt_room"
+      ]
+    },
+    "title": "Contract - Debt Counterparty",
+    "text": "The debtor is gone, but their excuses remain as recorded holograms. Each one contradicts the last by exactly one useful detail.",
+    "choices": [
+      {
+        "text": "Interview the recordings until the contradiction appears",
+        "effect": {
+          "giveXP": 20
+        },
+        "nextScene": "floor3_debt_room"
+      },
+      {
+        "text": "Break the witness terminal and pocket the emergency scrip",
+        "effect": {
+          "damage": 10,
+          "giveGold": 15
+        },
+        "nextScene": "floor3_debt_room"
+      }
+    ]
+  },
+  "floor3_debt_room": {
+    "id": "floor3_debt_room",
+    "map": {
+      "x": 5,
+      "y": 33,
+      "name": "DEBT",
+      "tag": "event",
+      "connections": [
+        "floor3_debt_counterparty",
+        "floor3_debt_complete"
+      ]
+    },
+    "title": "Contract - Debt",
+    "text": "A stall appears without a seller. Scales hang over a contract slate. The slate lists three acceptable payments: gold, blood, or leverage.",
+    "choices": [
+      {
+        "text": "Pay the debt cleanly (30 gold)",
+        "requires": {
+          "gold": 30
+        },
+        "effect": {
+          "spendGold": 30,
+          "giveXP": 45
+        },
+        "nextScene": "floor3_debt_complete"
+      },
+      {
+        "text": "Pay in blood and keep your gold",
+        "effect": {
+          "damage": 20,
+          "giveXP": 35
+        },
+        "nextScene": "floor3_debt_complete"
+      },
+      {
+        "text": "Find leverage in the fine print",
+        "effect": {
+          "giveGold": 15,
+          "giveXP": 40
+        },
+        "nextScene": "floor3_debt_complete"
+      }
+    ]
+  },
+  "floor3_debt_complete": {
+    "id": "floor3_debt_complete",
+    "map": {
+      "x": 5,
+      "y": 34,
+      "name": "DDONE",
+      "tag": "event",
+      "connections": [
+        "floor3_debt_room",
+        "floor3_market"
+      ]
+    },
+    "title": "Contract Complete - Debt",
+    "text": "The slate zeroes out, then stamps your Debt Seal with a sound like a judge's gavel. The market recognizes paid debt, and that recognition has weight.",
+    "choices": [
+      {
+        "text": "Claim the Debt Contract mark and return",
+        "effect": {
+          "completeContract": "debt",
+          "giveItem": "contract_mark",
+          "giveItems": [
+            "debt_seal"
+          ],
+          "giveGold": 20,
+          "giveXP": 30
+        },
+        "once": true,
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_boss_portal": {
+    "id": "floor3_boss_portal",
+    "map": {
+      "x": 0,
+      "y": 34,
+      "name": "BPORT",
+      "tag": "event",
+      "connections": [
+        "floor3_market",
+        "floor3_boss"
+      ]
+    },
+    "title": "Floor 3 - Boss Portal",
+    "text": "Five contract marks and five seals rise from your inventory and slot themselves into the portal frame. The market quiets. Even the venders stop pretending not to watch. A counter flips from 5/5 to PORTAL LIVE.",
+    "choices": [
+      {
+        "text": "Enter the boss portal",
+        "nextScene": "floor3_boss"
+      },
+      {
+        "text": "Return to the market",
+        "nextScene": "floor3_market"
+      }
+    ]
+  },
+  "floor3_boss": {
+    "id": "floor3_boss",
+    "map": {
+      "x": 0,
+      "y": 35,
+      "name": "F3BOSS",
+      "tag": "boss",
+      "connections": [
+        "floor3_boss_portal",
+        "floor3_clear_room"
+      ]
+    },
+    "title": "Floor 3 - The Market Arbiter",
+    "text": "The boss chamber is a counting house with no walls. Receipts orbit a central throne. The Market Arbiter looks up from a ledger that already has your name written five times.",
+    "combat": {
+      "name": "The Market Arbiter",
+      "phaseName": "Audit",
+      "hp": 165,
+      "attack": 35,
+      "defense": 11,
+      "xp": 350,
+      "goldReward": 135,
+      "loot": [
+        "large_potion",
+        "market_arbiter_ledger"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "armor_break",
+        "heavy_hit"
+      ],
+      "intro": "The Arbiter opens the ledger. Every completed contract becomes a weaponized line item.",
+      "victoryText": "The ledger splits down the spine. The Arbiter tries to total your debt one last time, but the number resolves to zero.",
+      "advantages": [
+        {
+          "item": "hunt_seal",
+          "hpDelta": -18,
+          "message": "Mara's Hunt Seal marks the Arbiter's real body among the receipt doubles."
+        },
+        {
+          "item": "recovery_seal",
+          "defenseDelta": -2,
+          "message": "The Recovery Seal proves which assets the Arbiter can no longer claim."
+        },
+        {
+          "item": "puzzle_seal",
+          "removeAbilities": [
+            "armor_break"
+          ],
+          "message": "The Puzzle Seal balances the audit before the armor-break clause resolves."
+        },
+        {
+          "item": "escort_seal",
+          "attackDelta": -3,
+          "message": "The Escort Seal forces the market pylons to misroute the Arbiter's strongest orders."
+        },
+        {
+          "item": "debt_seal",
+          "hpDelta": -12,
+          "attackDelta": -1,
+          "defenseDelta": -1,
+          "message": "The Debt Seal zeroes a line item the Arbiter planned to weaponize."
+        }
+      ],
+      "phases": [
+        {
+          "phaseName": "Collection",
+          "hp": 95,
+          "attack": 36,
+          "defense": 7,
+          "type": "aggressive",
+          "abilities": [
+            "battle_roar",
+            "cleave",
+            "crushing_blow"
+          ],
+          "intro": "The market calls in every debt at once."
+        }
+      ]
+    },
+    "fleeScene": "floor3_boss_portal",
+    "victoryScene": "floor3_clear_room",
+    "choices": []
+  },
+  "floor3_clear_room": {
+    "id": "floor3_clear_room",
+    "map": {
+      "x": 0,
+      "y": 36,
+      "name": "F3CLR",
+      "tag": "event",
+      "connections": [
+        "floor3_boss",
+        "the_end"
+      ]
+    },
+    "title": "Floor 3 Clear - Market Closed",
+    "text": "The market returns all at once: venders shouting, brokers laughing, portals cooling to dull glass. A bell rings five times for the contracts, then once more for the boss.\n\nMara Voss tips two fingers from the hunt desk. Tallow Jin stops haggling long enough to raise a bottle. Sister Quen folds a strip of contract metal into a quiet blessing. Nix Ledger tears your losing slip in half and writes a new line underneath: SPONSORS WATCHING.\n\nBehind the Arbiter's broken ledger, a black-market elevator opens on a shaft of colder light. The sign above it reads: FLOOR 4 ACCESS PENDING. Whatever waits below has already bought your name from the market.",
+    "choices": [
+      {
+        "text": "Step toward Floor 4. [FLOOR 3 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   },
   "game_over": {
     "id": "game_over",

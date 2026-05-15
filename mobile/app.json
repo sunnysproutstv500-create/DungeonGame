@@ -9,9 +9,11 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.jojen.dungeondepths",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.jojen.dungeondepths",
       "adaptiveIcon": {
         "backgroundColor": "#f5f1e8"
       }

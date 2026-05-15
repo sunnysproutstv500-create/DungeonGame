@@ -275,6 +275,177 @@
     "effect": "none",
     "value": 0
   },
+  "f2_tactical_readout": {
+    "id": "f2_tactical_readout",
+    "name": "Convergence Tactical Readout",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f2_scout_map": {
+    "id": "f2_scout_map",
+    "name": "Rival Scout Map",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f2_pattern_key": {
+    "id": "f2_pattern_key",
+    "name": "Solved Convergence Pattern",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "logic_prism": {
+    "id": "logic_prism",
+    "name": "Logic Prism",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "gauntlet_maul": {
+    "id": "gauntlet_maul",
+    "name": "Gauntlet Maul",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 8
+    },
+    "trait": {
+      "id": "first_attack_bonus",
+      "value": 6,
+      "text": "First attack each combat deals +6 damage."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "war_plate": {
+    "id": "war_plate",
+    "name": "War Plate",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 7
+    },
+    "trait": {
+      "id": "first_hit_reduction",
+      "value": 10,
+      "text": "Reduce the first incoming hit each combat by 10."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "convergence_core": {
+    "id": "convergence_core",
+    "name": "Convergence Core",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "market_arbiter_ledger": {
+    "id": "market_arbiter_ledger",
+    "name": "Market Arbiter's Ledger",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "arbiter_clause": {
+    "id": "arbiter_clause",
+    "name": "Arbiter Clause",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "contract_mark": {
+    "id": "contract_mark",
+    "name": "Contract Mark",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "hunt_seal": {
+    "id": "hunt_seal",
+    "name": "Hunt Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "recovery_seal": {
+    "id": "recovery_seal",
+    "name": "Recovery Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "puzzle_seal": {
+    "id": "puzzle_seal",
+    "name": "Puzzle Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "escort_seal": {
+    "id": "escort_seal",
+    "name": "Escort Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "debt_seal": {
+    "id": "debt_seal",
+    "name": "Debt Seal",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "market_spike": {
+    "id": "market_spike",
+    "name": "Market Spike",
+    "type": "gear",
+    "slot": "weapon",
+    "stats": {
+      "attack": 9
+    },
+    "trait": {
+      "id": "first_attack_bonus",
+      "value": 7,
+      "text": "First attack each combat deals +7 damage."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "contract_lamellar": {
+    "id": "contract_lamellar",
+    "name": "Contract Lamellar",
+    "type": "gear",
+    "slot": "armor",
+    "stats": {
+      "defense": 8
+    },
+    "trait": {
+      "id": "first_hit_reduction",
+      "value": 12,
+      "text": "Reduce the first incoming hit each combat by 12."
+    },
+    "effect": "none",
+    "value": 0
+  },
+  "broker_abacus": {
+    "id": "broker_abacus",
+    "name": "Broker Abacus",
+    "type": "gear",
+    "slot": "trinket",
+    "stats": {
+      "perception": 2
+    },
+    "trait": {
+      "id": "bonus_gold",
+      "value": 8,
+      "text": "Gain +8 gold after combat victories."
+    },
+    "effect": "none",
+    "value": 0
+  },
   "ranger_cloak": {
     "id": "ranger_cloak",
     "name": "Ranger Cloak",

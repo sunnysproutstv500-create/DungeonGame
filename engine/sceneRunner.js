@@ -31,6 +31,10 @@ function evaluateCondition(condition, player) {
     return (player.perception || 0) >= condition.perception;
   }
 
+  if (condition.contractsCompleted !== undefined) {
+    return (player.contractsCompleted || 0) >= condition.contractsCompleted;
+  }
+
   if (condition.stat && condition.operator !== undefined && condition.value !== undefined) {
     const statMap = {
       hp:    player.hp,
@@ -87,6 +91,13 @@ function applyEffect(player, effect) {
     console.log(`  You obtained: ${effect.giveItem}`);
   }
 
+  if (Array.isArray(effect.giveItems)) {
+    for (const itemId of effect.giveItems) {
+      player.inventory.push(itemId);
+      console.log(`  You obtained: ${itemId}`);
+    }
+  }
+
   if (effect.giveGold) {
     player.gold += effect.giveGold;
     console.log(`  You found ${effect.giveGold} gold.`);
@@ -103,6 +114,15 @@ function applyEffect(player, effect) {
 
   if (effect.setRoute) {
     player.route = effect.setRoute;
+  }
+
+  if (effect.completeContract) {
+    if (!Array.isArray(player.completedContracts)) player.completedContracts = [];
+    if (!player.completedContracts.includes(effect.completeContract)) {
+      player.completedContracts.push(effect.completeContract);
+    }
+    player.contractsCompleted = player.completedContracts.length;
+    console.log(`  Contract complete: ${effect.completeContract}. (${player.contractsCompleted}/5)`);
   }
 
   if (effect.applyStatus) {
