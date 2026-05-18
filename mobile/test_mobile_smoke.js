@@ -55,6 +55,8 @@ assert(appSource.includes('styles.intentPanel'), 'smoke: combat screen renders e
 assert(appSource.includes('Danger:'), 'smoke: combat intent shows danger rating');
 assert(appSource.includes('Pressure'), 'smoke: combat screen explains attack pressure');
 assert(appSource.includes('view.combat.pressure'), 'smoke: combat pressure comes from runtime view');
+assert(appSource.includes('Boss Advantage'), 'smoke: combat screen calls out active boss advantages');
+assert(appSource.includes('view.combat.enemy.advantagesApplied'), 'smoke: boss advantages come from runtime enemy view');
 assert(appSource.includes('function OutcomePanel'), 'smoke: room and combat outcomes render outside the collapsed log');
 assert(appSource.includes('Recent Result'), 'smoke: visible outcome panel has a clear label');
 assert(appSource.includes('Quick Items'), 'smoke: combat screen exposes quick item controls');
@@ -163,6 +165,14 @@ let floor3State = runtime.startNewRun({
 floor3State.currentSceneId = 'floor3_market';
 const floor3View = runtime.getView(floor3State);
 assert(floor3View.contractProgress && floor3View.contractProgress.label === 'Contracts 3/5', 'smoke: Floor 3 runtime exposes contract progress label', floor3View.contractProgress);
+
+let floor2BossState = runtime.startNewRun({
+  name: 'Floor2BossSmoke',
+  playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },
+});
+floor2BossState.currentSceneId = 'floor2_shared_boss';
+const floor2BossView = runtime.getView(floor2BossState);
+assert(floor2BossView.combat.enemy.advantagesApplied.includes('f2_tactical_readout'), 'smoke: Floor 2 boss view exposes applied advantage items', floor2BossView.combat.enemy);
 
 const ended = runtime.dispatch(restored, { type: 'end_run' });
 assert(ended.state.player.runEnded === true && ended.events.some(event => event.type === 'run_ended'), 'smoke: combat End Run ends safely', ended);

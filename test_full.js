@@ -1325,6 +1325,16 @@ console.log('\n── Floor 1 Expansion ──');
       ? ok('floor2_safe_room: trader prices support one meaningful gear purchase')
       : fail('floor2_safe_room trader price balance', JSON.stringify(upgradedGear.map(c => ({ item: c.effect.giveItem, cost: c.effect.spendGold }))));
 
+    const mismatchedPrices = (floor2Safe?.choices || []).filter(choice => {
+      const match = String(choice.text || '').match(/(\d+) gold/);
+      if (!match) return false;
+      const shown = Number(match[1]);
+      return choice.requires?.gold !== shown || choice.effect?.spendGold !== shown;
+    });
+    mismatchedPrices.length === 0
+      ? ok('floor2_safe_room: trader displayed prices match required and spent gold')
+      : fail('floor2_safe_room mismatched trader prices', JSON.stringify(mismatchedPrices.map(choice => ({ text: choice.text, requires: choice.requires?.gold, spend: choice.effect?.spendGold }))));
+
     const blockedReturns = doorChoices.every(c => {
       const target = scenes[c.nextScene];
       return target && !(target.choices || []).some(next => next.nextScene === 'floor2_safe_room');
@@ -3591,6 +3601,21 @@ console.log('\n── Section 18: Runtime Combat Actions ──');
     redView.combat.enemy.advantagesApplied?.includes('f2_tactical_readout')
     ? ok('runtime floor2 boss: red tactical readout weakens attack and defense')
     : fail('runtime floor2 boss red advantage', JSON.stringify({ base: baseView.combat.enemy, red: redView.combat.enemy }));
+}
+
+{
+  const state = runtime.startNewRun({
+    name: 'MapReader',
+    playerPatch: { floor: 3, contractsCompleted: 5 },
+  });
+  state.currentSceneId = 'floor3_market';
+  const view = runtime.getView(state);
+  const floor3MappedRoomCount = Object.keys(scenes).filter(id => id.startsWith('floor3_') && scenes[id].map).length;
+
+  view.mapProgress.totalRooms === floor3MappedRoomCount &&
+    view.mapProgress.rooms.every(room => room.id.startsWith('floor3_'))
+    ? ok('runtime map progress: counts only current floor rooms')
+    : fail('runtime map progress current floor scope', JSON.stringify(view.mapProgress));
 }
 
 {

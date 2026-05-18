@@ -207,17 +207,23 @@ function buildObjective(player) {
   };
 }
 
+function sceneBelongsToFloor(id, floor) {
+  if (floor === 2) return id.startsWith('floor2_');
+  if (floor === 3) return id.startsWith('floor3_');
+  return !id.startsWith('floor2_') && !id.startsWith('floor3_');
+}
+
 function buildMapProgress(state) {
   const floor = state.player.floor || 1;
   const mapState = getFloorMap(state.player, floor);
-  const discovered = new Set(mapState.discovered || []);
-  const visited = new Set(mapState.visited || []);
-  if (SCENES[state.currentSceneId]?.map) {
+  const discovered = new Set((mapState.discovered || []).filter(id => sceneBelongsToFloor(id, floor)));
+  const visited = new Set((mapState.visited || []).filter(id => sceneBelongsToFloor(id, floor)));
+  if (SCENES[state.currentSceneId]?.map && sceneBelongsToFloor(state.currentSceneId, floor)) {
     discovered.add(state.currentSceneId);
     visited.add(state.currentSceneId);
   }
 
-  const totalRooms = Object.values(SCENES).filter(scene => scene.map).length;
+  const totalRooms = Object.entries(SCENES).filter(([id, scene]) => scene.map && sceneBelongsToFloor(id, floor)).length;
   const rooms = [...discovered]
     .map(id => {
       const scene = SCENES[id];

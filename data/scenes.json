@@ -1571,9 +1571,9 @@
         "once": true
       },
       {
-        "text": "Buy Large Potion - 35 gold",
+        "text": "Buy Large Potion - 30 gold",
         "requires": {
-          "gold": 35
+          "gold": 30
         },
         "effect": {
           "giveItem": "large_potion",
@@ -1582,9 +1582,9 @@
         "once": true
       },
       {
-        "text": "Buy Phase Edge - 70 gold",
+        "text": "Buy Phase Edge - 80 gold",
         "requires": {
-          "gold": 70
+          "gold": 80
         },
         "effect": {
           "giveItem": "phase_edge",
@@ -1593,9 +1593,9 @@
         "once": true
       },
       {
-        "text": "Buy Mesh Armor - 75 gold",
+        "text": "Buy Mesh Armor - 85 gold",
         "requires": {
-          "gold": 75
+          "gold": 85
         },
         "effect": {
           "giveItem": "mesh_armor",
@@ -1604,9 +1604,9 @@
         "once": true
       },
       {
-        "text": "Buy Calibrated Lens - 60 gold",
+        "text": "Buy Calibrated Lens - 50 gold",
         "requires": {
-          "gold": 60
+          "gold": 50
         },
         "effect": {
           "giveItem": "floor2_lens",

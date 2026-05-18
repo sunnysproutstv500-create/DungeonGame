@@ -523,6 +523,7 @@ function ScenePanel({ view, onAction, events }) {
 
 function CombatPanel({ view, onAction, events }) {
   const quickItems = (view.items || []).filter(item => item.usable);
+  const bossAdvantages = view.combat.enemy.advantagesApplied || [];
 
   return (
     <>
@@ -549,6 +550,14 @@ function CombatPanel({ view, onAction, events }) {
         <View style={styles.pressurePanel}>
           <Text style={styles.pressureLabel}>Pressure</Text>
           <Text style={styles.pressureText}>{view.combat.pressure.text}</Text>
+        </View>
+      )}
+      {bossAdvantages.length > 0 && (
+        <View style={styles.bossAdvantagePanel}>
+          <Text style={styles.bossAdvantageLabel}>Boss Advantage</Text>
+          <Text style={styles.bossAdvantageText}>
+            {bossAdvantages.length} earned counter{bossAdvantages.length === 1 ? '' : 's'} active.
+          </Text>
         </View>
       )}
       <StatusRow label="You" effects={view.player.statusEffects} />
@@ -1716,6 +1725,29 @@ const styles = StyleSheet.create({
   },
   pressureText: {
     color: '#332820',
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '800',
+  },
+  bossAdvantagePanel: {
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderWidth: 1,
+    borderColor: '#506a5b',
+    borderRadius: 8,
+    backgroundColor: '#edf5ed',
+    gap: 3,
+  },
+  bossAdvantageLabel: {
+    color: '#2f4f3d',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  bossAdvantageText: {
+    color: '#263229',
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
