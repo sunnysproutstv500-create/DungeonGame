@@ -10,6 +10,7 @@ const { completeFloor, endRun, formatRunSummary, MAX_IMPLEMENTED_FLOOR } = requi
 const runtime = require('./engine/runtime');
 const metaCore = require('./engine/metaCore');
 const saveStore = require('./mobile/saveStore');
+const items = require('./data/items.json');
 
 const scenes = loadScenes();
 let passed = 0;
@@ -944,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 93
-      ? ok(`scene map data: ${mappedIds.length}/93 scenes have map coordinates`)
+    mappedIds.length === 106
+      ? ok(`scene map data: ${mappedIds.length}/106 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -960,7 +961,7 @@ console.log('\n── Map System ──');
       else positions[key] = id;
     }
     dupes === 0
-      ? ok('map coordinates: all 93 rooms have unique (x,y) positions')
+      ? ok('map coordinates: all mapped rooms have unique (x,y) positions')
       : fail('map coordinate collision', `${dupes} duplicates`);
   }
 
@@ -1864,6 +1865,126 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('floor3 clear room payoff missing', scenes['floor3_clear_room']?.text);
   }
 
+  // ── Floor 4: Sponsor Vault ──
+  {
+    ['f4_gold_key', 'f4_blood_key', 'f4_signal_key', 'f4_auction_contract', 'f4_blood_writ', 'f4_signal_patch', 'sponsor_crown'].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor4 item exists: ${itemId}`)
+        : fail(`floor4 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor4_elevator'];
+    safe?.map?.tag === 'safe' && /Sponsor Vault|relay|vendor|Vault Keys 0\/3/i.test(safe?.text || '')
+      ? ok('floor4_elevator: safe relay room introduces Sponsor Vault and Vault Key goal')
+      : fail('floor4_elevator missing safe intro', JSON.stringify(safe));
+
+    const wingStarts = ['floor4_gold_entry', 'floor4_blood_entry', 'floor4_signal_entry'];
+    wingStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor4_elevator: opens three distinct sponsor wings')
+      : fail('floor4_elevator wing choices missing', JSON.stringify(safe?.choices));
+
+    const floor4Rooms = [
+      'floor4_gold_entry',
+      'floor4_gold_auction',
+      'floor4_gold_vault',
+      'floor4_blood_entry',
+      'floor4_blood_trial',
+      'floor4_blood_vault',
+      'floor4_signal_entry',
+      'floor4_signal_puzzle',
+      'floor4_signal_vault',
+      'floor4_boss_gate',
+      'floor4_boss',
+      'floor4_clear_room',
+    ];
+
+    floor4Rooms.every(id => scenes[id])
+      ? ok('floor4 sponsor vault: core rooms exist')
+      : fail('floor4 sponsor vault missing rooms', floor4Rooms.filter(id => !scenes[id]).join(', '));
+
+    const keyRewards = [
+      ['floor4_gold_vault', 'f4_gold_key'],
+      ['floor4_blood_vault', 'f4_blood_key'],
+      ['floor4_signal_vault', 'f4_signal_key'],
+    ];
+
+    keyRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor4 sponsor vault: each wing awards a unique Vault Key')
+      : fail('floor4 sponsor vault key rewards missing', JSON.stringify(keyRewards));
+
+    ['floor4_gold_auction', 'floor4_blood_trial', 'floor4_signal_puzzle'].every(id => /Sponsor Pressure|pressure|sponsor/i.test(scenes[id]?.text || ''))
+      ? ok('floor4 sponsor vault: wing rooms emphasize sponsor pressure')
+      : fail('floor4 sponsor pressure flavor missing');
+
+    const gateChoice = (scenes['floor4_boss_gate']?.choices || []).find(choice => choice.nextScene === 'floor4_boss');
+    gateChoice?.requires?.items?.includes('f4_gold_key') &&
+      gateChoice.requires.items.includes('f4_blood_key') &&
+      gateChoice.requires.items.includes('f4_signal_key')
+      ? ok('floor4 boss gate: requires all three Vault Keys')
+      : fail('floor4 boss gate requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor4_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === "The Sponsor's Champion" &&
+      boss.combat?.loot?.includes('sponsor_crown') &&
+      boss.victoryScene === 'floor4_clear_room'
+      ? ok('floor4 boss: Sponsor Champion drops unique relic and clears floor')
+      : fail('floor4 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f4_auction_contract', 'f4_blood_writ', 'f4_signal_patch'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor4 boss: optional sponsor pressure rewards create boss advantages')
+      : fail('floor4 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor4_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 5|Overseers|Sponsors/i.test(scenes['floor4_clear_room']?.text || '')
+      ? ok('floor4 clear room: hands off toward Floor 5')
+      : fail('floor4 clear room handoff missing', scenes['floor4_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 4 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 30 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'SponsorVaultRunner',
+      playerPatch: { floor: 4, hp: 999, maxHp: 999, attack: 999, defense: 99, gold: 200 },
+    });
+    run.currentSceneId = 'floor4_elevator';
+
+    run = chooseByText(run, /Gold Wing/);
+    run = chooseByText(run, /auction lights/);
+    run = chooseByText(run, /sell your combat pattern/);
+    run = chooseByText(run, /Gold Vault Key/);
+    run = chooseByText(run, /Blood Wing/);
+    run = winCombat(run);
+    run = chooseByText(run, /Blood Writ/);
+    run = chooseByText(run, /Blood Vault Key/);
+    run = chooseByText(run, /Signal Wing/);
+    run = chooseByText(run, /Trace the broadcast/);
+    run = chooseByText(run, /patch the Champion feed/);
+    run = chooseByText(run, /Signal Vault Key/);
+    run = chooseByText(run, /Slot all three Vault Keys/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor4_clear_room' &&
+      ['f4_gold_key', 'f4_blood_key', 'f4_signal_key', 'f4_auction_contract', 'f4_blood_writ', 'f4_signal_patch', 'sponsor_crown'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 4 full playthrough: three wings unlock and clear the Sponsor Champion')
+      : fail('runtime Floor 4 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -2554,6 +2675,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f1 = generateFloor(1);
   const f2 = generateFloor(2);
   const f3 = generateFloor(3);
+  const f4 = generateFloor(4);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -2567,9 +2689,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 3 uses real market generator')
     : fail('generateFloor floor 3 real config', JSON.stringify(f3));
 
-  MAX_IMPLEMENTED_FLOOR === 3
-    ? ok('run lifecycle: max implemented floor includes Floor 3')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 3', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f4 && f4.floor === 4 && f4.placeholder !== true && Array.isArray(f4.excludedRooms) && f4.safeRoom === 'floor4_elevator'
+    ? ok('generateFloor: floor 4 uses real Sponsor Vault generator')
+    : fail('generateFloor floor 4 real config', JSON.stringify(f4));
+
+  MAX_IMPLEMENTED_FLOOR === 4
+    ? ok('run lifecycle: max implemented floor includes Floor 4')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 4', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -2787,21 +2913,53 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   state.currentSceneId = 'the_end';
   const result = runtime.dispatch(state, { type: 'complete_floor' });
   const floorEvent = result.events.find(event => event.type === 'floor_completed');
-  const runEndEvent = result.events.find(event => event.type === 'run_ended');
-
   floorEvent?.completedFloor === 3 && floorEvent?.nextFloor === 4 && floorEvent?.currencyReward === 45
     ? ok('runtime.complete_floor: Floor 3 completion awards Floor 3 meta event')
     : fail('runtime.complete_floor Floor 3 reward event', JSON.stringify(result.events));
 
-  result.state.player.runEnded === true &&
-    result.state.player.currentRunActive === false &&
-    runEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 4/i.test(runEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 3 handoff ends at Floor 4 under construction')
+  result.state.currentSceneId === 'floor4_elevator' &&
+    result.state.floorConfig.placeholder !== true &&
+    result.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 3 handoff enters Floor 4 Sponsor Vault')
     : fail('runtime.complete_floor Floor 3 handoff', JSON.stringify({ player: result.state.player, events: result.events }));
 }
 
 // ── 18. Runtime Combat Actions ────────────────────────────────────────────
+{
+  const state = runtime.startNewRun({
+    name: 'Floor4Reader',
+    playerPatch: { floor: 4, inventory: ['f4_gold_key', 'f4_signal_key'] },
+  });
+  state.currentSceneId = 'floor4_boss_gate';
+  const view = runtime.getView(state);
+
+  view.objective?.route === 'sponsor-vault' &&
+    view.objective.goal === 'Collect Vault Keys 2/3' &&
+    view.objective.missing.includes('Blood Vault Key')
+    ? ok('runtime Floor 4 objective: tracks Vault Keys before boss gate')
+    : fail('runtime Floor 4 objective missing', JSON.stringify(view.objective));
+}
+
+{
+  const state = runtime.startNewRun({ name: 'Floor4Finisher' });
+  state.player.floor = 4;
+  state.currentSceneId = 'the_end';
+  const result = runtime.dispatch(state, { type: 'complete_floor' });
+  const floorEvent = result.events.find(event => event.type === 'floor_completed');
+  const runEndEvent = result.events.find(event => event.type === 'run_ended');
+
+  floorEvent?.completedFloor === 4 && floorEvent?.nextFloor === 5 && floorEvent?.currencyReward === 60
+    ? ok('runtime.complete_floor: Floor 4 completion awards Floor 4 meta event')
+    : fail('runtime.complete_floor Floor 4 reward event', JSON.stringify(result.events));
+
+  result.state.player.runEnded === true &&
+    result.state.player.currentRunActive === false &&
+    runEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 5/i.test(runEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 4 handoff ends at Floor 5 under construction')
+    : fail('runtime.complete_floor Floor 4 handoff', JSON.stringify({ player: result.state.player, events: result.events }));
+}
+
 console.log('\n── Section 18: Runtime Combat Actions ──');
 
 {

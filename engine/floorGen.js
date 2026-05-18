@@ -110,10 +110,20 @@ function generateFloor3Config() {
   };
 }
 
+function generateFloor4Config() {
+  return {
+    floor: 4,
+    excludedRooms: [],
+    enemyVariants: {},
+    safeRoom: 'floor4_elevator',
+  };
+}
+
 function generateFloor(floor) {
   if (floor === 1) return generateFloor1Config();
   if (floor === 2) return generateFloor2Config();
   if (floor === 3) return generateFloor3Config();
+  if (floor === 4) return generateFloor4Config();
   return {
     floor,
     placeholder: true,
@@ -123,4 +133,4 @@ function generateFloor(floor) {
   };
 }
 
-module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, filterChoices, ENEMY_VARIANTS };
+module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, generateFloor4Config, filterChoices, ENEMY_VARIANTS };

@@ -38,6 +38,12 @@ const PROGRESS_ITEMS = {
   overseer_code: 'Service corridor code found.',
   cipher_fragment: 'Alternate completion proof secured.',
   warden_badge: 'Combat completion proof secured.',
+  f4_gold_key: 'Gold Vault Key secured.',
+  f4_blood_key: 'Blood Vault Key secured.',
+  f4_signal_key: 'Signal Vault Key secured.',
+  f4_auction_contract: 'Sponsor auction counter secured.',
+  f4_blood_writ: 'Blood Writ counter secured.',
+  f4_signal_patch: 'Signal Patch counter secured.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -165,6 +171,23 @@ function buildObjective(player) {
     };
   }
 
+  if ((player.floor || 1) === 4) {
+    const required = [
+      ['f4_gold_key', 'Gold Vault Key'],
+      ['f4_blood_key', 'Blood Vault Key'],
+      ['f4_signal_key', 'Signal Vault Key'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'sponsor-vault',
+      goal: ready ? "Challenge the Sponsor's Champion" : `Collect Vault Keys ${completed}/3`,
+      missing,
+      ready,
+    };
+  }
+
   const route = player.route || 'unknown';
   if (player.runEnded) {
     return { route, goal: 'Run ended', missing: [], ready: false };
@@ -208,9 +231,8 @@ function buildObjective(player) {
 }
 
 function sceneBelongsToFloor(id, floor) {
-  if (floor === 2) return id.startsWith('floor2_');
-  if (floor === 3) return id.startsWith('floor3_');
-  return !id.startsWith('floor2_') && !id.startsWith('floor3_');
+  if (floor >= 2) return id.startsWith(`floor${floor}_`);
+  return !/^floor\d+_/.test(id);
 }
 
 function buildMapProgress(state) {

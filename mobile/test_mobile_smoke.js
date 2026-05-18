@@ -166,6 +166,14 @@ floor3State.currentSceneId = 'floor3_market';
 const floor3View = runtime.getView(floor3State);
 assert(floor3View.contractProgress && floor3View.contractProgress.label === 'Contracts 3/5', 'smoke: Floor 3 runtime exposes contract progress label', floor3View.contractProgress);
 
+let floor4State = runtime.startNewRun({
+  name: 'Floor4Smoke',
+  playerPatch: { floor: 4, inventory: ['f4_gold_key'] },
+});
+floor4State.currentSceneId = 'floor4_boss_gate';
+const floor4View = runtime.getView(floor4State);
+assert(floor4View.objective && floor4View.objective.goal === 'Collect Vault Keys 1/3', 'smoke: Floor 4 runtime exposes Vault Key objective', floor4View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

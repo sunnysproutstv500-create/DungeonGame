@@ -1,9 +1,9 @@
 {
   "start_room": {
-      "id": "start_room",
-      "map": {
-        "x": 4,
-        "y": 0,
+    "id": "start_room",
+    "map": {
+      "x": 4,
+      "y": 0,
       "name": "START",
       "tag": "event",
       "connections": [
@@ -32,10 +32,10 @@
     ]
   },
   "left_path": {
-      "id": "left_path",
-      "map": {
-        "x": 2,
-        "y": 1,
+    "id": "left_path",
+    "map": {
+      "x": 2,
+      "y": 1,
       "name": "L.PATH",
       "tag": "event",
       "connections": [
@@ -3561,5 +3561,502 @@
     "title": "Floor Complete",
     "text": "The Overseers log your progress. Earth holds its position in the rankings — for now.",
     "choices": []
+  },
+  "floor4_elevator": {
+    "id": "floor4_elevator",
+    "map": {
+      "x": 0,
+      "y": 40,
+      "name": "F4SAFE",
+      "tag": "safe",
+      "connections": [
+        "floor4_gold_entry",
+        "floor4_blood_entry",
+        "floor4_signal_entry",
+        "floor4_boss_gate"
+      ]
+    },
+    "type": "safe",
+    "title": "Floor 4 - Sponsor Relay",
+    "text": "The black-market elevator opens into a private relay chamber. No guards. No crowd. Just a vendor in a silver mask, a wall of sponsor logos, and three vault doors waiting for bids. The relay NPC calls themself Vale and speaks like every word has been paid for in advance.\n\nSponsor Vault rules: collect Vault Keys 0/3. Gold, Blood, and Signal wings each hold one key. Sponsor Pressure offers better rewards if you accept pain, exposure, or a rigged room. The boss gate will not open until all three keys are slotted.",
+    "choices": [
+      {
+        "text": "Rest in the relay cot before taking a sponsor door",
+        "effect": {
+          "heal": 45
+        },
+        "once": true
+      },
+      {
+        "text": "Buy Large Potion - 45 gold",
+        "requires": {
+          "gold": 45
+        },
+        "effect": {
+          "giveItem": "large_potion",
+          "spendGold": 45
+        },
+        "once": true,
+        "nextScene": "floor4_elevator"
+      },
+      {
+        "text": "Buy Antidote - 20 gold",
+        "requires": {
+          "gold": 20
+        },
+        "effect": {
+          "giveItem": "antidote",
+          "spendGold": 20
+        },
+        "once": true,
+        "nextScene": "floor4_elevator"
+      },
+      {
+        "text": "Enter the Gold Wing",
+        "nextScene": "floor4_gold_entry"
+      },
+      {
+        "text": "Enter the Blood Wing",
+        "nextScene": "floor4_blood_entry"
+      },
+      {
+        "text": "Enter the Signal Wing",
+        "nextScene": "floor4_signal_entry"
+      },
+      {
+        "text": "Approach the sealed boss gate",
+        "nextScene": "floor4_boss_gate"
+      }
+    ]
+  },
+  "floor4_gold_entry": {
+    "id": "floor4_gold_entry",
+    "map": {
+      "x": -2,
+      "y": 41,
+      "name": "GOLD",
+      "tag": "event",
+      "connections": [
+        "floor4_elevator",
+        "floor4_gold_auction"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 4 - Gold Wing Entrance",
+    "text": "The Gold Wing is a silent auction hall. Every door shows a price before it shows a handle. Sponsor drones watch your hands, your inventory, and every flicker of hesitation.",
+    "choices": [
+      {
+        "text": "Follow the auction lights deeper",
+        "nextScene": "floor4_gold_auction"
+      },
+      {
+        "text": "Return to the sponsor relay",
+        "nextScene": "floor4_elevator"
+      }
+    ]
+  },
+  "floor4_gold_auction": {
+    "id": "floor4_gold_auction",
+    "map": {
+      "x": -3,
+      "y": 42,
+      "name": "AUCT",
+      "tag": "treasure",
+      "connections": [
+        "floor4_gold_entry",
+        "floor4_gold_vault"
+      ]
+    },
+    "type": "treasure",
+    "title": "Floor 4 - Auction Trap",
+    "text": "Sponsor Pressure: a contract scroll offers to mark your habits for the watching bidders. The payout is immediate. So is the cost. Refuse, and the room still lets you pass, but the Champion keeps its private data.",
+    "choices": [
+      {
+        "text": "Accept Sponsor Pressure - sell your combat pattern for gold and a boss counter",
+        "effect": {
+          "damage": 16,
+          "giveGold": 95,
+          "giveItem": "f4_auction_contract"
+        },
+        "once": true,
+        "nextScene": "floor4_gold_vault"
+      },
+      {
+        "text": "Refuse the contract and take the clean route",
+        "effect": {
+          "giveXP": 35
+        },
+        "once": true,
+        "nextScene": "floor4_gold_vault"
+      }
+    ]
+  },
+  "floor4_gold_vault": {
+    "id": "floor4_gold_vault",
+    "map": {
+      "x": -4,
+      "y": 43,
+      "name": "GKEY",
+      "tag": "treasure",
+      "connections": [
+        "floor4_gold_auction",
+        "floor4_boss_gate"
+      ]
+    },
+    "type": "treasure",
+    "title": "Floor 4 - Gold Vault",
+    "text": "The vault opens onto stacked coin-light and a key suspended inside a glass of liquid gold. A sponsor logo burns away as you touch it.",
+    "choices": [
+      {
+        "text": "Claim the Gold Vault Key",
+        "effect": {
+          "giveItem": "f4_gold_key",
+          "giveGold": 80,
+          "giveXP": 70
+        },
+        "once": true,
+        "nextScene": "floor4_boss_gate"
+      },
+      {
+        "text": "Leave the emptied Gold Vault",
+        "nextScene": "floor4_boss_gate"
+      }
+    ]
+  },
+  "floor4_blood_entry": {
+    "id": "floor4_blood_entry",
+    "map": {
+      "x": 0,
+      "y": 41,
+      "name": "BLOOD",
+      "tag": "combat",
+      "connections": [
+        "floor4_elevator",
+        "floor4_blood_trial"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 4 - Blood Wing Entrance",
+    "text": "The Blood Wing is a training arena built for spectators who cannot smell the room. Red seats rise into darkness. A rival-branded execution dummy turns its head when you enter.",
+    "combat": {
+      "name": "Sponsored Bruiser",
+      "hp": 92,
+      "attack": 30,
+      "defense": 8,
+      "xp": 105,
+      "goldReward": 35,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "cleave",
+        "crushing_blow"
+      ],
+      "victoryScene": "floor4_blood_trial",
+      "fleeScene": "floor4_elevator"
+    },
+    "victoryScene": "floor4_blood_trial",
+    "fleeScene": "floor4_elevator"
+  },
+  "floor4_blood_trial": {
+    "id": "floor4_blood_trial",
+    "map": {
+      "x": 0,
+      "y": 42,
+      "name": "TRIAL",
+      "tag": "combat",
+      "connections": [
+        "floor4_blood_entry",
+        "floor4_blood_vault"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 4 - Blood Trial",
+    "text": "Sponsor Pressure: the floor asks for a signed Blood Writ. Accept, and the Champion loses one of its crowd-funded attack routines. Decline, and you keep your blood but not the advantage.",
+    "choices": [
+      {
+        "text": "Accept Sponsor Pressure - sign the Blood Writ",
+        "effect": {
+          "damage": 22,
+          "giveItem": "f4_blood_writ",
+          "giveXP": 45
+        },
+        "once": true,
+        "nextScene": "floor4_blood_vault"
+      },
+      {
+        "text": "Decline the writ and conserve strength",
+        "effect": {
+          "heal": 15
+        },
+        "once": true,
+        "nextScene": "floor4_blood_vault"
+      }
+    ]
+  },
+  "floor4_blood_vault": {
+    "id": "floor4_blood_vault",
+    "map": {
+      "x": 0,
+      "y": 43,
+      "name": "BKEY",
+      "tag": "treasure",
+      "connections": [
+        "floor4_blood_trial",
+        "floor4_boss_gate"
+      ]
+    },
+    "type": "treasure",
+    "title": "Floor 4 - Blood Vault",
+    "text": "A red key hangs from a chain of stamped medical tags. Each tag has a competitor number. Some are crossed out. Yours has been left blank.",
+    "choices": [
+      {
+        "text": "Claim the Blood Vault Key",
+        "effect": {
+          "giveItem": "f4_blood_key",
+          "giveGold": 45,
+          "giveXP": 95
+        },
+        "once": true,
+        "nextScene": "floor4_boss_gate"
+      },
+      {
+        "text": "Leave the Blood Vault",
+        "nextScene": "floor4_boss_gate"
+      }
+    ]
+  },
+  "floor4_signal_entry": {
+    "id": "floor4_signal_entry",
+    "map": {
+      "x": 2,
+      "y": 41,
+      "name": "SIGNAL",
+      "tag": "puzzle",
+      "connections": [
+        "floor4_elevator",
+        "floor4_signal_puzzle"
+      ]
+    },
+    "type": "puzzle",
+    "title": "Floor 4 - Signal Wing Entrance",
+    "text": "The Signal Wing does not have walls so much as permissions. Screens show earlier floors from impossible angles. Someone has clipped your best moments into sponsor bait.",
+    "choices": [
+      {
+        "text": "Trace the broadcast source",
+        "effect": {
+          "giveXP": 35
+        },
+        "once": true,
+        "nextScene": "floor4_signal_puzzle"
+      },
+      {
+        "text": "Rush the signal corridor",
+        "effect": {
+          "damage": 12
+        },
+        "once": true,
+        "nextScene": "floor4_signal_puzzle"
+      }
+    ]
+  },
+  "floor4_signal_puzzle": {
+    "id": "floor4_signal_puzzle",
+    "map": {
+      "x": 3,
+      "y": 42,
+      "name": "PATCH",
+      "tag": "puzzle",
+      "connections": [
+        "floor4_signal_entry",
+        "floor4_signal_vault"
+      ]
+    },
+    "type": "puzzle",
+    "title": "Floor 4 - Signal Patch",
+    "text": "Sponsor Pressure: a cracked broadcast line lets you patch the Champion feed. The patch will weaken its armor routine, but the relay burns feedback through your nervous system.",
+    "choices": [
+      {
+        "text": "Accept Sponsor Pressure - patch the Champion feed",
+        "effect": {
+          "damage": 18,
+          "giveItem": "f4_signal_patch",
+          "giveXP": 80
+        },
+        "once": true,
+        "nextScene": "floor4_signal_vault"
+      },
+      {
+        "text": "Solve only the safe part of the broadcast puzzle",
+        "effect": {
+          "giveXP": 55
+        },
+        "once": true,
+        "nextScene": "floor4_signal_vault"
+      }
+    ]
+  },
+  "floor4_signal_vault": {
+    "id": "floor4_signal_vault",
+    "map": {
+      "x": 4,
+      "y": 43,
+      "name": "SKEY",
+      "tag": "treasure",
+      "connections": [
+        "floor4_signal_puzzle",
+        "floor4_boss_gate"
+      ]
+    },
+    "type": "treasure",
+    "title": "Floor 4 - Signal Vault",
+    "text": "A key made of blue static waits inside a soundless server rack. It flickers between your hand and the screen, then decides both are real enough.",
+    "choices": [
+      {
+        "text": "Claim the Signal Vault Key",
+        "effect": {
+          "giveItem": "f4_signal_key",
+          "giveGold": 35,
+          "giveXP": 110
+        },
+        "once": true,
+        "nextScene": "floor4_boss_gate"
+      },
+      {
+        "text": "Leave the Signal Vault",
+        "nextScene": "floor4_boss_gate"
+      }
+    ]
+  },
+  "floor4_boss_gate": {
+    "id": "floor4_boss_gate",
+    "map": {
+      "x": 0,
+      "y": 44,
+      "name": "GATE",
+      "tag": "event",
+      "connections": [
+        "floor4_elevator",
+        "floor4_gold_entry",
+        "floor4_blood_entry",
+        "floor4_signal_entry",
+        "floor4_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 4 - Sponsor Gate",
+    "text": "Three key slots ring the gate. Gold wants proof of greed. Blood wants proof of survival. Signal wants proof that you can see the hook before it pulls you.",
+    "choices": [
+      {
+        "text": "Return to the sponsor relay",
+        "nextScene": "floor4_elevator"
+      },
+      {
+        "text": "Re-enter the Gold Wing",
+        "nextScene": "floor4_gold_entry"
+      },
+      {
+        "text": "Re-enter the Blood Wing",
+        "nextScene": "floor4_blood_entry"
+      },
+      {
+        "text": "Re-enter the Signal Wing",
+        "nextScene": "floor4_signal_entry"
+      },
+      {
+        "text": "Slot all three Vault Keys and challenge the Champion",
+        "requires": {
+          "items": [
+            "f4_gold_key",
+            "f4_blood_key",
+            "f4_signal_key"
+          ]
+        },
+        "nextScene": "floor4_boss"
+      }
+    ]
+  },
+  "floor4_boss": {
+    "id": "floor4_boss",
+    "map": {
+      "x": 0,
+      "y": 45,
+      "name": "F4BOSS",
+      "tag": "boss",
+      "connections": [
+        "floor4_boss_gate",
+        "floor4_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 4 - The Sponsor's Champion",
+    "text": "The arena is a glass bowl suspended in broadcast light. The Sponsor's Champion steps out wearing too many logos and not enough fear. Every sponsor contract you bent now pulls against them.",
+    "combat": {
+      "name": "The Sponsor's Champion",
+      "hp": 205,
+      "attack": 40,
+      "defense": 13,
+      "xp": 260,
+      "goldReward": 130,
+      "loot": [
+        "large_potion",
+        "sponsor_crown"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "cleave",
+        "armor_break",
+        "sweeping_attack"
+      ],
+      "intro": "The Champion raises one hand. The sponsors raise the odds.",
+      "victoryText": "The Champion falls quiet. For the first time, the broadcast has no prepared line.",
+      "advantages": [
+        {
+          "item": "f4_auction_contract",
+          "attackDelta": -3,
+          "defenseDelta": -1
+        },
+        {
+          "item": "f4_blood_writ",
+          "hpDelta": -28,
+          "removeAbilities": [
+            "sweeping_attack"
+          ]
+        },
+        {
+          "item": "f4_signal_patch",
+          "defenseDelta": -3,
+          "removeAbilities": [
+            "armor_break"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor4_boss_gate",
+    "victoryScene": "floor4_clear_room"
+  },
+  "floor4_clear_room": {
+    "id": "floor4_clear_room",
+    "map": {
+      "x": 0,
+      "y": 46,
+      "name": "F4CLR",
+      "tag": "event",
+      "connections": [
+        "floor4_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 4 Clear - Broadcast Cut",
+    "text": "The Sponsor Vault goes dark one logo at a time. Vale removes the silver mask and looks suddenly tired. Above the arena, the sponsors keep bidding, but the Overseers interrupt the feed before the numbers finish climbing.\n\nA service hatch opens under the dead broadcast board. The sign reads: FLOOR 5 ACCESS PENDING. Beneath it, a second line appears for half a second: OVERSEERS ONLY.\n\nFor the first time, the Sponsors are not the only ones watching you.",
+    "choices": [
+      {
+        "text": "Step into the Overseer hatch. [FLOOR 4 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }

@@ -1,6 +1,6 @@
 'use strict';
 
-const MAX_IMPLEMENTED_FLOOR = 3;
+const MAX_IMPLEMENTED_FLOOR = 4;
 
 function ensureRunStats(player) {
   if (!player.runStats) {

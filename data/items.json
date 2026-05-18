@@ -461,5 +461,54 @@
     },
     "effect": "none",
     "value": 0
+  },
+  "f4_gold_key": {
+    "id": "f4_gold_key",
+    "name": "Gold Vault Key",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f4_blood_key": {
+    "id": "f4_blood_key",
+    "name": "Blood Vault Key",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f4_signal_key": {
+    "id": "f4_signal_key",
+    "name": "Signal Vault Key",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f4_auction_contract": {
+    "id": "f4_auction_contract",
+    "name": "Auction Contract",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f4_blood_writ": {
+    "id": "f4_blood_writ",
+    "name": "Blood Writ",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f4_signal_patch": {
+    "id": "f4_signal_patch",
+    "name": "Signal Patch",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "sponsor_crown": {
+    "id": "sponsor_crown",
+    "name": "Sponsor Crown",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }
