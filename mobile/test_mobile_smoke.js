@@ -182,6 +182,14 @@ floor5State.currentSceneId = 'floor5_boss_gate';
 const floor5View = runtime.getView(floor5State);
 assert(floor5View.objective && floor5View.objective.goal === 'Clear Protocols 1/4', 'smoke: Floor 5 runtime exposes Protocol objective', floor5View.objective);
 
+let floor6State = runtime.startNewRun({
+  name: 'Floor6Smoke',
+  playerPatch: { floor: 6, inventory: ['f6_glass_anchor', 'f6_road_anchor'] },
+});
+floor6State.currentSceneId = 'floor6_boss_gate';
+const floor6View = runtime.getView(floor6State);
+assert(floor6View.objective && floor6View.objective.goal === 'Stabilize Anchors 2/3', 'smoke: Floor 6 runtime exposes Anchor objective', floor6View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

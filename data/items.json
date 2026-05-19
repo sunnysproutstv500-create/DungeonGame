@@ -573,5 +573,54 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f6_glass_anchor": {
+    "id": "f6_glass_anchor",
+    "name": "Glass Anchor Shard",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f6_root_anchor": {
+    "id": "f6_root_anchor",
+    "name": "Root Anchor Shard",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f6_road_anchor": {
+    "id": "f6_road_anchor",
+    "name": "Road Anchor Shard",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f6_glass_anomaly": {
+    "id": "f6_glass_anomaly",
+    "name": "Glass Anomaly Mark",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f6_root_anomaly": {
+    "id": "f6_root_anomaly",
+    "name": "Root Anomaly Mark",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f6_road_anomaly": {
+    "id": "f6_road_anomaly",
+    "name": "Road Anomaly Mark",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "outside_heart": {
+    "id": "outside_heart",
+    "name": "Outside Heart",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }

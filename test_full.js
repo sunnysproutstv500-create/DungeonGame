@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 122
-      ? ok(`scene map data: ${mappedIds.length}/122 scenes have map coordinates`)
+    mappedIds.length === 135
+      ? ok(`scene map data: ${mappedIds.length}/135 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -2139,6 +2139,139 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 5 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 6: Fracture Map
+  {
+    [
+      'f6_glass_anchor',
+      'f6_root_anchor',
+      'f6_road_anchor',
+      'f6_glass_anomaly',
+      'f6_root_anomaly',
+      'f6_road_anomaly',
+      'outside_heart',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor6 item exists: ${itemId}`)
+        : fail(`floor6 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor6_weather_gap'];
+    safe?.map?.tag === 'safe' && /Weather Gap|outside the system|Anchor Shards 0\/3/i.test(safe?.text || '')
+      ? ok('floor6_weather_gap: safe fracture start introduces Anchor Shards')
+      : fail('floor6_weather_gap missing safe intro', JSON.stringify(safe));
+
+    const regionStarts = ['floor6_glass_field', 'floor6_rooted_static', 'floor6_nameless_road'];
+    regionStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor6_weather_gap: opens three unstable regions')
+      : fail('floor6_weather_gap region choices missing', JSON.stringify(safe?.choices));
+
+    const floor6Rooms = [
+      'floor6_glass_field',
+      'floor6_glass_rain',
+      'floor6_glass_anchor',
+      'floor6_rooted_static',
+      'floor6_static_grove',
+      'floor6_root_anchor',
+      'floor6_nameless_road',
+      'floor6_road_mile',
+      'floor6_road_anchor',
+      'floor6_boss_gate',
+      'floor6_boss',
+      'floor6_clear_room',
+    ];
+
+    floor6Rooms.every(id => scenes[id])
+      ? ok('floor6 fracture map: core rooms exist')
+      : fail('floor6 fracture map missing rooms', floor6Rooms.filter(id => !scenes[id]).join(', '));
+
+    const anchorRewards = [
+      ['floor6_glass_anchor', 'f6_glass_anchor'],
+      ['floor6_root_anchor', 'f6_root_anchor'],
+      ['floor6_road_anchor', 'f6_road_anchor'],
+    ];
+
+    anchorRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor6 fracture map: each region awards an Anchor Shard')
+      : fail('floor6 anchor rewards missing', JSON.stringify(anchorRewards));
+
+    const anomalyRewards = [
+      ['floor6_glass_field', 'f6_glass_anomaly'],
+      ['floor6_rooted_static', 'f6_root_anomaly'],
+      ['floor6_nameless_road', 'f6_road_anomaly'],
+    ];
+
+    anomalyRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId && /fracture|anomaly|break/i.test(choice.text)))
+      ? ok('floor6 fracture map: optional fracture choices award Anomaly Marks')
+      : fail('floor6 anomaly rewards missing', JSON.stringify(anomalyRewards));
+
+    const gateChoice = (scenes['floor6_boss_gate']?.choices || []).find(choice => choice.nextScene === 'floor6_boss');
+    ['f6_glass_anchor', 'f6_root_anchor', 'f6_road_anchor'].every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor6 boss gate: requires all three Anchor Shards')
+      : fail('floor6 boss gate requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor6_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Outside Thing' &&
+      boss.combat?.loot?.includes('outside_heart') &&
+      boss.victoryScene === 'floor6_clear_room'
+      ? ok('floor6 boss: Outside Thing drops unique heart and clears floor')
+      : fail('floor6 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f6_glass_anomaly', 'f6_root_anomaly', 'f6_road_anomaly'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor6 boss: Anomaly Marks weaken the Outside Thing')
+      : fail('floor6 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor6_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 7|first free zone|outside/i.test(scenes['floor6_clear_room']?.text || '')
+      ? ok('floor6 clear room: hands off toward Floor 7')
+      : fail('floor6 clear room handoff missing', scenes['floor6_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 6 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 40 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'FractureMapRunner',
+      playerPatch: { floor: 6, hp: 1400, maxHp: 1400, attack: 1400, defense: 140, gold: 400 },
+    });
+    run.currentSceneId = 'floor6_weather_gap';
+
+    run = chooseByText(run, /Glass Rain Field/);
+    run = chooseByText(run, /fracture/);
+    run = chooseByText(run, /cross the glass rain/);
+    run = chooseByText(run, /Glass Anchor/);
+    run = chooseByText(run, /Rooted Static/);
+    run = chooseByText(run, /fracture/);
+    run = winCombat(run);
+    run = chooseByText(run, /Root Anchor/);
+    run = chooseByText(run, /Nameless Road/);
+    run = chooseByText(run, /fracture/);
+    run = chooseByText(run, /walk until the name returns/);
+    run = chooseByText(run, /Road Anchor/);
+    run = chooseByText(run, /Anchor gate/);
+    run = chooseByText(run, /Open the outside gate/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor6_clear_room' &&
+      ['f6_glass_anchor', 'f6_root_anchor', 'f6_road_anchor', 'f6_glass_anomaly', 'f6_root_anomaly', 'f6_road_anomaly', 'outside_heart'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 6 full playthrough: three regions anchor and clear the Outside Thing')
+      : fail('runtime Floor 6 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -2831,6 +2964,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f3 = generateFloor(3);
   const f4 = generateFloor(4);
   const f5 = generateFloor(5);
+  const f6 = generateFloor(6);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -2852,9 +2986,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 5 uses real Overseer Engine generator')
     : fail('generateFloor floor 5 real config', JSON.stringify(f5));
 
-  MAX_IMPLEMENTED_FLOOR === 5
-    ? ok('run lifecycle: max implemented floor includes Floor 5')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 5', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f6 && f6.floor === 6 && f6.placeholder !== true && Array.isArray(f6.excludedRooms) && f6.safeRoom === 'floor6_weather_gap'
+    ? ok('generateFloor: floor 6 uses real Fracture Map generator')
+    : fail('generateFloor floor 6 real config', JSON.stringify(f6));
+
+  MAX_IMPLEMENTED_FLOOR === 6
+    ? ok('run lifecycle: max implemented floor includes Floor 6')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 6', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -3135,18 +3273,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   floor5FinishState.currentSceneId = 'the_end';
   const floor5FinishResult = runtime.dispatch(floor5FinishState, { type: 'complete_floor' });
   const floor5Event = floor5FinishResult.events.find(event => event.type === 'floor_completed');
-  const floor5RunEndEvent = floor5FinishResult.events.find(event => event.type === 'run_ended');
 
   floor5Event?.completedFloor === 5 && floor5Event?.nextFloor === 6 && floor5Event?.currencyReward === 75
     ? ok('runtime.complete_floor: Floor 5 completion awards Floor 5 meta event')
     : fail('runtime.complete_floor Floor 5 reward event', JSON.stringify(floor5FinishResult.events));
 
-  floor5FinishResult.state.player.runEnded === true &&
-    floor5FinishResult.state.player.currentRunActive === false &&
-    floor5RunEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 6/i.test(floor5RunEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 5 handoff ends at Floor 6 under construction')
+  floor5FinishResult.state.currentSceneId === 'floor6_weather_gap' &&
+    floor5FinishResult.state.floorConfig.placeholder !== true &&
+    floor5FinishResult.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 5 handoff enters Floor 6 Fracture Map')
     : fail('runtime.complete_floor Floor 5 handoff', JSON.stringify({ player: floor5FinishResult.state.player, events: floor5FinishResult.events }));
+
+  const floor6ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor6Reader',
+    playerPatch: { floor: 6, inventory: ['f6_glass_anchor'] },
+  });
+  floor6ObjectiveProbe.currentSceneId = 'floor6_boss_gate';
+  const floor6ObjectiveView = runtime.getView(floor6ObjectiveProbe);
+
+  floor6ObjectiveView.objective?.route === 'fracture-map' &&
+    floor6ObjectiveView.objective.goal === 'Stabilize Anchors 1/3' &&
+    floor6ObjectiveView.objective.missing.includes('Root Anchor Shard') &&
+    floor6ObjectiveView.objective.missing.includes('Road Anchor Shard')
+    ? ok('runtime Floor 6 objective: tracks Anchor Shards before boss gate')
+    : fail('runtime Floor 6 objective missing', JSON.stringify(floor6ObjectiveView.objective));
+
+  const floor6FinishState = runtime.startNewRun({ name: 'Floor6Finisher' });
+  floor6FinishState.player.floor = 6;
+  floor6FinishState.currentSceneId = 'the_end';
+  const floor6FinishResult = runtime.dispatch(floor6FinishState, { type: 'complete_floor' });
+  const floor6Event = floor6FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor6RunEndEvent = floor6FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor6Event?.completedFloor === 6 && floor6Event?.nextFloor === 7 && floor6Event?.currencyReward === 90
+    ? ok('runtime.complete_floor: Floor 6 completion awards Floor 6 meta event')
+    : fail('runtime.complete_floor Floor 6 reward event', JSON.stringify(floor6FinishResult.events));
+
+  floor6FinishResult.state.player.runEnded === true &&
+    floor6FinishResult.state.player.currentRunActive === false &&
+    floor6RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 7/i.test(floor6RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 6 handoff ends at Floor 7 under construction')
+    : fail('runtime.complete_floor Floor 6 handoff', JSON.stringify({ player: floor6FinishResult.state.player, events: floor6FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

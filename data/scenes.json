@@ -4622,5 +4622,451 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor6_weather_gap": {
+    "id": "floor6_weather_gap",
+    "map": {
+      "x": 0,
+      "y": 64,
+      "name": "F6GAP",
+      "tag": "safe",
+      "connections": [
+        "floor6_glass_field",
+        "floor6_rooted_static",
+        "floor6_nameless_road",
+        "floor6_boss_gate"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - The Weather Gap",
+    "text": "The Weather Gap is the first safe place outside the system, though safe is only half true. Rain falls upward, the horizon loads in pieces, and the dungeon walls end like a sentence cut short. A cracked sign reads Anchor Shards 0/3. Stabilize Glass Rain Field, Rooted Static, and Nameless Road before the outside notices you completely.",
+    "choices": [
+      {
+        "text": "Rest under the broken sky",
+        "once": true,
+        "effect": {
+          "heal": 85
+        }
+      },
+      {
+        "text": "Scavenge the crash kit for a Large Potion",
+        "once": true,
+        "effect": {
+          "giveItem": "large_potion"
+        }
+      },
+      {
+        "text": "Enter the Glass Rain Field",
+        "nextScene": "floor6_glass_field"
+      },
+      {
+        "text": "Enter Rooted Static",
+        "nextScene": "floor6_rooted_static"
+      },
+      {
+        "text": "Walk the Nameless Road",
+        "nextScene": "floor6_nameless_road"
+      },
+      {
+        "text": "Approach the Anchor gate",
+        "nextScene": "floor6_boss_gate"
+      }
+    ]
+  },
+  "floor6_glass_field": {
+    "id": "floor6_glass_field",
+    "map": {
+      "x": -4,
+      "y": 65,
+      "name": "GLASS",
+      "tag": "event",
+      "connections": [
+        "floor6_weather_gap",
+        "floor6_glass_rain"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Glass Rain Field",
+    "text": "Glass rain hangs in the air, each shard reflecting a different possible room. Normal steps make the field behave. Fracture steps make it remember that it was never built for feet.",
+    "choices": [
+      {
+        "text": "Take the marked path through the glass field",
+        "nextScene": "floor6_glass_rain"
+      },
+      {
+        "text": "Touch the fracture in the glass rain and take its anomaly",
+        "once": true,
+        "effect": {
+          "damage": 30,
+          "giveItem": "f6_glass_anomaly"
+        },
+        "nextScene": "floor6_glass_rain"
+      }
+    ]
+  },
+  "floor6_glass_rain": {
+    "id": "floor6_glass_rain",
+    "map": {
+      "x": -4,
+      "y": 66,
+      "name": "RAIN",
+      "tag": "puzzle",
+      "connections": [
+        "floor6_glass_field",
+        "floor6_glass_anchor"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Hanging Rain",
+    "text": "The rain will cut anything moving in a straight line. The only safe route is a crooked answer: forward, aside, wait, forward again.",
+    "choices": [
+      {
+        "text": "cross the glass rain by moving crooked",
+        "effect": {
+          "giveXP": 100
+        },
+        "nextScene": "floor6_glass_anchor"
+      },
+      {
+        "text": "Sprint through the rain before it chooses a direction",
+        "effect": {
+          "damage": 38,
+          "giveXP": 55
+        },
+        "nextScene": "floor6_glass_anchor"
+      }
+    ]
+  },
+  "floor6_glass_anchor": {
+    "id": "floor6_glass_anchor",
+    "map": {
+      "x": -4,
+      "y": 67,
+      "name": "G-ANCH",
+      "tag": "treasure",
+      "connections": [
+        "floor6_glass_rain",
+        "floor6_weather_gap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Glass Anchor",
+    "text": "A shard of clear sky sits in a crater. When you lift it, the glass rain remembers gravity for a few seconds.",
+    "choices": [
+      {
+        "text": "Claim the Glass Anchor Shard and return to the Weather Gap",
+        "once": true,
+        "effect": {
+          "giveItem": "f6_glass_anchor",
+          "giveXP": 55
+        },
+        "nextScene": "floor6_weather_gap"
+      }
+    ]
+  },
+  "floor6_rooted_static": {
+    "id": "floor6_rooted_static",
+    "map": {
+      "x": 4,
+      "y": 65,
+      "name": "STATIC",
+      "tag": "combat",
+      "connections": [
+        "floor6_weather_gap",
+        "floor6_static_grove"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Rooted Static",
+    "text": "Trees grow from dead signal. Their leaves hiss with voices from every floor below. The normal path keeps distance. The fracture path lets the static root in your shadow.",
+    "choices": [
+      {
+        "text": "Circle the static grove at a distance",
+        "nextScene": "floor6_static_grove"
+      },
+      {
+        "text": "Break the fracture root and take its anomaly",
+        "once": true,
+        "effect": {
+          "damage": 28,
+          "giveItem": "f6_root_anomaly"
+        },
+        "nextScene": "floor6_static_grove"
+      }
+    ]
+  },
+  "floor6_static_grove": {
+    "id": "floor6_static_grove",
+    "map": {
+      "x": 4,
+      "y": 66,
+      "name": "GROVE",
+      "tag": "combat",
+      "connections": [
+        "floor6_rooted_static",
+        "floor6_root_anchor"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 6 - Static Grove",
+    "text": "A thing wearing bark and broken announcements crawls out of the rooted static. It repeats your old objective tracker in a voice that hates you.",
+    "combat": {
+      "name": "Static Rootbound",
+      "hp": 155,
+      "attack": 36,
+      "defense": 11,
+      "xp": 180,
+      "goldReward": 55,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "poison_hit",
+        "cleave"
+      ],
+      "intro": "The grove says your name in the wrong order.",
+      "victoryText": "The static drops into the soil and stays quiet."
+    },
+    "fleeScene": "floor6_weather_gap",
+    "victoryScene": "floor6_root_anchor"
+  },
+  "floor6_root_anchor": {
+    "id": "floor6_root_anchor",
+    "map": {
+      "x": 4,
+      "y": 67,
+      "name": "R-ANCH",
+      "tag": "treasure",
+      "connections": [
+        "floor6_static_grove",
+        "floor6_weather_gap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Root Anchor",
+    "text": "The grove leaves one root behind, braided around a piece of quiet. It steadies the ground when you take it.",
+    "choices": [
+      {
+        "text": "Claim the Root Anchor Shard and return to the Weather Gap",
+        "once": true,
+        "effect": {
+          "giveItem": "f6_root_anchor",
+          "giveGold": 60
+        },
+        "nextScene": "floor6_weather_gap"
+      }
+    ]
+  },
+  "floor6_nameless_road": {
+    "id": "floor6_nameless_road",
+    "map": {
+      "x": 0,
+      "y": 68,
+      "name": "ROAD",
+      "tag": "event",
+      "connections": [
+        "floor6_weather_gap",
+        "floor6_road_mile"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Nameless Road",
+    "text": "The road has no signs because signs are a kind of permission. It tries to remove names from your map, your items, and eventually you. The fracture ahead is shaped like a missing word.",
+    "choices": [
+      {
+        "text": "Follow the road without naming it",
+        "nextScene": "floor6_road_mile"
+      },
+      {
+        "text": "Break the nameless fracture and take its anomaly",
+        "once": true,
+        "effect": {
+          "damage": 24,
+          "giveItem": "f6_road_anomaly"
+        },
+        "nextScene": "floor6_road_mile"
+      }
+    ]
+  },
+  "floor6_road_mile": {
+    "id": "floor6_road_mile",
+    "map": {
+      "x": 0,
+      "y": 69,
+      "name": "MILE",
+      "tag": "puzzle",
+      "connections": [
+        "floor6_nameless_road",
+        "floor6_road_anchor"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - The Mile That Repeats",
+    "text": "You pass the same stone three times. Each time it has a different name scratched into it. The road wants you to accept one. The trick is to keep walking until the name returns to you instead.",
+    "choices": [
+      {
+        "text": "walk until the name returns",
+        "effect": {
+          "giveXP": 120
+        },
+        "nextScene": "floor6_road_anchor"
+      },
+      {
+        "text": "Carve a temporary name into the stone",
+        "effect": {
+          "damage": 26,
+          "giveGold": 35,
+          "giveXP": 60
+        },
+        "nextScene": "floor6_road_anchor"
+      }
+    ]
+  },
+  "floor6_road_anchor": {
+    "id": "floor6_road_anchor",
+    "map": {
+      "x": 0,
+      "y": 70,
+      "name": "N-ANCH",
+      "tag": "treasure",
+      "connections": [
+        "floor6_road_mile",
+        "floor6_weather_gap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Road Anchor",
+    "text": "The road gives up a black stone with your footprint already in it. It is heavier than distance should be.",
+    "choices": [
+      {
+        "text": "Claim the Road Anchor Shard and return to the Weather Gap",
+        "once": true,
+        "effect": {
+          "giveItem": "f6_road_anchor",
+          "giveXP": 50
+        },
+        "nextScene": "floor6_weather_gap"
+      }
+    ]
+  },
+  "floor6_boss_gate": {
+    "id": "floor6_boss_gate",
+    "map": {
+      "x": 0,
+      "y": 71,
+      "name": "F6GATE",
+      "tag": "event",
+      "connections": [
+        "floor6_weather_gap",
+        "floor6_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 - Anchor Gate",
+    "text": "Three Anchor Shards turn in the air without touching anything. Behind them, the outside presses its face against the gap in the world.",
+    "choices": [
+      {
+        "text": "Return to the Weather Gap",
+        "nextScene": "floor6_weather_gap"
+      },
+      {
+        "text": "Open the outside gate with all three Anchor Shards",
+        "requires": {
+          "items": [
+            "f6_glass_anchor",
+            "f6_root_anchor",
+            "f6_road_anchor"
+          ]
+        },
+        "nextScene": "floor6_boss"
+      }
+    ]
+  },
+  "floor6_boss": {
+    "id": "floor6_boss",
+    "map": {
+      "x": 0,
+      "y": 72,
+      "name": "OUT",
+      "tag": "boss",
+      "connections": [
+        "floor6_boss_gate",
+        "floor6_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 6 - The Outside Thing",
+    "text": "The Outside Thing arrives without entering. It is weather, hunger, road, root, reflection, and something that has never heard of floors. Your Anomaly Marks make parts of it disagree with itself.",
+    "combat": {
+      "name": "The Outside Thing",
+      "hp": 285,
+      "attack": 49,
+      "defense": 17,
+      "xp": 430,
+      "goldReward": 180,
+      "loot": [
+        "large_potion",
+        "outside_heart"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "sweeping_attack",
+        "poison_hit",
+        "armor_break",
+        "cleave"
+      ],
+      "intro": "The outside leans in. The room forgets which way damage is supposed to travel.",
+      "victoryText": "The Outside Thing folds backward into weather. The gap remains, but now it knows your shape.",
+      "advantages": [
+        {
+          "item": "f6_glass_anomaly",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "sweeping_attack"
+          ]
+        },
+        {
+          "item": "f6_root_anomaly",
+          "defenseDelta": -5,
+          "removeAbilities": [
+            "poison_hit"
+          ]
+        },
+        {
+          "item": "f6_road_anomaly",
+          "hpDelta": -40,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor6_boss_gate",
+    "victoryScene": "floor6_clear_room"
+  },
+  "floor6_clear_room": {
+    "id": "floor6_clear_room",
+    "map": {
+      "x": 0,
+      "y": 73,
+      "name": "F6CLR",
+      "tag": "event",
+      "connections": [
+        "floor6_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 6 Clear - First Free Weather",
+    "text": "The Outside Heart beats once and the Weather Gap becomes a doorway instead of a wound. Behind you, the dungeon still counts floors. Ahead, Floor 7 is the first free zone, a place not yet named by Overseers, Sponsors, markets, or rules.",
+    "choices": [
+      {
+        "text": "Step into the first free zone. [FLOOR 6 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }

@@ -52,6 +52,12 @@ const PROGRESS_ITEMS = {
   f5_memory_override: 'Memory Override Sigil will bend the Rulekeeper.',
   f5_debt_override: 'Debt Override Sigil will bend the Rulekeeper.',
   f5_identity_override: 'Identity Override Sigil will bend the Rulekeeper.',
+  f6_glass_anchor: 'Glass Anchor Shard stabilized.',
+  f6_root_anchor: 'Root Anchor Shard stabilized.',
+  f6_road_anchor: 'Road Anchor Shard stabilized.',
+  f6_glass_anomaly: 'Glass Anomaly Mark will distort the Outside Thing.',
+  f6_root_anomaly: 'Root Anomaly Mark will distort the Outside Thing.',
+  f6_road_anomaly: 'Road Anomaly Mark will distort the Outside Thing.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -209,6 +215,23 @@ function buildObjective(player) {
     return {
       route: 'overseer-engine',
       goal: ready ? 'Challenge the Rulekeeper' : `Clear Protocols ${completed}/4`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 6) {
+    const required = [
+      ['f6_glass_anchor', 'Glass Anchor Shard'],
+      ['f6_root_anchor', 'Root Anchor Shard'],
+      ['f6_road_anchor', 'Road Anchor Shard'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'fracture-map',
+      goal: ready ? 'Challenge the Outside Thing' : `Stabilize Anchors ${completed}/3`,
       missing,
       ready,
     };
