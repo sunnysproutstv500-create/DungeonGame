@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 135
-      ? ok(`scene map data: ${mappedIds.length}/135 scenes have map coordinates`)
+    mappedIds.length === 151
+      ? ok(`scene map data: ${mappedIds.length}/151 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -2272,6 +2272,150 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 6 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 7: First Free Zone
+  {
+    [
+      'f7_forager_trust',
+      'f7_scout_trust',
+      'f7_healer_trust',
+      'f7_builder_trust',
+      'f7_forager_favor',
+      'f7_scout_favor',
+      'f7_healer_favor',
+      'f7_builder_favor',
+      'freecamp_banner',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor7 item exists: ${itemId}`)
+        : fail(`floor7 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor7_freecamp'];
+    safe?.map?.tag === 'safe' && /Freecamp|First Free Zone|Trust Bonds 0\/4/i.test(safe?.text || '')
+      ? ok('floor7_freecamp: safe settlement introduces Trust Bonds')
+      : fail('floor7_freecamp missing safe intro', JSON.stringify(safe));
+
+    const pathStarts = ['floor7_forager_orchard', 'floor7_scout_ridge', 'floor7_healer_tents', 'floor7_builder_wall'];
+    pathStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor7_freecamp: opens four local trust paths')
+      : fail('floor7_freecamp trust choices missing', JSON.stringify(safe?.choices));
+
+    const floor7Rooms = [
+      'floor7_forager_orchard',
+      'floor7_living_orchard',
+      'floor7_forager_bond',
+      'floor7_scout_ridge',
+      'floor7_no_rule_ridge',
+      'floor7_scout_bond',
+      'floor7_healer_tents',
+      'floor7_weather_sick',
+      'floor7_healer_bond',
+      'floor7_builder_wall',
+      'floor7_defense_line',
+      'floor7_builder_bond',
+      'floor7_council_fire',
+      'floor7_boss',
+      'floor7_clear_room',
+    ];
+
+    floor7Rooms.every(id => scenes[id])
+      ? ok('floor7 first free zone: core rooms exist')
+      : fail('floor7 first free zone missing rooms', floor7Rooms.filter(id => !scenes[id]).join(', '));
+
+    const trustRewards = [
+      ['floor7_forager_bond', 'f7_forager_trust'],
+      ['floor7_scout_bond', 'f7_scout_trust'],
+      ['floor7_healer_bond', 'f7_healer_trust'],
+      ['floor7_builder_bond', 'f7_builder_trust'],
+    ];
+
+    trustRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor7 first free zone: each path awards a Trust Bond')
+      : fail('floor7 trust rewards missing', JSON.stringify(trustRewards));
+
+    const favorRewards = [
+      ['floor7_forager_orchard', 'f7_forager_favor'],
+      ['floor7_scout_ridge', 'f7_scout_favor'],
+      ['floor7_healer_tents', 'f7_healer_favor'],
+      ['floor7_builder_wall', 'f7_builder_favor'],
+    ];
+
+    favorRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId && /favor|help|share|stand/i.test(choice.text)))
+      ? ok('floor7 first free zone: compassionate choices award Free Zone Favors')
+      : fail('floor7 favor rewards missing', JSON.stringify(favorRewards));
+
+    const gateChoice = (scenes['floor7_council_fire']?.choices || []).find(choice => choice.nextScene === 'floor7_boss');
+    ['f7_forager_trust', 'f7_scout_trust', 'f7_healer_trust', 'f7_builder_trust'].every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor7 council fire: requires all four Trust Bonds')
+      : fail('floor7 council fire requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor7_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Claimant' &&
+      boss.combat?.loot?.includes('freecamp_banner') &&
+      boss.victoryScene === 'floor7_clear_room'
+      ? ok('floor7 boss: Claimant drops Freecamp Banner and clears floor')
+      : fail('floor7 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f7_forager_favor', 'f7_scout_favor', 'f7_healer_favor', 'f7_builder_favor'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor7 boss: Free Zone Favors weaken the Claimant')
+      : fail('floor7 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor7_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 8|wider wild|Freecamp/i.test(scenes['floor7_clear_room']?.text || '')
+      ? ok('floor7 clear room: hands off toward Floor 8')
+      : fail('floor7 clear room handoff missing', scenes['floor7_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 7 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 45 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'FreecampRunner',
+      playerPatch: { floor: 7, hp: 1600, maxHp: 1600, attack: 1600, defense: 160, gold: 500 },
+    });
+    run.currentSceneId = 'floor7_freecamp';
+
+    run = chooseByText(run, /Foragers/);
+    run = chooseByText(run, /share the first safe fruit/);
+    run = chooseByText(run, /harvest the living orchard/);
+    run = chooseByText(run, /Forager Trust/);
+    run = chooseByText(run, /Scouts/);
+    run = chooseByText(run, /stand watch/);
+    run = chooseByText(run, /map the no-rule ridge/);
+    run = chooseByText(run, /Scout Trust/);
+    run = chooseByText(run, /Healers/);
+    run = chooseByText(run, /help carry the injured/);
+    run = chooseByText(run, /stabilize the weather sick/);
+    run = chooseByText(run, /Healer Trust/);
+    run = chooseByText(run, /Builders/);
+    run = chooseByText(run, /stand on the wall/);
+    run = winCombat(run);
+    run = chooseByText(run, /Builder Trust/);
+    run = chooseByText(run, /Council Fire/);
+    run = chooseByText(run, /Open the boss trail/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor7_clear_room' &&
+      ['f7_forager_trust', 'f7_scout_trust', 'f7_healer_trust', 'f7_builder_trust', 'f7_forager_favor', 'f7_scout_favor', 'f7_healer_favor', 'f7_builder_favor', 'freecamp_banner'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 7 full playthrough: four trust paths rally Freecamp and clear the Claimant')
+      : fail('runtime Floor 7 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -2965,6 +3109,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f4 = generateFloor(4);
   const f5 = generateFloor(5);
   const f6 = generateFloor(6);
+  const f7 = generateFloor(7);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -2990,9 +3135,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 6 uses real Fracture Map generator')
     : fail('generateFloor floor 6 real config', JSON.stringify(f6));
 
-  MAX_IMPLEMENTED_FLOOR === 6
-    ? ok('run lifecycle: max implemented floor includes Floor 6')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 6', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f7 && f7.floor === 7 && f7.placeholder !== true && Array.isArray(f7.excludedRooms) && f7.safeRoom === 'floor7_freecamp'
+    ? ok('generateFloor: floor 7 uses real First Free Zone generator')
+    : fail('generateFloor floor 7 real config', JSON.stringify(f7));
+
+  MAX_IMPLEMENTED_FLOOR === 7
+    ? ok('run lifecycle: max implemented floor includes Floor 7')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 7', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -3303,18 +3452,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   floor6FinishState.currentSceneId = 'the_end';
   const floor6FinishResult = runtime.dispatch(floor6FinishState, { type: 'complete_floor' });
   const floor6Event = floor6FinishResult.events.find(event => event.type === 'floor_completed');
-  const floor6RunEndEvent = floor6FinishResult.events.find(event => event.type === 'run_ended');
 
   floor6Event?.completedFloor === 6 && floor6Event?.nextFloor === 7 && floor6Event?.currencyReward === 90
     ? ok('runtime.complete_floor: Floor 6 completion awards Floor 6 meta event')
     : fail('runtime.complete_floor Floor 6 reward event', JSON.stringify(floor6FinishResult.events));
 
-  floor6FinishResult.state.player.runEnded === true &&
-    floor6FinishResult.state.player.currentRunActive === false &&
-    floor6RunEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 7/i.test(floor6RunEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 6 handoff ends at Floor 7 under construction')
+  floor6FinishResult.state.currentSceneId === 'floor7_freecamp' &&
+    floor6FinishResult.state.floorConfig.placeholder !== true &&
+    floor6FinishResult.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 6 handoff enters Floor 7 First Free Zone')
     : fail('runtime.complete_floor Floor 6 handoff', JSON.stringify({ player: floor6FinishResult.state.player, events: floor6FinishResult.events }));
+
+  const floor7ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor7Reader',
+    playerPatch: { floor: 7, inventory: ['f7_forager_trust', 'f7_healer_trust'] },
+  });
+  floor7ObjectiveProbe.currentSceneId = 'floor7_council_fire';
+  const floor7ObjectiveView = runtime.getView(floor7ObjectiveProbe);
+
+  floor7ObjectiveView.objective?.route === 'first-free-zone' &&
+    floor7ObjectiveView.objective.goal === 'Earn Trust Bonds 2/4' &&
+    floor7ObjectiveView.objective.missing.includes('Scout Trust Bond') &&
+    floor7ObjectiveView.objective.missing.includes('Builder Trust Bond')
+    ? ok('runtime Floor 7 objective: tracks Trust Bonds before Council Fire')
+    : fail('runtime Floor 7 objective missing', JSON.stringify(floor7ObjectiveView.objective));
+
+  const floor7FinishState = runtime.startNewRun({ name: 'Floor7Finisher' });
+  floor7FinishState.player.floor = 7;
+  floor7FinishState.currentSceneId = 'the_end';
+  const floor7FinishResult = runtime.dispatch(floor7FinishState, { type: 'complete_floor' });
+  const floor7Event = floor7FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor7RunEndEvent = floor7FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor7Event?.completedFloor === 7 && floor7Event?.nextFloor === 8 && floor7Event?.currencyReward === 105
+    ? ok('runtime.complete_floor: Floor 7 completion awards Floor 7 meta event')
+    : fail('runtime.complete_floor Floor 7 reward event', JSON.stringify(floor7FinishResult.events));
+
+  floor7FinishResult.state.player.runEnded === true &&
+    floor7FinishResult.state.player.currentRunActive === false &&
+    floor7RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 8/i.test(floor7RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 7 handoff ends at Floor 8 under construction')
+    : fail('runtime.complete_floor Floor 7 handoff', JSON.stringify({ player: floor7FinishResult.state.player, events: floor7FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

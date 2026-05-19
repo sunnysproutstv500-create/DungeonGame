@@ -190,6 +190,14 @@ floor6State.currentSceneId = 'floor6_boss_gate';
 const floor6View = runtime.getView(floor6State);
 assert(floor6View.objective && floor6View.objective.goal === 'Stabilize Anchors 2/3', 'smoke: Floor 6 runtime exposes Anchor objective', floor6View.objective);
 
+let floor7State = runtime.startNewRun({
+  name: 'Floor7Smoke',
+  playerPatch: { floor: 7, inventory: ['f7_forager_trust', 'f7_builder_trust'] },
+});
+floor7State.currentSceneId = 'floor7_council_fire';
+const floor7View = runtime.getView(floor7State);
+assert(floor7View.objective && floor7View.objective.goal === 'Earn Trust Bonds 2/4', 'smoke: Floor 7 runtime exposes Trust objective', floor7View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

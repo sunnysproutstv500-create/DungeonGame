@@ -622,5 +622,68 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f7_forager_trust": {
+    "id": "f7_forager_trust",
+    "name": "Forager Trust Bond",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_scout_trust": {
+    "id": "f7_scout_trust",
+    "name": "Scout Trust Bond",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_healer_trust": {
+    "id": "f7_healer_trust",
+    "name": "Healer Trust Bond",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_builder_trust": {
+    "id": "f7_builder_trust",
+    "name": "Builder Trust Bond",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_forager_favor": {
+    "id": "f7_forager_favor",
+    "name": "Forager Favor",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_scout_favor": {
+    "id": "f7_scout_favor",
+    "name": "Scout Favor",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_healer_favor": {
+    "id": "f7_healer_favor",
+    "name": "Healer Favor",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f7_builder_favor": {
+    "id": "f7_builder_favor",
+    "name": "Builder Favor",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "freecamp_banner": {
+    "id": "freecamp_banner",
+    "name": "Freecamp Banner",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }

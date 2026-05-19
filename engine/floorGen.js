@@ -137,6 +137,15 @@ function generateFloor6Config() {
   };
 }
 
+function generateFloor7Config() {
+  return {
+    floor: 7,
+    excludedRooms: [],
+    enemyVariants: {},
+    safeRoom: 'floor7_freecamp',
+  };
+}
+
 function generateFloor(floor) {
   if (floor === 1) return generateFloor1Config();
   if (floor === 2) return generateFloor2Config();
@@ -144,6 +153,7 @@ function generateFloor(floor) {
   if (floor === 4) return generateFloor4Config();
   if (floor === 5) return generateFloor5Config();
   if (floor === 6) return generateFloor6Config();
+  if (floor === 7) return generateFloor7Config();
   return {
     floor,
     placeholder: true,
@@ -153,4 +163,4 @@ function generateFloor(floor) {
   };
 }
 
-module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, generateFloor4Config, generateFloor5Config, generateFloor6Config, filterChoices, ENEMY_VARIANTS };
+module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, generateFloor4Config, generateFloor5Config, generateFloor6Config, generateFloor7Config, filterChoices, ENEMY_VARIANTS };

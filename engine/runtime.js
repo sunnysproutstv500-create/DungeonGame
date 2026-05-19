@@ -58,6 +58,14 @@ const PROGRESS_ITEMS = {
   f6_glass_anomaly: 'Glass Anomaly Mark will distort the Outside Thing.',
   f6_root_anomaly: 'Root Anomaly Mark will distort the Outside Thing.',
   f6_road_anomaly: 'Road Anomaly Mark will distort the Outside Thing.',
+  f7_forager_trust: 'Forager Trust Bond earned.',
+  f7_scout_trust: 'Scout Trust Bond earned.',
+  f7_healer_trust: 'Healer Trust Bond earned.',
+  f7_builder_trust: 'Builder Trust Bond earned.',
+  f7_forager_favor: 'Forager Favor secured for the Claimant fight.',
+  f7_scout_favor: 'Scout Favor secured for the Claimant fight.',
+  f7_healer_favor: 'Healer Favor secured for the Claimant fight.',
+  f7_builder_favor: 'Builder Favor secured for the Claimant fight.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -232,6 +240,24 @@ function buildObjective(player) {
     return {
       route: 'fracture-map',
       goal: ready ? 'Challenge the Outside Thing' : `Stabilize Anchors ${completed}/3`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 7) {
+    const required = [
+      ['f7_forager_trust', 'Forager Trust Bond'],
+      ['f7_scout_trust', 'Scout Trust Bond'],
+      ['f7_healer_trust', 'Healer Trust Bond'],
+      ['f7_builder_trust', 'Builder Trust Bond'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'first-free-zone',
+      goal: ready ? 'Challenge the Claimant at the boss trail' : `Earn Trust Bonds ${completed}/4`,
       missing,
       ready,
     };

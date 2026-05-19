@@ -5068,5 +5068,556 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor7_freecamp": {
+    "id": "floor7_freecamp",
+    "map": {
+      "x": 0,
+      "y": 78,
+      "name": "F7CAMP",
+      "tag": "safe",
+      "connections": [
+        "floor7_forager_orchard",
+        "floor7_scout_ridge",
+        "floor7_healer_tents",
+        "floor7_builder_wall",
+        "floor7_council_fire"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Freecamp",
+    "text": "Freecamp is the First Free Zone: canvas roofs, cooking smoke, fence posts, arguments, children sleeping under borrowed armor, and no Overseer signs anywhere. The settlement will not open the boss trail until you earn Trust Bonds 0/4 from the Foragers, Scouts, Healers, and Builders.",
+    "choices": [
+      {
+        "text": "Rest beside the Freecamp cookfire",
+        "once": true,
+        "effect": {
+          "heal": 95
+        }
+      },
+      {
+        "text": "Trade camp stories for a Large Potion",
+        "once": true,
+        "effect": {
+          "giveItem": "large_potion"
+        }
+      },
+      {
+        "text": "Help the Foragers at the living orchard",
+        "nextScene": "floor7_forager_orchard"
+      },
+      {
+        "text": "Join the Scouts on the no-rule ridge",
+        "nextScene": "floor7_scout_ridge"
+      },
+      {
+        "text": "Assist the Healers in the weather tents",
+        "nextScene": "floor7_healer_tents"
+      },
+      {
+        "text": "Work with the Builders on the wall",
+        "nextScene": "floor7_builder_wall"
+      },
+      {
+        "text": "Approach the Council Fire",
+        "nextScene": "floor7_council_fire"
+      }
+    ]
+  },
+  "floor7_forager_orchard": {
+    "id": "floor7_forager_orchard",
+    "map": {
+      "x": -5,
+      "y": 79,
+      "name": "FORAGE",
+      "tag": "event",
+      "connections": [
+        "floor7_freecamp",
+        "floor7_living_orchard"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Forager Orchard",
+    "text": "The Foragers found trees growing fruit shaped like closed fists. Food means survival, but the orchard twitches when anyone takes too much.",
+    "choices": [
+      {
+        "text": "Take only what Freecamp can eat tonight",
+        "nextScene": "floor7_living_orchard"
+      },
+      {
+        "text": "share the first safe fruit with the hungry kids and earn a forager favor",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_forager_favor",
+          "giveXP": 40
+        },
+        "nextScene": "floor7_living_orchard"
+      }
+    ]
+  },
+  "floor7_living_orchard": {
+    "id": "floor7_living_orchard",
+    "map": {
+      "x": -5,
+      "y": 80,
+      "name": "ORCHD",
+      "tag": "puzzle",
+      "connections": [
+        "floor7_forager_orchard",
+        "floor7_forager_bond"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Living Orchard",
+    "text": "The orchard opens paths only when you harvest in rhythm with the roots. Too quick and it bites. Too slow and the fruit spoils in your hand.",
+    "choices": [
+      {
+        "text": "harvest the living orchard in root rhythm",
+        "effect": {
+          "giveItem": "big_potion",
+          "giveXP": 95
+        },
+        "nextScene": "floor7_forager_bond"
+      },
+      {
+        "text": "Cut a fast basket before the branches close",
+        "effect": {
+          "damage": 30,
+          "giveItem": "large_potion",
+          "giveXP": 55
+        },
+        "nextScene": "floor7_forager_bond"
+      }
+    ]
+  },
+  "floor7_forager_bond": {
+    "id": "floor7_forager_bond",
+    "map": {
+      "x": -5,
+      "y": 81,
+      "name": "F-BOND",
+      "tag": "treasure",
+      "connections": [
+        "floor7_living_orchard",
+        "floor7_freecamp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Forager Trust",
+    "text": "The Foragers count the baskets, then count the people you fed first. They nod as if that math matters more.",
+    "choices": [
+      {
+        "text": "Claim the Forager Trust Bond and return to Freecamp",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_forager_trust",
+          "giveGold": 45
+        },
+        "nextScene": "floor7_freecamp"
+      }
+    ]
+  },
+  "floor7_scout_ridge": {
+    "id": "floor7_scout_ridge",
+    "map": {
+      "x": 5,
+      "y": 79,
+      "name": "SCOUT",
+      "tag": "event",
+      "connections": [
+        "floor7_freecamp",
+        "floor7_no_rule_ridge"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Scout Ridge",
+    "text": "The Scouts climb a ridge where maps refuse to stay drawn. From here, Freecamp looks small enough to lose and stubborn enough to matter.",
+    "choices": [
+      {
+        "text": "Follow the scout markers quietly",
+        "nextScene": "floor7_no_rule_ridge"
+      },
+      {
+        "text": "stand watch for the slowest scout and earn a scout favor",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_scout_favor",
+          "giveXP": 45
+        },
+        "nextScene": "floor7_no_rule_ridge"
+      }
+    ]
+  },
+  "floor7_no_rule_ridge": {
+    "id": "floor7_no_rule_ridge",
+    "map": {
+      "x": 5,
+      "y": 80,
+      "name": "RIDGE",
+      "tag": "puzzle",
+      "connections": [
+        "floor7_scout_ridge",
+        "floor7_scout_bond"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - No-Rule Ridge",
+    "text": "The ridge has no north. The Scouts ask you to map it anyway, not because the map will be perfect, but because people walk braver when someone tried.",
+    "choices": [
+      {
+        "text": "map the no-rule ridge by landmarks, not directions",
+        "effect": {
+          "giveXP": 115
+        },
+        "nextScene": "floor7_scout_bond"
+      },
+      {
+        "text": "Mark a faster route through unstable ground",
+        "effect": {
+          "damage": 28,
+          "giveGold": 55,
+          "giveXP": 60
+        },
+        "nextScene": "floor7_scout_bond"
+      }
+    ]
+  },
+  "floor7_scout_bond": {
+    "id": "floor7_scout_bond",
+    "map": {
+      "x": 5,
+      "y": 81,
+      "name": "S-BOND",
+      "tag": "treasure",
+      "connections": [
+        "floor7_no_rule_ridge",
+        "floor7_freecamp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Scout Trust",
+    "text": "The Scouts pin your rough map beside their own. It is ugly, useful, and already saving arguments.",
+    "choices": [
+      {
+        "text": "Claim the Scout Trust Bond and return to Freecamp",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_scout_trust",
+          "giveXP": 50
+        },
+        "nextScene": "floor7_freecamp"
+      }
+    ]
+  },
+  "floor7_healer_tents": {
+    "id": "floor7_healer_tents",
+    "map": {
+      "x": -3,
+      "y": 82,
+      "name": "HEAL",
+      "tag": "safe",
+      "connections": [
+        "floor7_freecamp",
+        "floor7_weather_sick"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Healer Tents",
+    "text": "The Healers work under stitched tarps while free weather crawls through bandages. They need hands, not speeches.",
+    "choices": [
+      {
+        "text": "Sort medicine and keep quiet",
+        "nextScene": "floor7_weather_sick"
+      },
+      {
+        "text": "help carry the injured through the worst gust and earn a healer favor",
+        "once": true,
+        "effect": {
+          "damage": 18,
+          "giveItem": "f7_healer_favor"
+        },
+        "nextScene": "floor7_weather_sick"
+      }
+    ]
+  },
+  "floor7_weather_sick": {
+    "id": "floor7_weather_sick",
+    "map": {
+      "x": -3,
+      "y": 83,
+      "name": "SICK",
+      "tag": "event",
+      "connections": [
+        "floor7_healer_tents",
+        "floor7_healer_bond"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Weather Sick Ward",
+    "text": "The patients are sick with places they briefly stood in: glass rain in the lungs, static in the blood, road dust under the skin.",
+    "choices": [
+      {
+        "text": "stabilize the weather sick one breath at a time",
+        "effect": {
+          "heal": 45,
+          "giveXP": 130
+        },
+        "nextScene": "floor7_healer_bond"
+      },
+      {
+        "text": "Burn scarce supplies to save time",
+        "effect": {
+          "spendGold": 35,
+          "heal": 65,
+          "giveXP": 80
+        },
+        "nextScene": "floor7_healer_bond"
+      }
+    ]
+  },
+  "floor7_healer_bond": {
+    "id": "floor7_healer_bond",
+    "map": {
+      "x": -3,
+      "y": 84,
+      "name": "H-BOND",
+      "tag": "treasure",
+      "connections": [
+        "floor7_weather_sick",
+        "floor7_freecamp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Healer Trust",
+    "text": "One patient wakes and asks if Freecamp is still there. The Healers look at you when they answer yes.",
+    "choices": [
+      {
+        "text": "Claim the Healer Trust Bond and return to Freecamp",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_healer_trust",
+          "giveXP": 55
+        },
+        "nextScene": "floor7_freecamp"
+      }
+    ]
+  },
+  "floor7_builder_wall": {
+    "id": "floor7_builder_wall",
+    "map": {
+      "x": 3,
+      "y": 82,
+      "name": "BUILD",
+      "tag": "event",
+      "connections": [
+        "floor7_freecamp",
+        "floor7_defense_line"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Builder Wall",
+    "text": "The Builders are raising a wall from wrecked doors, boss bones, and things nobody wants to explain. It is not pretty. It is standing.",
+    "choices": [
+      {
+        "text": "Haul braces to the weak side",
+        "nextScene": "floor7_defense_line"
+      },
+      {
+        "text": "stand on the wall while the others reinforce it and earn a builder favor",
+        "once": true,
+        "effect": {
+          "damage": 22,
+          "giveItem": "f7_builder_favor"
+        },
+        "nextScene": "floor7_defense_line"
+      }
+    ]
+  },
+  "floor7_defense_line": {
+    "id": "floor7_defense_line",
+    "map": {
+      "x": 3,
+      "y": 83,
+      "name": "WALL",
+      "tag": "combat",
+      "connections": [
+        "floor7_builder_wall",
+        "floor7_builder_bond"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 7 - Defense Line",
+    "text": "A Claimant outrider tests the new wall with hooks and old ownership papers. The Builders shout advice that sounds a lot like courage.",
+    "combat": {
+      "name": "Claimant Outrider",
+      "hp": 175,
+      "attack": 39,
+      "defense": 12,
+      "xp": 210,
+      "goldReward": 70,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "armor_break",
+        "cleave"
+      ],
+      "intro": "The outrider points at Freecamp like it has already bought the place.",
+      "victoryText": "The wall holds. The ownership papers do not."
+    },
+    "fleeScene": "floor7_freecamp",
+    "victoryScene": "floor7_builder_bond"
+  },
+  "floor7_builder_bond": {
+    "id": "floor7_builder_bond",
+    "map": {
+      "x": 3,
+      "y": 84,
+      "name": "B-BOND",
+      "tag": "treasure",
+      "connections": [
+        "floor7_defense_line",
+        "floor7_freecamp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Builder Trust",
+    "text": "The Builders carve your mark into a brace where only they will see it. That is how they say thank you.",
+    "choices": [
+      {
+        "text": "Claim the Builder Trust Bond and return to Freecamp",
+        "once": true,
+        "effect": {
+          "giveItem": "f7_builder_trust",
+          "giveGold": 65
+        },
+        "nextScene": "floor7_freecamp"
+      }
+    ]
+  },
+  "floor7_council_fire": {
+    "id": "floor7_council_fire",
+    "map": {
+      "x": 0,
+      "y": 85,
+      "name": "COUNC",
+      "tag": "event",
+      "connections": [
+        "floor7_freecamp",
+        "floor7_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 - Council Fire",
+    "text": "The Council Fire is not a throne. It is four circles of people disagreeing honestly. If every Trust Bond is present, they open the boss trail together.",
+    "choices": [
+      {
+        "text": "Return to Freecamp",
+        "nextScene": "floor7_freecamp"
+      },
+      {
+        "text": "Open the boss trail with all four Trust Bonds",
+        "requires": {
+          "items": [
+            "f7_forager_trust",
+            "f7_scout_trust",
+            "f7_healer_trust",
+            "f7_builder_trust"
+          ]
+        },
+        "nextScene": "floor7_boss"
+      }
+    ]
+  },
+  "floor7_boss": {
+    "id": "floor7_boss",
+    "map": {
+      "x": 0,
+      "y": 86,
+      "name": "CLAIM",
+      "tag": "boss",
+      "connections": [
+        "floor7_council_fire",
+        "floor7_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 7 - The Claimant",
+    "text": "The Claimant arrives with banners, ledgers, and a smile polished by conquest. It says freedom is only land nobody stronger has named yet. Freecamp answers from behind you.",
+    "combat": {
+      "name": "The Claimant",
+      "hp": 330,
+      "attack": 54,
+      "defense": 18,
+      "xp": 520,
+      "goldReward": 220,
+      "loot": [
+        "large_potion",
+        "freecamp_banner"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "quick_strike",
+        "sweeping_attack",
+        "armor_break",
+        "cleave",
+        "battle_roar"
+      ],
+      "intro": "The Claimant plants a flag where your shadow falls.",
+      "victoryText": "The flag comes down. Freecamp does not cheer at first. It listens to the silence and realizes it is still free.",
+      "advantages": [
+        {
+          "item": "f7_forager_favor",
+          "hpDelta": -35
+        },
+        {
+          "item": "f7_scout_favor",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        },
+        {
+          "item": "f7_healer_favor",
+          "attackDelta": -3,
+          "removeAbilities": [
+            "battle_roar"
+          ]
+        },
+        {
+          "item": "f7_builder_favor",
+          "defenseDelta": -5,
+          "removeAbilities": [
+            "sweeping_attack"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor7_council_fire",
+    "victoryScene": "floor7_clear_room"
+  },
+  "floor7_clear_room": {
+    "id": "floor7_clear_room",
+    "map": {
+      "x": 0,
+      "y": 87,
+      "name": "F7CLR",
+      "tag": "event",
+      "connections": [
+        "floor7_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 7 Clear - Freecamp Holds",
+    "text": "Freecamp raises its banner where the Claimant tried to plant one. Nobody agrees what freedom should become next, which is how you know it survived. Beyond the settlement, Floor 8 waits in the wider wild, past the first free zone and into country no one has defended yet.",
+    "choices": [
+      {
+        "text": "Walk beyond Freecamp. [FLOOR 7 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }
