@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 151
-      ? ok(`scene map data: ${mappedIds.length}/151 scenes have map coordinates`)
+    mappedIds.length === 167
+      ? ok(`scene map data: ${mappedIds.length}/167 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -2416,6 +2416,150 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 7 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 8: The Hunt Beyond
+  {
+    [
+      'f8_scent_trap',
+      'f8_snare_trap',
+      'f8_echo_trap',
+      'f8_sight_trap',
+      'f8_scent_edge',
+      'f8_snare_edge',
+      'f8_echo_edge',
+      'f8_sight_edge',
+      'pale_stalker_hide',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor8 item exists: ${itemId}`)
+        : fail(`floor8 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor8_trailhead_camp'];
+    safe?.map?.tag === 'safe' && /Trailhead Camp|Hunt Traps 0\/4|Pale Stalker/i.test(safe?.text || '')
+      ? ok('floor8_trailhead_camp: safe start introduces the hunt and trap goal')
+      : fail('floor8_trailhead_camp missing safe intro', JSON.stringify(safe));
+
+    const pathStarts = ['floor8_scent_trail', 'floor8_bone_snare', 'floor8_echo_blind', 'floor8_moon_blind'];
+    pathStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor8_trailhead_camp: opens four hunt preparation paths')
+      : fail('floor8_trailhead_camp hunt choices missing', JSON.stringify(safe?.choices));
+
+    const floor8Rooms = [
+      'floor8_scent_trail',
+      'floor8_marked_brush',
+      'floor8_scent_trap',
+      'floor8_bone_snare',
+      'floor8_old_kill_site',
+      'floor8_snare_trap',
+      'floor8_echo_blind',
+      'floor8_canyon_echo',
+      'floor8_echo_trap',
+      'floor8_moon_blind',
+      'floor8_broken_moonlight',
+      'floor8_sight_trap',
+      'floor8_killing_ground',
+      'floor8_boss',
+      'floor8_clear_room',
+    ];
+
+    floor8Rooms.every(id => scenes[id])
+      ? ok('floor8 hunt beyond: core rooms exist')
+      : fail('floor8 hunt beyond missing rooms', floor8Rooms.filter(id => !scenes[id]).join(', '));
+
+    const trapRewards = [
+      ['floor8_scent_trap', 'f8_scent_trap'],
+      ['floor8_snare_trap', 'f8_snare_trap'],
+      ['floor8_echo_trap', 'f8_echo_trap'],
+      ['floor8_sight_trap', 'f8_sight_trap'],
+    ];
+
+    trapRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor8 hunt beyond: each preparation path awards a Hunt Trap')
+      : fail('floor8 trap rewards missing', JSON.stringify(trapRewards));
+
+    const edgeRewards = [
+      ['floor8_scent_trail', 'f8_scent_edge'],
+      ['floor8_bone_snare', 'f8_snare_edge'],
+      ['floor8_echo_blind', 'f8_echo_edge'],
+      ['floor8_moon_blind', 'f8_sight_edge'],
+    ];
+
+    edgeRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId && /bait|edge|risk|offer/i.test(choice.text)))
+      ? ok("floor8 hunt beyond: bait choices award Hunter's Edges")
+      : fail('floor8 edge rewards missing', JSON.stringify(edgeRewards));
+
+    const gateChoice = (scenes['floor8_killing_ground']?.choices || []).find(choice => choice.nextScene === 'floor8_boss');
+    ['f8_scent_trap', 'f8_snare_trap', 'f8_echo_trap', 'f8_sight_trap'].every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor8 killing ground: requires all four Hunt Traps')
+      : fail('floor8 killing ground requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor8_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Pale Stalker' &&
+      boss.combat?.loot?.includes('pale_stalker_hide') &&
+      boss.victoryScene === 'floor8_clear_room'
+      ? ok('floor8 boss: Pale Stalker drops unique hide and clears floor')
+      : fail('floor8 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f8_scent_edge', 'f8_snare_edge', 'f8_echo_edge', 'f8_sight_edge'].every(itemId => advantageItems.includes(itemId))
+      ? ok("floor8 boss: Hunter's Edges weaken the Pale Stalker")
+      : fail('floor8 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor8_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 9|deeper wilderness|old power/i.test(scenes['floor8_clear_room']?.text || '')
+      ? ok('floor8 clear room: hands off toward Floor 9')
+      : fail('floor8 clear room handoff missing', scenes['floor8_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 8 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 50 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'HuntBeyondRunner',
+      playerPatch: { floor: 8, hp: 1800, maxHp: 1800, attack: 1800, defense: 180, gold: 600 },
+    });
+    run.currentSceneId = 'floor8_trailhead_camp';
+
+    run = chooseByText(run, /Scent Trail/);
+    run = chooseByText(run, /bait yourself/);
+    run = chooseByText(run, /read the marked brush/);
+    run = chooseByText(run, /Scent Trap/);
+    run = chooseByText(run, /Bone Snare/);
+    run = chooseByText(run, /offer fresh blood/);
+    run = chooseByText(run, /bind the old kill site/);
+    run = chooseByText(run, /Snare Trap/);
+    run = chooseByText(run, /Echo Blind/);
+    run = chooseByText(run, /risk a shout/);
+    run = chooseByText(run, /break the canyon echo/);
+    run = chooseByText(run, /Echo Trap/);
+    run = chooseByText(run, /Moon Blind/);
+    run = chooseByText(run, /stand in broken moonlight/);
+    run = winCombat(run);
+    run = chooseByText(run, /Sight Trap/);
+    run = chooseByText(run, /Killing Ground/);
+    run = chooseByText(run, /Set all four Hunt Traps/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor8_clear_room' &&
+      ['f8_scent_trap', 'f8_snare_trap', 'f8_echo_trap', 'f8_sight_trap', 'f8_scent_edge', 'f8_snare_edge', 'f8_echo_edge', 'f8_sight_edge', 'pale_stalker_hide'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 8 full playthrough: four traps prepare and clear the Pale Stalker')
+      : fail('runtime Floor 8 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -3110,6 +3254,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f5 = generateFloor(5);
   const f6 = generateFloor(6);
   const f7 = generateFloor(7);
+  const f8 = generateFloor(8);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -3139,9 +3284,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 7 uses real First Free Zone generator')
     : fail('generateFloor floor 7 real config', JSON.stringify(f7));
 
-  MAX_IMPLEMENTED_FLOOR === 7
-    ? ok('run lifecycle: max implemented floor includes Floor 7')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 7', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f8 && f8.floor === 8 && f8.placeholder !== true && Array.isArray(f8.excludedRooms) && f8.safeRoom === 'floor8_trailhead_camp'
+    ? ok('generateFloor: floor 8 uses real Hunt Beyond generator')
+    : fail('generateFloor floor 8 real config', JSON.stringify(f8));
+
+  MAX_IMPLEMENTED_FLOOR === 8
+    ? ok('run lifecycle: max implemented floor includes Floor 8')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 8', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -3482,18 +3631,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   floor7FinishState.currentSceneId = 'the_end';
   const floor7FinishResult = runtime.dispatch(floor7FinishState, { type: 'complete_floor' });
   const floor7Event = floor7FinishResult.events.find(event => event.type === 'floor_completed');
-  const floor7RunEndEvent = floor7FinishResult.events.find(event => event.type === 'run_ended');
 
   floor7Event?.completedFloor === 7 && floor7Event?.nextFloor === 8 && floor7Event?.currencyReward === 105
     ? ok('runtime.complete_floor: Floor 7 completion awards Floor 7 meta event')
     : fail('runtime.complete_floor Floor 7 reward event', JSON.stringify(floor7FinishResult.events));
 
-  floor7FinishResult.state.player.runEnded === true &&
-    floor7FinishResult.state.player.currentRunActive === false &&
-    floor7RunEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 8/i.test(floor7RunEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 7 handoff ends at Floor 8 under construction')
+  floor7FinishResult.state.currentSceneId === 'floor8_trailhead_camp' &&
+    floor7FinishResult.state.floorConfig.placeholder !== true &&
+    floor7FinishResult.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 7 handoff enters Floor 8 Hunt Beyond')
     : fail('runtime.complete_floor Floor 7 handoff', JSON.stringify({ player: floor7FinishResult.state.player, events: floor7FinishResult.events }));
+
+  const floor8ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor8Reader',
+    playerPatch: { floor: 8, inventory: ['f8_scent_trap', 'f8_echo_trap'] },
+  });
+  floor8ObjectiveProbe.currentSceneId = 'floor8_killing_ground';
+  const floor8ObjectiveView = runtime.getView(floor8ObjectiveProbe);
+
+  floor8ObjectiveView.objective?.route === 'hunt-beyond' &&
+    floor8ObjectiveView.objective.goal === 'Set Hunt Traps 2/4' &&
+    floor8ObjectiveView.objective.missing.includes('Snare Trap') &&
+    floor8ObjectiveView.objective.missing.includes('Sight Trap')
+    ? ok('runtime Floor 8 objective: tracks Hunt Traps before the Killing Ground')
+    : fail('runtime Floor 8 objective missing', JSON.stringify(floor8ObjectiveView.objective));
+
+  const floor8FinishState = runtime.startNewRun({ name: 'Floor8Finisher' });
+  floor8FinishState.player.floor = 8;
+  floor8FinishState.currentSceneId = 'the_end';
+  const floor8FinishResult = runtime.dispatch(floor8FinishState, { type: 'complete_floor' });
+  const floor8Event = floor8FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor8RunEndEvent = floor8FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor8Event?.completedFloor === 8 && floor8Event?.nextFloor === 9 && floor8Event?.currencyReward === 120
+    ? ok('runtime.complete_floor: Floor 8 completion awards Floor 8 meta event')
+    : fail('runtime.complete_floor Floor 8 reward event', JSON.stringify(floor8FinishResult.events));
+
+  floor8FinishResult.state.player.runEnded === true &&
+    floor8FinishResult.state.player.currentRunActive === false &&
+    floor8RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 9/i.test(floor8RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 8 handoff ends at Floor 9 under construction')
+    : fail('runtime.complete_floor Floor 8 handoff', JSON.stringify({ player: floor8FinishResult.state.player, events: floor8FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

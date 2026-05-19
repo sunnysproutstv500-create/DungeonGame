@@ -198,6 +198,14 @@ floor7State.currentSceneId = 'floor7_council_fire';
 const floor7View = runtime.getView(floor7State);
 assert(floor7View.objective && floor7View.objective.goal === 'Earn Trust Bonds 2/4', 'smoke: Floor 7 runtime exposes Trust objective', floor7View.objective);
 
+let floor8State = runtime.startNewRun({
+  name: 'Floor8Smoke',
+  playerPatch: { floor: 8, inventory: ['f8_scent_trap', 'f8_sight_trap'] },
+});
+floor8State.currentSceneId = 'floor8_killing_ground';
+const floor8View = runtime.getView(floor8State);
+assert(floor8View.objective && floor8View.objective.goal === 'Set Hunt Traps 2/4', 'smoke: Floor 8 runtime exposes Hunt Trap objective', floor8View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

@@ -685,5 +685,68 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f8_scent_trap": {
+    "id": "f8_scent_trap",
+    "name": "Scent Trap",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_snare_trap": {
+    "id": "f8_snare_trap",
+    "name": "Snare Trap",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_echo_trap": {
+    "id": "f8_echo_trap",
+    "name": "Echo Trap",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_sight_trap": {
+    "id": "f8_sight_trap",
+    "name": "Sight Trap",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_scent_edge": {
+    "id": "f8_scent_edge",
+    "name": "Scent Hunter's Edge",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_snare_edge": {
+    "id": "f8_snare_edge",
+    "name": "Snare Hunter's Edge",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_echo_edge": {
+    "id": "f8_echo_edge",
+    "name": "Echo Hunter's Edge",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f8_sight_edge": {
+    "id": "f8_sight_edge",
+    "name": "Sight Hunter's Edge",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "pale_stalker_hide": {
+    "id": "pale_stalker_hide",
+    "name": "Pale Stalker Hide",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }

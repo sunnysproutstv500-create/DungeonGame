@@ -66,6 +66,14 @@ const PROGRESS_ITEMS = {
   f7_scout_favor: 'Scout Favor secured for the Claimant fight.',
   f7_healer_favor: 'Healer Favor secured for the Claimant fight.',
   f7_builder_favor: 'Builder Favor secured for the Claimant fight.',
+  f8_scent_trap: 'Scent Trap set for the Pale Stalker hunt.',
+  f8_snare_trap: 'Snare Trap set for the Pale Stalker hunt.',
+  f8_echo_trap: 'Echo Trap set for the Pale Stalker hunt.',
+  f8_sight_trap: 'Sight Trap set for the Pale Stalker hunt.',
+  f8_scent_edge: "Scent Hunter's Edge secured for the Pale Stalker fight.",
+  f8_snare_edge: "Snare Hunter's Edge secured for the Pale Stalker fight.",
+  f8_echo_edge: "Echo Hunter's Edge secured for the Pale Stalker fight.",
+  f8_sight_edge: "Sight Hunter's Edge secured for the Pale Stalker fight.",
 };
 
 function getProgressMessageForItem(itemId) {
@@ -258,6 +266,24 @@ function buildObjective(player) {
     return {
       route: 'first-free-zone',
       goal: ready ? 'Challenge the Claimant at the boss trail' : `Earn Trust Bonds ${completed}/4`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 8) {
+    const required = [
+      ['f8_scent_trap', 'Scent Trap'],
+      ['f8_snare_trap', 'Snare Trap'],
+      ['f8_echo_trap', 'Echo Trap'],
+      ['f8_sight_trap', 'Sight Trap'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'hunt-beyond',
+      goal: ready ? 'Face the Pale Stalker' : `Set Hunt Traps ${completed}/4`,
       missing,
       ready,
     };

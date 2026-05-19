@@ -5619,5 +5619,570 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor8_trailhead_camp": {
+    "id": "floor8_trailhead_camp",
+    "map": {
+      "x": 0,
+      "y": 92,
+      "name": "TRAIL",
+      "tag": "safe",
+      "connections": [
+        "floor8_scent_trail",
+        "floor8_bone_snare",
+        "floor8_echo_blind",
+        "floor8_moon_blind",
+        "floor8_killing_ground"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Trailhead Camp",
+    "text": "Trailhead Camp is a ring of lanterns nailed to dead trees. The hunters here speak softly because the Pale Stalker learns voices. A carved board reads: Hunt Traps 0/4. Set Scent, Snare, Echo, and Sight before you step into the killing ground.",
+    "choices": [
+      {
+        "text": "Rest in the canvas bed before the hunt.",
+        "effect": {
+          "heal": 140
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Buy a large potion from the trail trader. (55 gold)",
+        "condition": {
+          "gold": 55
+        },
+        "effect": {
+          "spendGold": 55,
+          "giveItem": "large_potion"
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Take the Scent Trail.",
+        "nextScene": "floor8_scent_trail"
+      },
+      {
+        "text": "Walk to the Bone Snare field.",
+        "nextScene": "floor8_bone_snare"
+      },
+      {
+        "text": "Enter the Echo Blind.",
+        "nextScene": "floor8_echo_blind"
+      },
+      {
+        "text": "Climb toward the Moon Blind.",
+        "nextScene": "floor8_moon_blind"
+      },
+      {
+        "text": "Approach the Killing Ground.",
+        "nextScene": "floor8_killing_ground"
+      }
+    ]
+  },
+  "floor8_scent_trail": {
+    "id": "floor8_scent_trail",
+    "map": {
+      "x": -3,
+      "y": 93,
+      "name": "SCENT",
+      "tag": "event",
+      "connections": [
+        "floor8_trailhead_camp",
+        "floor8_marked_brush"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Scent Trail",
+    "text": "The trail is painted in old musk, crushed mint, and hunter ash. Claw marks stop at every place a frightened person would hide.",
+    "choices": [
+      {
+        "text": "bait yourself with hunter ash and walk first.",
+        "effect": {
+          "damage": 28,
+          "giveItem": "f8_scent_edge"
+        },
+        "once": true,
+        "nextScene": "floor8_marked_brush"
+      },
+      {
+        "text": "Follow the prepared scent line carefully.",
+        "nextScene": "floor8_marked_brush"
+      }
+    ]
+  },
+  "floor8_marked_brush": {
+    "id": "floor8_marked_brush",
+    "map": {
+      "x": -4,
+      "y": 94,
+      "name": "BRUSH",
+      "tag": "event",
+      "connections": [
+        "floor8_scent_trail",
+        "floor8_scent_trap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Marked Brush",
+    "text": "Ribbons of hide hang from thorn branches. Each strip carries a different lie about where prey has gone.",
+    "choices": [
+      {
+        "text": "read the marked brush and spoil the false trail.",
+        "effect": {
+          "giveXP": 170,
+          "giveGold": 35
+        },
+        "once": true,
+        "nextScene": "floor8_scent_trap"
+      },
+      {
+        "text": "Move through the brush by instinct.",
+        "nextScene": "floor8_scent_trap"
+      }
+    ]
+  },
+  "floor8_scent_trap": {
+    "id": "floor8_scent_trap",
+    "map": {
+      "x": -5,
+      "y": 95,
+      "name": "SMARK",
+      "tag": "treasure",
+      "connections": [
+        "floor8_marked_brush",
+        "floor8_trailhead_camp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Scent Trap",
+    "text": "A copper basin waits under a split pine. Once lit, it will drag the Stalker by memory instead of hunger.",
+    "choices": [
+      {
+        "text": "Set the Scent Trap and return to camp.",
+        "effect": {
+          "giveItem": "f8_scent_trap",
+          "giveXP": 140
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Return to Trailhead Camp.",
+        "nextScene": "floor8_trailhead_camp"
+      }
+    ]
+  },
+  "floor8_bone_snare": {
+    "id": "floor8_bone_snare",
+    "map": {
+      "x": -1,
+      "y": 93,
+      "name": "BONE",
+      "tag": "event",
+      "connections": [
+        "floor8_trailhead_camp",
+        "floor8_old_kill_site"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Bone Snare Field",
+    "text": "The ground is stitched with pale ribs. Hunters left the bones standing upright so anything charging blind breaks itself on the pattern.",
+    "choices": [
+      {
+        "text": "offer fresh blood to wake the snare pattern.",
+        "effect": {
+          "damage": 34,
+          "giveItem": "f8_snare_edge"
+        },
+        "once": true,
+        "nextScene": "floor8_old_kill_site"
+      },
+      {
+        "text": "Step between the ribs and keep your blood.",
+        "nextScene": "floor8_old_kill_site"
+      }
+    ]
+  },
+  "floor8_old_kill_site": {
+    "id": "floor8_old_kill_site",
+    "map": {
+      "x": -1,
+      "y": 94,
+      "name": "KILL",
+      "tag": "event",
+      "connections": [
+        "floor8_bone_snare",
+        "floor8_snare_trap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Old Kill Site",
+    "text": "A circle of crushed helmets marks where the Pale Stalker learned that armor makes a lovely sound when folded.",
+    "choices": [
+      {
+        "text": "bind the old kill site with wire and prayer.",
+        "effect": {
+          "giveXP": 190,
+          "giveGold": 45
+        },
+        "once": true,
+        "nextScene": "floor8_snare_trap"
+      },
+      {
+        "text": "Skirt the kill site and keep moving.",
+        "nextScene": "floor8_snare_trap"
+      }
+    ]
+  },
+  "floor8_snare_trap": {
+    "id": "floor8_snare_trap",
+    "map": {
+      "x": -1,
+      "y": 95,
+      "name": "SNARE",
+      "tag": "treasure",
+      "connections": [
+        "floor8_old_kill_site",
+        "floor8_trailhead_camp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Snare Trap",
+    "text": "Braided wire vanishes under leaves and bone dust. It will not kill the Stalker. It only needs to teach the thing one moment of stillness.",
+    "choices": [
+      {
+        "text": "Set the Snare Trap and return to camp.",
+        "effect": {
+          "giveItem": "f8_snare_trap",
+          "giveXP": 140
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Return to Trailhead Camp.",
+        "nextScene": "floor8_trailhead_camp"
+      }
+    ]
+  },
+  "floor8_echo_blind": {
+    "id": "floor8_echo_blind",
+    "map": {
+      "x": 1,
+      "y": 93,
+      "name": "ECHO",
+      "tag": "event",
+      "connections": [
+        "floor8_trailhead_camp",
+        "floor8_canyon_echo"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Echo Blind",
+    "text": "A blind of black cloth hangs over a canyon mouth. Inside, every breath returns late, wearing teeth.",
+    "choices": [
+      {
+        "text": "risk a shout and make the canyon answer you.",
+        "effect": {
+          "damage": 30,
+          "giveItem": "f8_echo_edge"
+        },
+        "once": true,
+        "nextScene": "floor8_canyon_echo"
+      },
+      {
+        "text": "Cross the blind in silence.",
+        "nextScene": "floor8_canyon_echo"
+      }
+    ]
+  },
+  "floor8_canyon_echo": {
+    "id": "floor8_canyon_echo",
+    "map": {
+      "x": 1,
+      "y": 94,
+      "name": "CANYN",
+      "tag": "event",
+      "connections": [
+        "floor8_echo_blind",
+        "floor8_echo_trap"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Canyon Echo",
+    "text": "The canyon keeps repeating footsteps that have not happened yet. Somewhere below, something repeats yours perfectly.",
+    "choices": [
+      {
+        "text": "break the canyon echo with a cracked bell.",
+        "effect": {
+          "giveXP": 200,
+          "giveGold": 30
+        },
+        "once": true,
+        "nextScene": "floor8_echo_trap"
+      },
+      {
+        "text": "Let the echo fade on its own.",
+        "nextScene": "floor8_echo_trap"
+      }
+    ]
+  },
+  "floor8_echo_trap": {
+    "id": "floor8_echo_trap",
+    "map": {
+      "x": 1,
+      "y": 95,
+      "name": "EBELL",
+      "tag": "treasure",
+      "connections": [
+        "floor8_canyon_echo",
+        "floor8_trailhead_camp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Echo Trap",
+    "text": "Three bells hang in a triangle. When rung together, they make a silence sharp enough to cut pursuit.",
+    "choices": [
+      {
+        "text": "Set the Echo Trap and return to camp.",
+        "effect": {
+          "giveItem": "f8_echo_trap",
+          "giveXP": 140
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Return to Trailhead Camp.",
+        "nextScene": "floor8_trailhead_camp"
+      }
+    ]
+  },
+  "floor8_moon_blind": {
+    "id": "floor8_moon_blind",
+    "map": {
+      "x": 3,
+      "y": 93,
+      "name": "MOON",
+      "tag": "event",
+      "connections": [
+        "floor8_trailhead_camp",
+        "floor8_broken_moonlight"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Moon Blind",
+    "text": "Moonlight falls here in broken panels, bright enough to reveal skin and dark enough to hide claws.",
+    "choices": [
+      {
+        "text": "risk: stand in broken moonlight until the Stalker sees you.",
+        "effect": {
+          "damage": 32,
+          "giveItem": "f8_sight_edge"
+        },
+        "once": true,
+        "nextScene": "floor8_broken_moonlight"
+      },
+      {
+        "text": "Keep to the shadow line.",
+        "nextScene": "floor8_broken_moonlight"
+      }
+    ]
+  },
+  "floor8_broken_moonlight": {
+    "id": "floor8_broken_moonlight",
+    "map": {
+      "x": 4,
+      "y": 94,
+      "name": "DEC0Y",
+      "tag": "combat",
+      "connections": [
+        "floor8_moon_blind",
+        "floor8_sight_trap"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 8 - Broken Moonlight",
+    "text": "A moonlit decoy peels itself from your outline and comes at you with your own impatience.",
+    "combat": {
+      "name": "Moonlit Decoy",
+      "hp": 195,
+      "attack": 42,
+      "defense": 13,
+      "xp": 230,
+      "goldReward": 75,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "trickster",
+      "abilities": [
+        "quick_strike",
+        "armor_break",
+        "sweeping_attack"
+      ],
+      "intro": "The decoy smiles with your mouth.",
+      "victoryText": "The false outline tears apart and leaves the Sight Trap components behind."
+    },
+    "fleeScene": "floor8_trailhead_camp",
+    "victoryScene": "floor8_sight_trap"
+  },
+  "floor8_sight_trap": {
+    "id": "floor8_sight_trap",
+    "map": {
+      "x": 5,
+      "y": 95,
+      "name": "SIGHT",
+      "tag": "treasure",
+      "connections": [
+        "floor8_broken_moonlight",
+        "floor8_trailhead_camp"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Sight Trap",
+    "text": "Mirrored teeth click into a circle. When the Stalker crosses it, every shadow will point at the real body.",
+    "choices": [
+      {
+        "text": "Set the Sight Trap and return to camp.",
+        "effect": {
+          "giveItem": "f8_sight_trap",
+          "giveXP": 140
+        },
+        "once": true,
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Return to Trailhead Camp.",
+        "nextScene": "floor8_trailhead_camp"
+      }
+    ]
+  },
+  "floor8_killing_ground": {
+    "id": "floor8_killing_ground",
+    "map": {
+      "x": 0,
+      "y": 96,
+      "name": "GROUND",
+      "tag": "event",
+      "connections": [
+        "floor8_trailhead_camp",
+        "floor8_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 - Killing Ground",
+    "text": "The trees stop at a perfect circle. The Pale Stalker has killed here often enough that even the soil knows to stay flat.",
+    "choices": [
+      {
+        "text": "Return to Trailhead Camp.",
+        "nextScene": "floor8_trailhead_camp"
+      },
+      {
+        "text": "Set all four Hunt Traps and call the Pale Stalker.",
+        "requires": {
+          "items": [
+            "f8_scent_trap",
+            "f8_snare_trap",
+            "f8_echo_trap",
+            "f8_sight_trap"
+          ]
+        },
+        "nextScene": "floor8_boss"
+      }
+    ]
+  },
+  "floor8_boss": {
+    "id": "floor8_boss",
+    "map": {
+      "x": 0,
+      "y": 97,
+      "name": "STALK",
+      "tag": "boss",
+      "connections": [
+        "floor8_killing_ground",
+        "floor8_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 8 - The Pale Stalker",
+    "text": "The Pale Stalker enters without sound. It is too long, too still, and too familiar with fear. The four Hunt Traps wake around it one by one.",
+    "combat": {
+      "name": "The Pale Stalker",
+      "hp": 375,
+      "attack": 58,
+      "defense": 20,
+      "xp": 650,
+      "goldReward": 260,
+      "loot": [
+        "large_potion",
+        "pale_stalker_hide"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "sweeping_attack",
+        "poison_hit",
+        "armor_break",
+        "cleave"
+      ],
+      "intro": "The Pale Stalker lowers its antlered skull and chooses the sound of your heartbeat.",
+      "victoryText": "The Pale Stalker falls into every trap at once. When it stops moving, the wild remembers how to breathe.",
+      "advantages": [
+        {
+          "item": "f8_scent_edge",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "poison_hit"
+          ]
+        },
+        {
+          "item": "f8_snare_edge",
+          "defenseDelta": -5,
+          "removeAbilities": [
+            "cleave"
+          ]
+        },
+        {
+          "item": "f8_echo_edge",
+          "attackDelta": -3,
+          "removeAbilities": [
+            "sweeping_attack"
+          ]
+        },
+        {
+          "item": "f8_sight_edge",
+          "hpDelta": -45,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor8_killing_ground",
+    "victoryScene": "floor8_clear_room"
+  },
+  "floor8_clear_room": {
+    "id": "floor8_clear_room",
+    "map": {
+      "x": 0,
+      "y": 98,
+      "name": "F8CLR",
+      "tag": "event",
+      "connections": [
+        "floor8_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 8 Clear - Hide Under Stars",
+    "text": "The hunters hang the Pale Stalker hide over the trailhead fire. Past it, Floor 9 opens into deeper wilderness where old power moves under the roots and even the market maps go blank.",
+    "choices": [
+      {
+        "text": "Follow the old power deeper. [FLOOR 8 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }

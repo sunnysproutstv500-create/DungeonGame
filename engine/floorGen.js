@@ -146,6 +146,15 @@ function generateFloor7Config() {
   };
 }
 
+function generateFloor8Config() {
+  return {
+    floor: 8,
+    excludedRooms: [],
+    enemyVariants: {},
+    safeRoom: 'floor8_trailhead_camp',
+  };
+}
+
 function generateFloor(floor) {
   if (floor === 1) return generateFloor1Config();
   if (floor === 2) return generateFloor2Config();
@@ -154,6 +163,7 @@ function generateFloor(floor) {
   if (floor === 5) return generateFloor5Config();
   if (floor === 6) return generateFloor6Config();
   if (floor === 7) return generateFloor7Config();
+  if (floor === 8) return generateFloor8Config();
   return {
     floor,
     placeholder: true,
@@ -163,4 +173,4 @@ function generateFloor(floor) {
   };
 }
 
-module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, generateFloor4Config, generateFloor5Config, generateFloor6Config, generateFloor7Config, filterChoices, ENEMY_VARIANTS };
+module.exports = { generateFloor, generateFloor1Config, generateFloor2Config, generateFloor3Config, generateFloor4Config, generateFloor5Config, generateFloor6Config, generateFloor7Config, generateFloor8Config, filterChoices, ENEMY_VARIANTS };
