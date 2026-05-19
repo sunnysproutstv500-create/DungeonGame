@@ -44,6 +44,14 @@ const PROGRESS_ITEMS = {
   f4_auction_contract: 'Sponsor auction counter secured.',
   f4_blood_writ: 'Blood Writ counter secured.',
   f4_signal_patch: 'Signal Patch counter secured.',
+  f5_combat_protocol: 'Combat Protocol Clearance secured.',
+  f5_memory_protocol: 'Memory Protocol Clearance secured.',
+  f5_debt_protocol: 'Debt Protocol Clearance secured.',
+  f5_identity_protocol: 'Identity Protocol Clearance secured.',
+  f5_combat_override: 'Combat Override Sigil will bend the Rulekeeper.',
+  f5_memory_override: 'Memory Override Sigil will bend the Rulekeeper.',
+  f5_debt_override: 'Debt Override Sigil will bend the Rulekeeper.',
+  f5_identity_override: 'Identity Override Sigil will bend the Rulekeeper.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -183,6 +191,24 @@ function buildObjective(player) {
     return {
       route: 'sponsor-vault',
       goal: ready ? "Challenge the Sponsor's Champion" : `Collect Vault Keys ${completed}/3`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 5) {
+    const required = [
+      ['f5_combat_protocol', 'Combat Protocol Clearance'],
+      ['f5_memory_protocol', 'Memory Protocol Clearance'],
+      ['f5_debt_protocol', 'Debt Protocol Clearance'],
+      ['f5_identity_protocol', 'Identity Protocol Clearance'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'overseer-engine',
+      goal: ready ? 'Challenge the Rulekeeper' : `Clear Protocols ${completed}/4`,
       missing,
       ready,
     };

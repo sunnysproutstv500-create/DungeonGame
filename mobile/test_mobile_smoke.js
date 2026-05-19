@@ -174,6 +174,14 @@ floor4State.currentSceneId = 'floor4_boss_gate';
 const floor4View = runtime.getView(floor4State);
 assert(floor4View.objective && floor4View.objective.goal === 'Collect Vault Keys 1/3', 'smoke: Floor 4 runtime exposes Vault Key objective', floor4View.objective);
 
+let floor5State = runtime.startNewRun({
+  name: 'Floor5Smoke',
+  playerPatch: { floor: 5, inventory: ['f5_memory_protocol'] },
+});
+floor5State.currentSceneId = 'floor5_boss_gate';
+const floor5View = runtime.getView(floor5State);
+assert(floor5View.objective && floor5View.objective.goal === 'Clear Protocols 1/4', 'smoke: Floor 5 runtime exposes Protocol objective', floor5View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

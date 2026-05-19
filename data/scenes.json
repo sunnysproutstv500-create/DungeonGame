@@ -4058,5 +4058,569 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor5_service_dock": {
+    "id": "floor5_service_dock",
+    "map": {
+      "x": 0,
+      "y": 50,
+      "name": "F5DOCK",
+      "tag": "safe",
+      "connections": [
+        "floor5_combat_protocol",
+        "floor5_memory_protocol",
+        "floor5_debt_protocol",
+        "floor5_identity_protocol",
+        "floor5_boss_gate"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Overseer Service Dock",
+    "text": "The Overseer Service Dock is a safe room carved behind the broadcast walls: bed alcoves, repair lights, sealed vending drawers, and a silent clerk made of brass stamps. A wall display reads Protocol Clearances 0/4. The clerk will not bargain, but it will sell supplies and point to four protocol doors. Every door tests a different rule in the dungeon engine.",
+    "choices": [
+      {
+        "text": "Rest in the service bed",
+        "once": true,
+        "effect": {
+          "heal": 70
+        }
+      },
+      {
+        "text": "Buy a Large Potion from the service drawer - 45 gold",
+        "requires": {
+          "gold": 45
+        },
+        "once": true,
+        "effect": {
+          "spendGold": 45,
+          "giveItem": "large_potion"
+        }
+      },
+      {
+        "text": "Enter the Combat Protocol chamber",
+        "nextScene": "floor5_combat_protocol"
+      },
+      {
+        "text": "Enter the Memory Protocol chamber",
+        "nextScene": "floor5_memory_protocol"
+      },
+      {
+        "text": "Enter the Debt Protocol chamber",
+        "nextScene": "floor5_debt_protocol"
+      },
+      {
+        "text": "Enter the Identity Protocol chamber",
+        "nextScene": "floor5_identity_protocol"
+      },
+      {
+        "text": "Approach the Rulekeeper gate",
+        "nextScene": "floor5_boss_gate"
+      }
+    ]
+  },
+  "floor5_combat_protocol": {
+    "id": "floor5_combat_protocol",
+    "map": {
+      "x": -3,
+      "y": 51,
+      "name": "COMBAT",
+      "tag": "combat",
+      "connections": [
+        "floor5_service_dock",
+        "floor5_combat_trial"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Combat Protocol",
+    "text": "The Combat Protocol lists every fight you have survived and marks the messy parts in red. Complying gives you a fair arena. Overriding scars the rule before the Rulekeeper can use it.",
+    "choices": [
+      {
+        "text": "Comply with the Combat Protocol",
+        "nextScene": "floor5_combat_trial"
+      },
+      {
+        "text": "Override the Combat Protocol and take the backlash",
+        "once": true,
+        "effect": {
+          "damage": 26,
+          "giveItem": "f5_combat_override"
+        },
+        "nextScene": "floor5_combat_trial"
+      }
+    ]
+  },
+  "floor5_combat_trial": {
+    "id": "floor5_combat_trial",
+    "map": {
+      "x": -3,
+      "y": 52,
+      "name": "DUEL",
+      "tag": "combat",
+      "connections": [
+        "floor5_combat_protocol",
+        "floor5_combat_complete"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 5 - Combat Trial",
+    "text": "A training shell steps out of the wall wearing your stance badly. It fights like a rule trying to become a person.",
+    "combat": {
+      "name": "Protocol Duelist",
+      "hp": 120,
+      "attack": 31,
+      "defense": 8,
+      "xp": 135,
+      "goldReward": 45,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "armor_break"
+      ],
+      "intro": "The duelist salutes with a weapon made from red warning text.",
+      "victoryText": "The shell breaks into neat numbered pieces."
+    },
+    "fleeScene": "floor5_service_dock",
+    "victoryScene": "floor5_combat_complete"
+  },
+  "floor5_combat_complete": {
+    "id": "floor5_combat_complete",
+    "map": {
+      "x": -3,
+      "y": 53,
+      "name": "C-CLR",
+      "tag": "treasure",
+      "connections": [
+        "floor5_combat_trial",
+        "floor5_service_dock"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Combat Clearance",
+    "text": "The duel log stamps itself approved. The system admits you survived without becoming what it wanted.",
+    "choices": [
+      {
+        "text": "Claim the Combat Clearance and return to the dock",
+        "once": true,
+        "effect": {
+          "giveItem": "f5_combat_protocol",
+          "giveXP": 55
+        },
+        "nextScene": "floor5_service_dock"
+      }
+    ]
+  },
+  "floor5_memory_protocol": {
+    "id": "floor5_memory_protocol",
+    "map": {
+      "x": 3,
+      "y": 51,
+      "name": "MEMORY",
+      "tag": "puzzle",
+      "connections": [
+        "floor5_service_dock",
+        "floor5_memory_trial"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Memory Protocol",
+    "text": "The Memory Protocol opens with scenes you never chose: routes you skipped, deaths that did not happen, speeches from people you spared. It wants you to agree that the record is cleaner than the truth.",
+    "choices": [
+      {
+        "text": "Comply with the Memory Protocol",
+        "nextScene": "floor5_memory_trial"
+      },
+      {
+        "text": "Override the Memory Protocol and keep the contradiction",
+        "once": true,
+        "effect": {
+          "damage": 18,
+          "giveItem": "f5_memory_override"
+        },
+        "nextScene": "floor5_memory_trial"
+      }
+    ]
+  },
+  "floor5_memory_trial": {
+    "id": "floor5_memory_trial",
+    "map": {
+      "x": 3,
+      "y": 52,
+      "name": "RECALL",
+      "tag": "puzzle",
+      "connections": [
+        "floor5_memory_protocol",
+        "floor5_memory_complete"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Memory Trial",
+    "text": "Three false memories hang in glass: a door that was never opened, a contract that signed itself, and a victory without a cost. The true path is the one that still hurts.",
+    "choices": [
+      {
+        "text": "Name the memory with a cost",
+        "effect": {
+          "giveXP": 95
+        },
+        "nextScene": "floor5_memory_complete"
+      },
+      {
+        "text": "Accept the clean record",
+        "effect": {
+          "damage": 24,
+          "giveXP": 35
+        },
+        "nextScene": "floor5_memory_complete"
+      }
+    ]
+  },
+  "floor5_memory_complete": {
+    "id": "floor5_memory_complete",
+    "map": {
+      "x": 3,
+      "y": 53,
+      "name": "M-CLR",
+      "tag": "treasure",
+      "connections": [
+        "floor5_memory_trial",
+        "floor5_service_dock"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Memory Clearance",
+    "text": "The archive stutters, then stamps your version beside the official one. For once, both are allowed to exist.",
+    "choices": [
+      {
+        "text": "Claim the Memory Clearance and return to the dock",
+        "once": true,
+        "effect": {
+          "giveItem": "f5_memory_protocol",
+          "giveXP": 45
+        },
+        "nextScene": "floor5_service_dock"
+      }
+    ]
+  },
+  "floor5_debt_protocol": {
+    "id": "floor5_debt_protocol",
+    "map": {
+      "x": -2,
+      "y": 54,
+      "name": "DEBT",
+      "tag": "event",
+      "connections": [
+        "floor5_service_dock",
+        "floor5_debt_trial"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Debt Protocol",
+    "text": "The Debt Protocol is a counting house for damage, gold, favors, and fear. It claims every borrowed edge must be paid back with interest.",
+    "choices": [
+      {
+        "text": "Comply with the Debt Protocol",
+        "nextScene": "floor5_debt_trial"
+      },
+      {
+        "text": "Override the Debt Protocol and erase a line of interest",
+        "once": true,
+        "effect": {
+          "spendGold": 35,
+          "giveItem": "f5_debt_override"
+        },
+        "nextScene": "floor5_debt_trial"
+      }
+    ]
+  },
+  "floor5_debt_trial": {
+    "id": "floor5_debt_trial",
+    "map": {
+      "x": -2,
+      "y": 55,
+      "name": "LEDGER",
+      "tag": "event",
+      "connections": [
+        "floor5_debt_protocol",
+        "floor5_debt_complete"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Debt Trial",
+    "text": "An iron ledger asks for payment in three currencies. Gold is easiest. Blood is fastest. Refusal costs both but earns respect from the clerk watching behind the wall.",
+    "choices": [
+      {
+        "text": "Pay the ledger in gold",
+        "requires": {
+          "gold": 40
+        },
+        "effect": {
+          "spendGold": 40,
+          "giveXP": 45
+        },
+        "nextScene": "floor5_debt_complete"
+      },
+      {
+        "text": "Pay the ledger in blood",
+        "effect": {
+          "damage": 32,
+          "giveXP": 70
+        },
+        "nextScene": "floor5_debt_complete"
+      },
+      {
+        "text": "Refuse the ledger and endure the audit",
+        "effect": {
+          "damage": 42,
+          "giveGold": 25,
+          "giveXP": 90
+        },
+        "nextScene": "floor5_debt_complete"
+      }
+    ]
+  },
+  "floor5_debt_complete": {
+    "id": "floor5_debt_complete",
+    "map": {
+      "x": -2,
+      "y": 56,
+      "name": "D-CLR",
+      "tag": "treasure",
+      "connections": [
+        "floor5_debt_trial",
+        "floor5_service_dock"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Debt Clearance",
+    "text": "The ledger closes with a sound like a door choosing not to lock.",
+    "choices": [
+      {
+        "text": "Claim the Debt Clearance and return to the dock",
+        "once": true,
+        "effect": {
+          "giveItem": "f5_debt_protocol",
+          "giveGold": 45
+        },
+        "nextScene": "floor5_service_dock"
+      }
+    ]
+  },
+  "floor5_identity_protocol": {
+    "id": "floor5_identity_protocol",
+    "map": {
+      "x": 2,
+      "y": 54,
+      "name": "ID",
+      "tag": "event",
+      "connections": [
+        "floor5_service_dock",
+        "floor5_identity_trial"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Identity Protocol",
+    "text": "The Identity Protocol offers a mirror with preset names: Prisoner, Product, Asset, Failure, Champion. None of them fit without cutting something off.",
+    "choices": [
+      {
+        "text": "Comply with the Identity Protocol",
+        "nextScene": "floor5_identity_trial"
+      },
+      {
+        "text": "Override the Identity Protocol and reject the labels",
+        "once": true,
+        "effect": {
+          "damage": 22,
+          "giveItem": "f5_identity_override"
+        },
+        "nextScene": "floor5_identity_trial"
+      }
+    ]
+  },
+  "floor5_identity_trial": {
+    "id": "floor5_identity_trial",
+    "map": {
+      "x": 2,
+      "y": 55,
+      "name": "MIRROR",
+      "tag": "combat",
+      "connections": [
+        "floor5_identity_protocol",
+        "floor5_identity_complete"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 5 - Identity Trial",
+    "text": "Your reflection climbs out holding the version of you the system would prefer: simpler, crueler, easier to file.",
+    "combat": {
+      "name": "Filed Reflection",
+      "hp": 135,
+      "attack": 30,
+      "defense": 10,
+      "xp": 150,
+      "goldReward": 35,
+      "loot": [
+        "big_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "cleave"
+      ],
+      "intro": "The reflection smiles with your mouth and the Overseer signature behind its teeth.",
+      "victoryText": "The mirror breaks, but your shape stays yours."
+    },
+    "fleeScene": "floor5_service_dock",
+    "victoryScene": "floor5_identity_complete"
+  },
+  "floor5_identity_complete": {
+    "id": "floor5_identity_complete",
+    "map": {
+      "x": 2,
+      "y": 56,
+      "name": "I-CLR",
+      "tag": "treasure",
+      "connections": [
+        "floor5_identity_trial",
+        "floor5_service_dock"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Identity Clearance",
+    "text": "The mirror stamps no name at all. The blank space feels more honest than a title.",
+    "choices": [
+      {
+        "text": "Claim the Identity Clearance and return to the dock",
+        "once": true,
+        "effect": {
+          "giveItem": "f5_identity_protocol",
+          "giveXP": 60
+        },
+        "nextScene": "floor5_service_dock"
+      }
+    ]
+  },
+  "floor5_boss_gate": {
+    "id": "floor5_boss_gate",
+    "map": {
+      "x": 0,
+      "y": 57,
+      "name": "F5GATE",
+      "tag": "event",
+      "connections": [
+        "floor5_service_dock",
+        "floor5_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 - Rulekeeper Gate",
+    "text": "Four brass slots wait in the last door. Combat, Memory, Debt, Identity. The Rulekeeper will only answer a complete file.",
+    "choices": [
+      {
+        "text": "Return to the service dock",
+        "nextScene": "floor5_service_dock"
+      },
+      {
+        "text": "Open the Rulekeeper door with all four Protocol Clearances",
+        "requires": {
+          "items": [
+            "f5_combat_protocol",
+            "f5_memory_protocol",
+            "f5_debt_protocol",
+            "f5_identity_protocol"
+          ]
+        },
+        "nextScene": "floor5_boss"
+      }
+    ]
+  },
+  "floor5_boss": {
+    "id": "floor5_boss",
+    "map": {
+      "x": 0,
+      "y": 58,
+      "name": "RULE",
+      "tag": "boss",
+      "connections": [
+        "floor5_boss_gate",
+        "floor5_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 5 - The Rulekeeper",
+    "text": "The Rulekeeper unfolds from the ceiling as a judge, clerk, engine, and executioner sharing one body. Every override sigil you stole now burns inside its rulebook.",
+    "combat": {
+      "name": "The Rulekeeper",
+      "hp": 245,
+      "attack": 44,
+      "defense": 15,
+      "xp": 340,
+      "goldReward": 150,
+      "loot": [
+        "large_potion",
+        "rulekeeper_core"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "quick_strike",
+        "sweeping_attack",
+        "armor_break",
+        "cleave"
+      ],
+      "intro": "The Rulekeeper stamps the air. The room tries to make your choices illegal.",
+      "victoryText": "The last stamp falls without ink. The rulebook keeps turning pages, but none of them can find your name.",
+      "advantages": [
+        {
+          "item": "f5_combat_override",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "cleave"
+          ]
+        },
+        {
+          "item": "f5_memory_override",
+          "hpDelta": -35,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        },
+        {
+          "item": "f5_debt_override",
+          "defenseDelta": -4
+        },
+        {
+          "item": "f5_identity_override",
+          "attackDelta": -2,
+          "removeAbilities": [
+            "armor_break"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor5_boss_gate",
+    "victoryScene": "floor5_clear_room"
+  },
+  "floor5_clear_room": {
+    "id": "floor5_clear_room",
+    "map": {
+      "x": 0,
+      "y": 59,
+      "name": "F5CLR",
+      "tag": "event",
+      "connections": [
+        "floor5_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 5 Clear - Rulebook Empty",
+    "text": "The Rulekeeper Core cools in your hand. The service dock lights switch from command white to emergency green, and a wall you thought was load-bearing slides aside. Beyond it is not another cell, market, vault, or protocol. It is weather. Floor 6 waits outside the system, where the dungeon has fewer rules and more teeth.",
+    "choices": [
+      {
+        "text": "Step beyond the system. [FLOOR 5 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }

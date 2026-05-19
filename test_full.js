@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 106
-      ? ok(`scene map data: ${mappedIds.length}/106 scenes have map coordinates`)
+    mappedIds.length === 122
+      ? ok(`scene map data: ${mappedIds.length}/122 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -1985,6 +1985,160 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 4 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 5: Overseer Engine
+  {
+    [
+      'f5_combat_protocol',
+      'f5_memory_protocol',
+      'f5_debt_protocol',
+      'f5_identity_protocol',
+      'f5_combat_override',
+      'f5_memory_override',
+      'f5_debt_override',
+      'f5_identity_override',
+      'rulekeeper_core',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor5 item exists: ${itemId}`)
+        : fail(`floor5 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor5_service_dock'];
+    safe?.map?.tag === 'safe' && /Overseer Service Dock|safe|Protocol Clearances 0\/4/i.test(safe?.text || '')
+      ? ok('floor5_service_dock: safe dock introduces four protocol clearances')
+      : fail('floor5_service_dock missing safe intro', JSON.stringify(safe));
+
+    const protocolStarts = ['floor5_combat_protocol', 'floor5_memory_protocol', 'floor5_debt_protocol', 'floor5_identity_protocol'];
+    protocolStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor5_service_dock: opens four protocol chambers')
+      : fail('floor5_service_dock protocol choices missing', JSON.stringify(safe?.choices));
+
+    const floor5Rooms = [
+      'floor5_combat_protocol',
+      'floor5_combat_trial',
+      'floor5_combat_complete',
+      'floor5_memory_protocol',
+      'floor5_memory_trial',
+      'floor5_memory_complete',
+      'floor5_debt_protocol',
+      'floor5_debt_trial',
+      'floor5_debt_complete',
+      'floor5_identity_protocol',
+      'floor5_identity_trial',
+      'floor5_identity_complete',
+      'floor5_boss_gate',
+      'floor5_boss',
+      'floor5_clear_room',
+    ];
+
+    floor5Rooms.every(id => scenes[id])
+      ? ok('floor5 overseer engine: core rooms exist')
+      : fail('floor5 overseer engine missing rooms', floor5Rooms.filter(id => !scenes[id]).join(', '));
+
+    const protocolRewards = [
+      ['floor5_combat_complete', 'f5_combat_protocol'],
+      ['floor5_memory_complete', 'f5_memory_protocol'],
+      ['floor5_debt_complete', 'f5_debt_protocol'],
+      ['floor5_identity_complete', 'f5_identity_protocol'],
+    ];
+
+    protocolRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor5 overseer engine: each protocol awards a clearance')
+      : fail('floor5 protocol clearance rewards missing', JSON.stringify(protocolRewards));
+
+    const overrideRewards = [
+      ['floor5_combat_protocol', 'f5_combat_override'],
+      ['floor5_memory_protocol', 'f5_memory_override'],
+      ['floor5_debt_protocol', 'f5_debt_override'],
+      ['floor5_identity_protocol', 'f5_identity_override'],
+    ];
+
+    overrideRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId && /Override/i.test(choice.text)))
+      ? ok('floor5 overseer engine: risky override choices award boss advantages')
+      : fail('floor5 override rewards missing', JSON.stringify(overrideRewards));
+
+    const gateChoice = (scenes['floor5_boss_gate']?.choices || []).find(choice => choice.nextScene === 'floor5_boss');
+    ['f5_combat_protocol', 'f5_memory_protocol', 'f5_debt_protocol', 'f5_identity_protocol'].every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor5 boss gate: requires all four Protocol Clearances')
+      : fail('floor5 boss gate requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor5_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Rulekeeper' &&
+      boss.combat?.loot?.includes('rulekeeper_core') &&
+      boss.victoryScene === 'floor5_clear_room'
+      ? ok('floor5 boss: Rulekeeper drops unique core and clears floor')
+      : fail('floor5 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f5_combat_override', 'f5_memory_override', 'f5_debt_override', 'f5_identity_override'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor5 boss: override sigils weaken Rulekeeper rules')
+      : fail('floor5 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor5_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 6|outside the system|Rulekeeper/i.test(scenes['floor5_clear_room']?.text || '')
+      ? ok('floor5 clear room: hands off toward Floor 6')
+      : fail('floor5 clear room handoff missing', scenes['floor5_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 5 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 35 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'OverseerEngineRunner',
+      playerPatch: { floor: 5, hp: 1200, maxHp: 1200, attack: 1200, defense: 120, gold: 300 },
+    });
+    run.currentSceneId = 'floor5_service_dock';
+
+    run = chooseByText(run, /Combat Protocol/);
+    run = chooseByText(run, /Override/);
+    run = winCombat(run);
+    run = chooseByText(run, /Combat Clearance/);
+    run = chooseByText(run, /Memory Protocol/);
+    run = chooseByText(run, /Override/);
+    run = chooseByText(run, /memory with a cost/);
+    run = chooseByText(run, /Memory Clearance/);
+    run = chooseByText(run, /Debt Protocol/);
+    run = chooseByText(run, /Override/);
+    run = chooseByText(run, /Refuse the ledger/);
+    run = chooseByText(run, /Debt Clearance/);
+    run = chooseByText(run, /Identity Protocol/);
+    run = chooseByText(run, /Override/);
+    run = winCombat(run);
+    run = chooseByText(run, /Identity Clearance/);
+    run = chooseByText(run, /Rulekeeper gate/);
+    run = chooseByText(run, /Open the Rulekeeper door/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor5_clear_room' &&
+      [
+        'f5_combat_protocol',
+        'f5_memory_protocol',
+        'f5_debt_protocol',
+        'f5_identity_protocol',
+        'f5_combat_override',
+        'f5_memory_override',
+        'f5_debt_override',
+        'f5_identity_override',
+        'rulekeeper_core',
+      ].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 5 full playthrough: four protocols unlock and clear the Rulekeeper')
+      : fail('runtime Floor 5 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -2676,6 +2830,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f2 = generateFloor(2);
   const f3 = generateFloor(3);
   const f4 = generateFloor(4);
+  const f5 = generateFloor(5);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -2693,9 +2848,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 4 uses real Sponsor Vault generator')
     : fail('generateFloor floor 4 real config', JSON.stringify(f4));
 
-  MAX_IMPLEMENTED_FLOOR === 4
-    ? ok('run lifecycle: max implemented floor includes Floor 4')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 4', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f5 && f5.floor === 5 && f5.placeholder !== true && Array.isArray(f5.excludedRooms) && f5.safeRoom === 'floor5_service_dock'
+    ? ok('generateFloor: floor 5 uses real Overseer Engine generator')
+    : fail('generateFloor floor 5 real config', JSON.stringify(f5));
+
+  MAX_IMPLEMENTED_FLOOR === 5
+    ? ok('run lifecycle: max implemented floor includes Floor 5')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 5', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -2946,18 +3105,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   state.currentSceneId = 'the_end';
   const result = runtime.dispatch(state, { type: 'complete_floor' });
   const floorEvent = result.events.find(event => event.type === 'floor_completed');
-  const runEndEvent = result.events.find(event => event.type === 'run_ended');
 
   floorEvent?.completedFloor === 4 && floorEvent?.nextFloor === 5 && floorEvent?.currencyReward === 60
     ? ok('runtime.complete_floor: Floor 4 completion awards Floor 4 meta event')
     : fail('runtime.complete_floor Floor 4 reward event', JSON.stringify(result.events));
 
-  result.state.player.runEnded === true &&
-    result.state.player.currentRunActive === false &&
-    runEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 5/i.test(runEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 4 handoff ends at Floor 5 under construction')
+  result.state.currentSceneId === 'floor5_service_dock' &&
+    result.state.floorConfig.placeholder !== true &&
+    result.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 4 handoff enters Floor 5 Overseer Engine')
     : fail('runtime.complete_floor Floor 4 handoff', JSON.stringify({ player: result.state.player, events: result.events }));
+
+  const floor5ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor5Reader',
+    playerPatch: { floor: 5, inventory: ['f5_combat_protocol', 'f5_debt_protocol'] },
+  });
+  floor5ObjectiveProbe.currentSceneId = 'floor5_boss_gate';
+  const floor5ObjectiveView = runtime.getView(floor5ObjectiveProbe);
+
+  floor5ObjectiveView.objective?.route === 'overseer-engine' &&
+    floor5ObjectiveView.objective.goal === 'Clear Protocols 2/4' &&
+    floor5ObjectiveView.objective.missing.includes('Memory Protocol Clearance') &&
+    floor5ObjectiveView.objective.missing.includes('Identity Protocol Clearance')
+    ? ok('runtime Floor 5 objective: tracks Protocol Clearances before boss gate')
+    : fail('runtime Floor 5 objective missing', JSON.stringify(floor5ObjectiveView.objective));
+
+  const floor5FinishState = runtime.startNewRun({ name: 'Floor5Finisher' });
+  floor5FinishState.player.floor = 5;
+  floor5FinishState.currentSceneId = 'the_end';
+  const floor5FinishResult = runtime.dispatch(floor5FinishState, { type: 'complete_floor' });
+  const floor5Event = floor5FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor5RunEndEvent = floor5FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor5Event?.completedFloor === 5 && floor5Event?.nextFloor === 6 && floor5Event?.currencyReward === 75
+    ? ok('runtime.complete_floor: Floor 5 completion awards Floor 5 meta event')
+    : fail('runtime.complete_floor Floor 5 reward event', JSON.stringify(floor5FinishResult.events));
+
+  floor5FinishResult.state.player.runEnded === true &&
+    floor5FinishResult.state.player.currentRunActive === false &&
+    floor5RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 6/i.test(floor5RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 5 handoff ends at Floor 6 under construction')
+    : fail('runtime.complete_floor Floor 5 handoff', JSON.stringify({ player: floor5FinishResult.state.player, events: floor5FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

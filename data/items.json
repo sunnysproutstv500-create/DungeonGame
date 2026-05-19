@@ -510,5 +510,68 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f5_combat_protocol": {
+    "id": "f5_combat_protocol",
+    "name": "Combat Protocol Clearance",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_memory_protocol": {
+    "id": "f5_memory_protocol",
+    "name": "Memory Protocol Clearance",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_debt_protocol": {
+    "id": "f5_debt_protocol",
+    "name": "Debt Protocol Clearance",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_identity_protocol": {
+    "id": "f5_identity_protocol",
+    "name": "Identity Protocol Clearance",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_combat_override": {
+    "id": "f5_combat_override",
+    "name": "Combat Override Sigil",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_memory_override": {
+    "id": "f5_memory_override",
+    "name": "Memory Override Sigil",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_debt_override": {
+    "id": "f5_debt_override",
+    "name": "Debt Override Sigil",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f5_identity_override": {
+    "id": "f5_identity_override",
+    "name": "Identity Override Sigil",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "rulekeeper_core": {
+    "id": "rulekeeper_core",
+    "name": "Rulekeeper Core",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }
