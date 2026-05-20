@@ -206,6 +206,14 @@ floor8State.currentSceneId = 'floor8_killing_ground';
 const floor8View = runtime.getView(floor8State);
 assert(floor8View.objective && floor8View.objective.goal === 'Set Hunt Traps 2/4', 'smoke: Floor 8 runtime exposes Hunt Trap objective', floor8View.objective);
 
+let floor9State = runtime.startNewRun({
+  name: 'Floor9Smoke',
+  playerPatch: { floor: 9, inventory: ['f9_glass_root', 'f9_ash_root'] },
+});
+floor9State.currentSceneId = 'floor9_saint_gate';
+const floor9View = runtime.getView(floor9State);
+assert(floor9View.objective && floor9View.objective.goal === 'Awaken Ancient Roots 2/3', 'smoke: Floor 9 runtime exposes Ancient Root objective', floor9View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

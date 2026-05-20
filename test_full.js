@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 167
-      ? ok(`scene map data: ${mappedIds.length}/167 scenes have map coordinates`)
+    mappedIds.length === 180
+      ? ok(`scene map data: ${mappedIds.length}/180 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -2560,6 +2560,140 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 8 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 9: The Root Cathedral
+  {
+    [
+      'f9_glass_root',
+      'f9_blood_root',
+      'f9_ash_root',
+      'f9_glass_boon',
+      'f9_blood_boon',
+      'f9_ash_boon',
+      'buried_saint_seed',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor9 item exists: ${itemId}`)
+        : fail(`floor9 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor9_root_shrine'];
+    safe?.map?.tag === 'safe' && /Root Cathedral|Ancient Roots 0\/3|old power/i.test(safe?.text || '')
+      ? ok('floor9_root_shrine: safe start introduces the Root Cathedral and root goal')
+      : fail('floor9_root_shrine missing safe intro', JSON.stringify(safe));
+
+    const pathStarts = ['floor9_glass_root_path', 'floor9_blood_root_path', 'floor9_ash_root_path'];
+    pathStarts.every(id => (safe?.choices || []).some(choice => choice.nextScene === id))
+      ? ok('floor9_root_shrine: opens three Ancient Root paths')
+      : fail('floor9_root_shrine root choices missing', JSON.stringify(safe?.choices));
+
+    const floor9Rooms = [
+      'floor9_root_shrine',
+      'floor9_glass_root_path',
+      'floor9_mirror_grove',
+      'floor9_glass_root_heart',
+      'floor9_blood_root_path',
+      'floor9_sap_battlefield',
+      'floor9_blood_root_heart',
+      'floor9_ash_root_path',
+      'floor9_cinder_nursery',
+      'floor9_ash_root_heart',
+      'floor9_saint_gate',
+      'floor9_boss',
+      'floor9_clear_room',
+    ];
+
+    floor9Rooms.every(id => scenes[id])
+      ? ok('floor9 root cathedral: core rooms exist')
+      : fail('floor9 root cathedral missing rooms', floor9Rooms.filter(id => !scenes[id]).join(', '));
+
+    const rootRewards = [
+      ['floor9_glass_root_heart', 'f9_glass_root'],
+      ['floor9_blood_root_heart', 'f9_blood_root'],
+      ['floor9_ash_root_heart', 'f9_ash_root'],
+    ];
+
+    rootRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor9 root cathedral: each path awakens an Ancient Root')
+      : fail('floor9 root rewards missing', JSON.stringify(rootRewards));
+
+    const boonRewards = [
+      ['floor9_glass_root_path', 'f9_glass_boon'],
+      ['floor9_blood_root_path', 'f9_blood_boon'],
+      ['floor9_ash_root_path', 'f9_ash_boon'],
+    ];
+
+    boonRewards.every(([sceneId, itemId]) => (scenes[sceneId]?.choices || []).some(choice => choice.effect?.giveItem === itemId && /boon|risk|sacrifice|old power/i.test(choice.text)))
+      ? ok('floor9 root cathedral: risky old-power choices award boss boons')
+      : fail('floor9 boon rewards missing', JSON.stringify(boonRewards));
+
+    const gateChoice = (scenes['floor9_saint_gate']?.choices || []).find(choice => choice.nextScene === 'floor9_boss');
+    ['f9_glass_root', 'f9_blood_root', 'f9_ash_root'].every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor9 saint gate: requires all three Ancient Roots')
+      : fail('floor9 saint gate requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor9_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Buried Saint' &&
+      boss.combat?.loot?.includes('buried_saint_seed') &&
+      boss.victoryScene === 'floor9_clear_room'
+      ? ok('floor9 boss: Buried Saint drops unique seed and clears floor')
+      : fail('floor9 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f9_glass_boon', 'f9_blood_boon', 'f9_ash_boon'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor9 boss: old-power boons weaken the Buried Saint')
+      : fail('floor9 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor9_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /Floor 10|living dungeon|old power/i.test(scenes['floor9_clear_room']?.text || '')
+      ? ok('floor9 clear room: hands off toward Floor 10')
+      : fail('floor9 clear room handoff missing', scenes['floor9_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 9 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 50 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'RootCathedralRunner',
+      playerPatch: { floor: 9, hp: 2200, maxHp: 2200, attack: 2200, defense: 220, gold: 800 },
+    });
+    run.currentSceneId = 'floor9_root_shrine';
+
+    run = chooseByText(run, /Glass Root/);
+    run = chooseByText(run, /risk the old power/);
+    run = chooseByText(run, /solve the mirror grove/);
+    run = chooseByText(run, /Glass Root/);
+    run = chooseByText(run, /Blood Root/);
+    run = chooseByText(run, /sacrifice blood/);
+    run = winCombat(run);
+    run = chooseByText(run, /Blood Root/);
+    run = chooseByText(run, /Ash Root/);
+    run = chooseByText(run, /take the ash boon/);
+    run = chooseByText(run, /replant the cinder nursery/);
+    run = chooseByText(run, /Ash Root/);
+    run = chooseByText(run, /Saint Gate/);
+    run = chooseByText(run, /Awaken all three Ancient Roots/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor9_clear_room' &&
+      ['f9_glass_root', 'f9_blood_root', 'f9_ash_root', 'f9_glass_boon', 'f9_blood_boon', 'f9_ash_boon', 'buried_saint_seed'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 9 full playthrough: three roots awaken and clear the Buried Saint')
+      : fail('runtime Floor 9 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -3255,6 +3389,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f6 = generateFloor(6);
   const f7 = generateFloor(7);
   const f8 = generateFloor(8);
+  const f9 = generateFloor(9);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -3288,9 +3423,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 8 uses real Hunt Beyond generator')
     : fail('generateFloor floor 8 real config', JSON.stringify(f8));
 
-  MAX_IMPLEMENTED_FLOOR === 8
-    ? ok('run lifecycle: max implemented floor includes Floor 8')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 8', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f9 && f9.floor === 9 && f9.placeholder !== true && Array.isArray(f9.excludedRooms) && f9.safeRoom === 'floor9_root_shrine'
+    ? ok('generateFloor: floor 9 uses real Root Cathedral generator')
+    : fail('generateFloor floor 9 real config', JSON.stringify(f9));
+
+  MAX_IMPLEMENTED_FLOOR === 9
+    ? ok('run lifecycle: max implemented floor includes Floor 9')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 9', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -3661,18 +3800,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   floor8FinishState.currentSceneId = 'the_end';
   const floor8FinishResult = runtime.dispatch(floor8FinishState, { type: 'complete_floor' });
   const floor8Event = floor8FinishResult.events.find(event => event.type === 'floor_completed');
-  const floor8RunEndEvent = floor8FinishResult.events.find(event => event.type === 'run_ended');
 
   floor8Event?.completedFloor === 8 && floor8Event?.nextFloor === 9 && floor8Event?.currencyReward === 120
     ? ok('runtime.complete_floor: Floor 8 completion awards Floor 8 meta event')
     : fail('runtime.complete_floor Floor 8 reward event', JSON.stringify(floor8FinishResult.events));
 
-  floor8FinishResult.state.player.runEnded === true &&
-    floor8FinishResult.state.player.currentRunActive === false &&
-    floor8RunEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 9/i.test(floor8RunEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 8 handoff ends at Floor 9 under construction')
+  floor8FinishResult.state.currentSceneId === 'floor9_root_shrine' &&
+    floor8FinishResult.state.floorConfig.placeholder !== true &&
+    floor8FinishResult.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 8 handoff enters Floor 9 Root Cathedral')
     : fail('runtime.complete_floor Floor 8 handoff', JSON.stringify({ player: floor8FinishResult.state.player, events: floor8FinishResult.events }));
+
+  const floor9ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor9Reader',
+    playerPatch: { floor: 9, inventory: ['f9_glass_root'] },
+  });
+  floor9ObjectiveProbe.currentSceneId = 'floor9_saint_gate';
+  const floor9ObjectiveView = runtime.getView(floor9ObjectiveProbe);
+
+  floor9ObjectiveView.objective?.route === 'root-cathedral' &&
+    floor9ObjectiveView.objective.goal === 'Awaken Ancient Roots 1/3' &&
+    floor9ObjectiveView.objective.missing.includes('Blood Root') &&
+    floor9ObjectiveView.objective.missing.includes('Ash Root')
+    ? ok('runtime Floor 9 objective: tracks Ancient Roots before the Saint Gate')
+    : fail('runtime Floor 9 objective missing', JSON.stringify(floor9ObjectiveView.objective));
+
+  const floor9FinishState = runtime.startNewRun({ name: 'Floor9Finisher' });
+  floor9FinishState.player.floor = 9;
+  floor9FinishState.currentSceneId = 'the_end';
+  const floor9FinishResult = runtime.dispatch(floor9FinishState, { type: 'complete_floor' });
+  const floor9Event = floor9FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor9RunEndEvent = floor9FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor9Event?.completedFloor === 9 && floor9Event?.nextFloor === 10 && floor9Event?.currencyReward === 135
+    ? ok('runtime.complete_floor: Floor 9 completion awards Floor 9 meta event')
+    : fail('runtime.complete_floor Floor 9 reward event', JSON.stringify(floor9FinishResult.events));
+
+  floor9FinishResult.state.player.runEnded === true &&
+    floor9FinishResult.state.player.currentRunActive === false &&
+    floor9RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 10/i.test(floor9RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 9 handoff ends at Floor 10 under construction')
+    : fail('runtime.complete_floor Floor 9 handoff', JSON.stringify({ player: floor9FinishResult.state.player, events: floor9FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

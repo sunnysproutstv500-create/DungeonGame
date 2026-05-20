@@ -748,5 +748,54 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f9_glass_root": {
+    "id": "f9_glass_root",
+    "name": "Glass Root",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f9_blood_root": {
+    "id": "f9_blood_root",
+    "name": "Blood Root",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f9_ash_root": {
+    "id": "f9_ash_root",
+    "name": "Ash Root",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f9_glass_boon": {
+    "id": "f9_glass_boon",
+    "name": "Glass Boon",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f9_blood_boon": {
+    "id": "f9_blood_boon",
+    "name": "Blood Boon",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f9_ash_boon": {
+    "id": "f9_ash_boon",
+    "name": "Ash Boon",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "buried_saint_seed": {
+    "id": "buried_saint_seed",
+    "name": "Buried Saint Seed",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }

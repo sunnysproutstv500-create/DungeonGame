@@ -6184,5 +6184,464 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor9_root_shrine": {
+    "id": "floor9_root_shrine",
+    "map": {
+      "x": 0,
+      "y": 103,
+      "name": "ROOTS",
+      "tag": "safe",
+      "connections": [
+        "floor9_glass_root_path",
+        "floor9_blood_root_path",
+        "floor9_ash_root_path",
+        "floor9_saint_gate"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Root Cathedral Shrine",
+    "text": "The Root Cathedral is not built. It grew around a buried altar and decided to become holy. Old power moves under the bark like breath. A root-carved tablet reads: Ancient Roots 0/3. Awaken Glass, Blood, and Ash before the Buried Saint opens its eyes.",
+    "choices": [
+      {
+        "text": "Rest beside the moss altar.",
+        "effect": {
+          "heal": 165
+        },
+        "once": true,
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Buy a large potion from the root pilgrim. (60 gold)",
+        "condition": {
+          "gold": 60
+        },
+        "effect": {
+          "spendGold": 60,
+          "giveItem": "large_potion"
+        },
+        "once": true,
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Enter the Glass Root path.",
+        "nextScene": "floor9_glass_root_path"
+      },
+      {
+        "text": "Enter the Blood Root path.",
+        "nextScene": "floor9_blood_root_path"
+      },
+      {
+        "text": "Enter the Ash Root path.",
+        "nextScene": "floor9_ash_root_path"
+      },
+      {
+        "text": "Approach the Saint Gate.",
+        "nextScene": "floor9_saint_gate"
+      }
+    ]
+  },
+  "floor9_glass_root_path": {
+    "id": "floor9_glass_root_path",
+    "map": {
+      "x": -3,
+      "y": 104,
+      "name": "GLASS",
+      "tag": "event",
+      "connections": [
+        "floor9_root_shrine",
+        "floor9_mirror_grove"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Glass Root Path",
+    "text": "Glass roots arch overhead, reflecting versions of you that made cleaner choices. They watch without blinking.",
+    "choices": [
+      {
+        "text": "risk the old power and let the glass remember you.",
+        "effect": {
+          "damage": 30,
+          "giveItem": "f9_glass_boon"
+        },
+        "once": true,
+        "nextScene": "floor9_mirror_grove"
+      },
+      {
+        "text": "Walk the reflections without touching them.",
+        "nextScene": "floor9_mirror_grove"
+      }
+    ]
+  },
+  "floor9_mirror_grove": {
+    "id": "floor9_mirror_grove",
+    "map": {
+      "x": -4,
+      "y": 105,
+      "name": "MIROR",
+      "tag": "event",
+      "connections": [
+        "floor9_glass_root_path",
+        "floor9_glass_root_heart"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Mirror Grove",
+    "text": "Every tree here reflects a different exit. Only one reflection shows dirt under your boots.",
+    "choices": [
+      {
+        "text": "solve the mirror grove by following the dirty reflection.",
+        "effect": {
+          "giveXP": 230,
+          "giveGold": 45
+        },
+        "once": true,
+        "nextScene": "floor9_glass_root_heart"
+      },
+      {
+        "text": "Close your eyes and walk by root pressure.",
+        "nextScene": "floor9_glass_root_heart"
+      }
+    ]
+  },
+  "floor9_glass_root_heart": {
+    "id": "floor9_glass_root_heart",
+    "map": {
+      "x": -5,
+      "y": 106,
+      "name": "GROOT",
+      "tag": "treasure",
+      "connections": [
+        "floor9_mirror_grove",
+        "floor9_root_shrine"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Glass Root Heart",
+    "text": "The Glass Root hums with memory. When you press your palm to it, the cathedral learns your true shape.",
+    "choices": [
+      {
+        "text": "Awaken the Glass Root and return to the shrine.",
+        "effect": {
+          "giveItem": "f9_glass_root",
+          "giveXP": 165
+        },
+        "once": true,
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Return to the Root Shrine.",
+        "nextScene": "floor9_root_shrine"
+      }
+    ]
+  },
+  "floor9_blood_root_path": {
+    "id": "floor9_blood_root_path",
+    "map": {
+      "x": 0,
+      "y": 104,
+      "name": "BLOOD",
+      "tag": "event",
+      "connections": [
+        "floor9_root_shrine",
+        "floor9_sap_battlefield"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Blood Root Path",
+    "text": "Red sap runs in channels along the floor. It pulses faster when you step near it, as if counting your heartbeats for later.",
+    "choices": [
+      {
+        "text": "sacrifice blood to claim the old power boon.",
+        "effect": {
+          "damage": 42,
+          "giveItem": "f9_blood_boon"
+        },
+        "once": true,
+        "nextScene": "floor9_sap_battlefield"
+      },
+      {
+        "text": "Refuse the sap and enter the battlefield clean.",
+        "nextScene": "floor9_sap_battlefield"
+      }
+    ]
+  },
+  "floor9_sap_battlefield": {
+    "id": "floor9_sap_battlefield",
+    "map": {
+      "x": 0,
+      "y": 105,
+      "name": "SAPIT",
+      "tag": "combat",
+      "connections": [
+        "floor9_blood_root_path",
+        "floor9_blood_root_heart"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 9 - Sap Battlefield",
+    "text": "Root-armored pilgrims rise from the sap. They do not hate you. They only remember guarding this place.",
+    "combat": {
+      "name": "Sapbound Pilgrims",
+      "hp": 240,
+      "attack": 46,
+      "defense": 16,
+      "xp": 285,
+      "goldReward": 90,
+      "loot": [
+        "large_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "cleave",
+        "armor_break"
+      ],
+      "intro": "The pilgrims lift wooden shields wet with red sap.",
+      "victoryText": "The sap calms and draws a red line toward the Blood Root."
+    },
+    "fleeScene": "floor9_root_shrine",
+    "victoryScene": "floor9_blood_root_heart"
+  },
+  "floor9_blood_root_heart": {
+    "id": "floor9_blood_root_heart",
+    "map": {
+      "x": 0,
+      "y": 106,
+      "name": "BROOT",
+      "tag": "treasure",
+      "connections": [
+        "floor9_sap_battlefield",
+        "floor9_root_shrine"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Blood Root Heart",
+    "text": "The Blood Root coils around old weapons and newer bones. It drinks the last tremor of battle and accepts you.",
+    "choices": [
+      {
+        "text": "Awaken the Blood Root and return to the shrine.",
+        "effect": {
+          "giveItem": "f9_blood_root",
+          "giveXP": 175
+        },
+        "once": true,
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Return to the Root Shrine.",
+        "nextScene": "floor9_root_shrine"
+      }
+    ]
+  },
+  "floor9_ash_root_path": {
+    "id": "floor9_ash_root_path",
+    "map": {
+      "x": 3,
+      "y": 104,
+      "name": "ASH",
+      "tag": "event",
+      "connections": [
+        "floor9_root_shrine",
+        "floor9_cinder_nursery"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Ash Root Path",
+    "text": "Ash falls upward here. Seeds crack open in the air, burn, and become seeds again before they touch the ground.",
+    "choices": [
+      {
+        "text": "take the ash boon and breathe the old power in.",
+        "effect": {
+          "damage": 34,
+          "giveItem": "f9_ash_boon"
+        },
+        "once": true,
+        "nextScene": "floor9_cinder_nursery"
+      },
+      {
+        "text": "Cover your mouth and cross the ash fall.",
+        "nextScene": "floor9_cinder_nursery"
+      }
+    ]
+  },
+  "floor9_cinder_nursery": {
+    "id": "floor9_cinder_nursery",
+    "map": {
+      "x": 4,
+      "y": 105,
+      "name": "CINDR",
+      "tag": "event",
+      "connections": [
+        "floor9_ash_root_path",
+        "floor9_ash_root_heart"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Cinder Nursery",
+    "text": "Tiny black trees grow from cracked helmets. The nursery wants decay, but it also wants someone careful enough to plant it correctly.",
+    "choices": [
+      {
+        "text": "replant the cinder nursery in living soil.",
+        "effect": {
+          "giveXP": 240,
+          "giveGold": 40
+        },
+        "once": true,
+        "nextScene": "floor9_ash_root_heart"
+      },
+      {
+        "text": "Let the ash choose its own pattern.",
+        "nextScene": "floor9_ash_root_heart"
+      }
+    ]
+  },
+  "floor9_ash_root_heart": {
+    "id": "floor9_ash_root_heart",
+    "map": {
+      "x": 5,
+      "y": 106,
+      "name": "AROOT",
+      "tag": "treasure",
+      "connections": [
+        "floor9_cinder_nursery",
+        "floor9_root_shrine"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Ash Root Heart",
+    "text": "The Ash Root is warm, dead, and alive in the same breath. It blooms only after it forgives the fire.",
+    "choices": [
+      {
+        "text": "Awaken the Ash Root and return to the shrine.",
+        "effect": {
+          "giveItem": "f9_ash_root",
+          "giveXP": 165
+        },
+        "once": true,
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Return to the Root Shrine.",
+        "nextScene": "floor9_root_shrine"
+      }
+    ]
+  },
+  "floor9_saint_gate": {
+    "id": "floor9_saint_gate",
+    "map": {
+      "x": 0,
+      "y": 107,
+      "name": "GATE9",
+      "tag": "event",
+      "connections": [
+        "floor9_root_shrine",
+        "floor9_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 - Saint Gate",
+    "text": "Three roots braid across a sealed arch. Behind it, the Buried Saint breathes through the whole cathedral.",
+    "choices": [
+      {
+        "text": "Return to the Root Shrine.",
+        "nextScene": "floor9_root_shrine"
+      },
+      {
+        "text": "Awaken all three Ancient Roots and open the Saint Gate.",
+        "requires": {
+          "items": [
+            "f9_glass_root",
+            "f9_blood_root",
+            "f9_ash_root"
+          ]
+        },
+        "nextScene": "floor9_boss"
+      }
+    ]
+  },
+  "floor9_boss": {
+    "id": "floor9_boss",
+    "map": {
+      "x": 0,
+      "y": 108,
+      "name": "SAINT",
+      "tag": "boss",
+      "connections": [
+        "floor9_saint_gate",
+        "floor9_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 9 - The Buried Saint",
+    "text": "The Buried Saint unfolds from the altar, crowned in roots and half-remembered prayers. It was planted to guard the dungeon from itself. It has forgotten the difference between guard and jailer.",
+    "combat": {
+      "name": "The Buried Saint",
+      "hp": 430,
+      "attack": 63,
+      "defense": 22,
+      "xp": 780,
+      "goldReward": 310,
+      "loot": [
+        "large_potion",
+        "buried_saint_seed"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "quick_strike",
+        "cleave",
+        "poison_hit",
+        "armor_break",
+        "battle_roar"
+      ],
+      "intro": "The Buried Saint opens wooden eyes full of old power.",
+      "victoryText": "The Saint kneels into the soil. A seed remains where its heart should have been.",
+      "advantages": [
+        {
+          "item": "f9_glass_boon",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        },
+        {
+          "item": "f9_blood_boon",
+          "attackDelta": -5,
+          "removeAbilities": [
+            "cleave"
+          ]
+        },
+        {
+          "item": "f9_ash_boon",
+          "hpDelta": -55,
+          "removeAbilities": [
+            "poison_hit"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor9_saint_gate",
+    "victoryScene": "floor9_clear_room"
+  },
+  "floor9_clear_room": {
+    "id": "floor9_clear_room",
+    "map": {
+      "x": 0,
+      "y": 109,
+      "name": "F9CLR",
+      "tag": "event",
+      "connections": [
+        "floor9_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 9 Clear - The Cathedral Breathes",
+    "text": "With the Buried Saint gone, the Root Cathedral exhales through every wall. The old power is awake now, and Floor 10 waits below as a living dungeon with roots wrapped around its laws.",
+    "choices": [
+      {
+        "text": "Descend toward the living dungeon. [FLOOR 9 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
   }
 }

@@ -74,6 +74,12 @@ const PROGRESS_ITEMS = {
   f8_snare_edge: "Snare Hunter's Edge secured for the Pale Stalker fight.",
   f8_echo_edge: "Echo Hunter's Edge secured for the Pale Stalker fight.",
   f8_sight_edge: "Sight Hunter's Edge secured for the Pale Stalker fight.",
+  f9_glass_root: 'Glass Root awakened in the Root Cathedral.',
+  f9_blood_root: 'Blood Root awakened in the Root Cathedral.',
+  f9_ash_root: 'Ash Root awakened in the Root Cathedral.',
+  f9_glass_boon: 'Glass Boon secured for the Buried Saint fight.',
+  f9_blood_boon: 'Blood Boon secured for the Buried Saint fight.',
+  f9_ash_boon: 'Ash Boon secured for the Buried Saint fight.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -284,6 +290,23 @@ function buildObjective(player) {
     return {
       route: 'hunt-beyond',
       goal: ready ? 'Face the Pale Stalker' : `Set Hunt Traps ${completed}/4`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 9) {
+    const required = [
+      ['f9_glass_root', 'Glass Root'],
+      ['f9_blood_root', 'Blood Root'],
+      ['f9_ash_root', 'Ash Root'],
+    ];
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'root-cathedral',
+      goal: ready ? 'Challenge the Buried Saint' : `Awaken Ancient Roots ${completed}/3`,
       missing,
       ready,
     };
