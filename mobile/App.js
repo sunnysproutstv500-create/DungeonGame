@@ -18,11 +18,120 @@ const saveStore = require('./saveStore');
 const CHOICE_RISK_PREFIX = 'Risk:';
 const CHOICE_REWARD_PREFIX = 'Reward:';
 
+const STITCH_THEME = {
+  background: '#0d0f0c',
+  surface: '#151714',
+  surfaceHigh: '#1e201d',
+  surfaceHighest: '#333532',
+  primary: '#f2ca50',
+  primaryDim: '#d4af37',
+  onPrimary: '#3c2f00',
+  text: '#f2f0ea',
+  muted: '#d0c5af',
+  outline: '#4d4635',
+  danger: '#8b1a12',
+};
+
 function Stat({ label, value }) {
   return (
     <View style={styles.stat}>
       <Text style={styles.statLabel}>{label}</Text>
       <Text style={styles.statValue}>{value}</Text>
+    </View>
+  );
+}
+
+function TrialTopBar({ title, player, meta }) {
+  return (
+    <View style={styles.trialTopBar}>
+      <View style={styles.trialTitleBlock}>
+        <Text style={styles.trialIcon}>◉</Text>
+        <Text style={styles.trialTitle}>{title}</Text>
+      </View>
+      <View style={styles.trialMetaBlock}>
+        <View style={styles.trialMetaColumn}>
+          <Text style={styles.trialMetaLabel}>{player?.name || 'EARTH-001'}</Text>
+          <Text style={styles.trialMetaValue}>LVL {player?.level || 1}</Text>
+        </View>
+        <View style={styles.trialDivider} />
+        <View style={styles.trialMetaColumn}>
+          <Text style={styles.trialMetaLabel}>ECHOES</Text>
+          <Text style={styles.trialEchoValue}>◇ {meta?.currency || 0}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function HpVitalityBar({ player }) {
+  const maxHp = Math.max(1, player?.maxHp || 1);
+  const hp = Math.max(0, player?.hp || 0);
+  const pct = Math.max(0, Math.min(100, Math.round((hp / maxHp) * 100)));
+  return (
+    <View style={styles.hpPanel}>
+      <View style={styles.hpHeader}>
+        <Text style={styles.hpLabel}>HP VITALITY</Text>
+        <Text style={styles.hpValue}>{hp}/{maxHp}</Text>
+      </View>
+      <View style={styles.hpTrack}>
+        <View style={[styles.hpFill, { width: `${pct}%` }]} />
+      </View>
+    </View>
+  );
+}
+
+function BottomTrialNav({ active = 'Scene' }) {
+  const tabs = [
+    ['Scene', '☷'],
+    ['Inventory', '▣'],
+    ['Map', '◉'],
+    ['Upgrades', '✧'],
+  ];
+  return (
+    <View style={styles.bottomTrialNav}>
+      {tabs.map(([label, icon]) => {
+        const selected = label === active;
+        return (
+          <View key={label} style={[styles.navTab, selected && styles.activeNavTab]}>
+            <Text style={[styles.navIcon, selected && styles.activeNavText]}>{icon}</Text>
+            <Text style={[styles.navLabel, selected && styles.activeNavText]}>{label}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function SceneArtwork({ label }) {
+  return (
+    <View style={styles.sceneArtwork}>
+      <Text style={styles.sceneArtworkIcon}>▧</Text>
+      <Text style={styles.sceneArtworkLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function countColiseumWins(player) {
+  return (player?.inventory || []).filter(itemId => /^f10_win_\d+$/.test(itemId)).length;
+}
+
+function ColiseumRecord({ player }) {
+  const wins = Math.min(10, countColiseumWins(player));
+  return (
+    <View style={styles.coliseumRecord}>
+      <View style={styles.coliseumHeader}>
+        <Text style={styles.coliseumLabel}>COLISEUM RECORD</Text>
+        <Text style={styles.coliseumValue}>{wins} / 10 WINS</Text>
+      </View>
+      <View style={styles.coliseumPips}>
+        {Array.from({ length: 10 }).map((_, index) => (
+          <View key={index} style={[styles.coliseumPip, index < wins && styles.filledColiseumPip]}>
+            <Text style={[styles.coliseumPipText, index < wins && styles.filledColiseumPipText]}>
+              {index === 9 ? '⌂' : '○'}
+            </Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
@@ -95,7 +204,8 @@ function StatusRow({ label, effects }) {
 function MetaPanel({ meta, onBuyUpgrade }) {
   return (
     <View style={styles.metaPanel}>
-      <Text style={styles.metaTitle}>Echo Progress</Text>
+      <Text style={styles.metaTitle}>The Echo Archive</Text>
+      <Text style={styles.metaText}>Bind Echoes from failed descents into permanent strength.</Text>
       <View style={styles.metaGrid}>
         <Stat label="ECHOES" value={meta.currency} />
         <Stat label="HP+" value={meta.upgrades.hp} />
@@ -173,13 +283,16 @@ function RunSetupPanel({ options, selectedAbilityIds, onSelectClass, onToggleAbi
   return (
     <View style={styles.setupPanel}>
       <View style={styles.setupPanelHeader}>
-        <Text style={styles.metaTitle}>Run Setup</Text>
+        <Text style={styles.metaTitle}>CHOOSE EARTH'S LOADOUT</Text>
         <Text style={styles.setupCount}>
           {selectedAbilityIds.length}/{options.maxAbilities} abilities
         </Text>
       </View>
+      <Text style={styles.helperText}>
+        The Overseers do not care what kind of hero Earth wanted. They only record what survives.
+      </Text>
 
-      <Text style={styles.sectionLabel}>Class</Text>
+      <Text style={styles.sectionLabel}>Earth-001 Discipline</Text>
       <View style={styles.itemList}>
         {options.classes.map(gameClass => (
           <View key={gameClass.id} style={[styles.abilitySelectRow, gameClass.selected && styles.selectedAbilityRow]}>
@@ -538,14 +651,17 @@ function InventoryPanel({ items, onUseItem, onEquipItem }) {
 
 function ScenePanel({ view, onAction, events }) {
   const isEndScene = view.scene.id === 'the_end';
+  const isColiseum = view.floor === 10 || /coliseum|arena|bout/i.test(`${view.scene.title} ${view.scene.text}`);
   return (
     <>
-      <View style={styles.sceneHeader}>
-        <Text style={styles.floorText}>Floor {view.floor}</Text>
+      <View style={styles.sceneCard}>
         <Text style={styles.title}>{view.scene.title}</Text>
+        <View style={styles.sceneDivider} />
+        <SceneArtwork label={view.scene.title} />
+        <Text style={styles.bodyText}>{view.scene.text}</Text>
       </View>
-      <Text style={styles.bodyText}>{view.scene.text}</Text>
       <OutcomePanel events={events} />
+      {isColiseum ? <ColiseumRecord player={view.player} /> : null}
       <View style={styles.actions}>
         {view.choices.map(choice => (
           <View key={`${choice.index}-${choice.text}`} style={styles.choiceBlock}>
@@ -596,11 +712,13 @@ function CombatPanel({ view, onAction, events }) {
 
   return (
     <>
-      <View style={styles.sceneHeader}>
-        <Text style={styles.floorText}>Combat</Text>
+      <View style={styles.sceneCard}>
+        <Text style={styles.floorText}>Combat Protocol</Text>
         <Text style={styles.title}>{view.scene.title}</Text>
+        <View style={styles.sceneDivider} />
+        <SceneArtwork label={view.combat.enemy.name} />
+        <Text style={styles.bodyText}>{view.scene.text}</Text>
       </View>
-      <Text style={styles.bodyText}>{view.scene.text}</Text>
       <View style={styles.enemyBand}>
         <Text style={styles.enemyName}>{view.combat.enemy.name}</Text>
         <Text style={styles.enemyHp}>HP {view.combat.enemy.hp}/{view.combat.enemy.maxHp}</Text>
@@ -728,8 +846,8 @@ function SetupScreen({ playerName, onChangeName, meta, savedRun, setupOptions, s
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <View style={styles.setupHeader}>
         <View style={styles.setupTitleBlock}>
-          <Text style={styles.floorText}>New Expedition</Text>
-          <Text style={styles.title}>Prepare Your Run</Text>
+          <Text style={styles.floorText}>Trial Setup</Text>
+          <Text style={styles.title}>Earth-001 Loadout</Text>
         </View>
         <ActionButton label="Back" onPress={onBack} tone="secondary" />
       </View>
@@ -772,7 +890,7 @@ function SetupScreen({ playerName, onChangeName, meta, savedRun, setupOptions, s
       </CollapsiblePanel>
 
       <View style={styles.startActionBar}>
-        <ActionButton label="Begin Run" onPress={() => onStart(cleanName)} disabled={cleanName.length === 0} />
+        <ActionButton label="Begin Trial" onPress={() => onStart(cleanName)} disabled={cleanName.length === 0} />
         <ActionButton
           label={savedRun ? `Continue ${savedRun.player.name}` : 'Continue Saved Run'}
           onPress={onContinue}
@@ -995,12 +1113,13 @@ module.exports = function App() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
       <View style={styles.shell}>
-        <PlayerStrip player={view.player} />
+        <TrialTopBar title={`Floor ${view.floor} - ${view.scene.title}`} player={view.player} meta={meta} />
+        <HpVitalityBar player={view.player} />
         <View style={styles.runToolbar}>
           <View>
-            <Text style={styles.toolbarText}>Floor {view.floor}</Text>
+            <Text style={styles.toolbarText}>Earth-001 Trial Feed</Text>
             {saveNotice ? <Text style={styles.saveNotice}>{saveNotice}</Text> : null}
           </View>
           <ActionButton label="Save Run" onPress={saveRun} tone="secondary" disabled={view.runEnded} />
@@ -1024,6 +1143,7 @@ module.exports = function App() {
           />
           <EventLog events={events} />
         </ScrollView>
+        <BottomTrialNav active={view.runEnded ? 'Upgrades' : view.mode === 'combat' ? 'Scene' : 'Scene'} />
       </View>
     </SafeAreaView>
   );
@@ -1032,62 +1152,67 @@ module.exports = function App() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#f5f1e8',
+    backgroundColor: STITCH_THEME.background,
   },
   homeSafe: {
     flex: 1,
-    backgroundColor: '#101713',
+    backgroundColor: STITCH_THEME.background,
   },
   shell: {
     flex: 1,
-    backgroundColor: '#f5f1e8',
+    backgroundColor: STITCH_THEME.background,
   },
   homeScreen: {
     flex: 1,
     justifyContent: 'center',
     paddingVertical: 18,
-    backgroundColor: '#101713',
+    backgroundColor: STITCH_THEME.background,
   },
   homeFrame: {
     width: '88%',
-    maxWidth: 320,
-    alignSelf: 'flex-start',
-    gap: 18,
-    marginLeft: 18,
-    padding: 18,
+    maxWidth: 340,
+    alignSelf: 'center',
+    gap: 12,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#52664e',
-    borderRadius: 8,
-    backgroundColor: '#172018',
+    borderColor: STITCH_THEME.outline,
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surface,
   },
   homeHero: {
     minHeight: 260,
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#7a6a45',
-    borderRadius: 8,
-    backgroundColor: '#20251f',
+    borderColor: 'rgba(242,202,80,0.35)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.background,
   },
   homeEyebrow: {
-    color: '#d9c28a',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
+    textAlign: 'center',
   },
   homeTitle: {
-    color: '#fffaf0',
-    fontSize: 33,
+    color: STITCH_THEME.primary,
+    fontSize: 31,
     lineHeight: 38,
     fontWeight: '900',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 3,
   },
   homeSubtitle: {
-    color: '#c7d6bd',
+    color: STITCH_THEME.muted,
     fontSize: 15,
     lineHeight: 21,
     fontWeight: '800',
+    textAlign: 'center',
   },
   homeStatusRow: {
     flexDirection: 'row',
@@ -1099,19 +1224,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 12,
     borderWidth: 1,
-    borderColor: '#52664e',
-    borderRadius: 8,
-    backgroundColor: '#111a15',
+    borderColor: STITCH_THEME.outline,
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   homeStatusLabel: {
-    color: '#9fb194',
+    color: STITCH_THEME.muted,
     fontSize: 11,
     lineHeight: 15,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   homeStatusValue: {
-    color: '#fffaf0',
+    color: STITCH_THEME.text,
     fontSize: 18,
     lineHeight: 23,
     fontWeight: '900',
@@ -1120,14 +1245,115 @@ const styles = StyleSheet.create({
   homeActions: {
     gap: 10,
     padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surface,
+  },
+  trialTopBar: {
+    minHeight: 62,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(242,202,80,0.22)',
+    backgroundColor: STITCH_THEME.surfaceHigh,
+  },
+  trialTitleBlock: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trialIcon: {
+    color: STITCH_THEME.primary,
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: '900',
+  },
+  trialTitle: {
+    flex: 1,
+    color: STITCH_THEME.primary,
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '900',
+  },
+  trialMetaBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  trialMetaColumn: {
+    alignItems: 'flex-end',
+  },
+  trialMetaLabel: {
+    color: STITCH_THEME.muted,
+    fontSize: 9,
+    lineHeight: 12,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  trialMetaValue: {
+    color: STITCH_THEME.text,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  trialEchoValue: {
+    color: STITCH_THEME.primary,
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '900',
+  },
+  trialDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: 'rgba(153,144,124,0.3)',
+  },
+  hpPanel: {
+    gap: 6,
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 8,
+    backgroundColor: STITCH_THEME.background,
+  },
+  hpHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  hpLabel: {
+    color: STITCH_THEME.muted,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  hpValue: {
+    color: STITCH_THEME.primary,
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '900',
+  },
+  hpTrack: {
+    height: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(242,202,80,0.18)',
+    backgroundColor: STITCH_THEME.surfaceHighest,
+  },
+  hpFill: {
+    height: '100%',
+    backgroundColor: 'rgba(242,202,80,0.65)',
   },
   statsBand: {
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#20251f',
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   playerIdentity: {
     flexDirection: 'row',
@@ -1137,13 +1363,13 @@ const styles = StyleSheet.create({
   },
   playerName: {
     flex: 1,
-    color: '#fffaf0',
+    color: STITCH_THEME.text,
     fontSize: 17,
     lineHeight: 22,
     fontWeight: '900',
   },
   playerClass: {
-    color: '#c7d6bd',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '800',
@@ -1159,12 +1385,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statLabel: {
-    color: '#c7d6bd',
+    color: STITCH_THEME.muted,
     fontSize: 11,
     fontWeight: '700',
   },
   statValue: {
-    color: '#fffaf0',
+    color: STITCH_THEME.text,
     fontSize: 14,
     fontWeight: '800',
   },
@@ -1173,7 +1399,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 18,
-    paddingBottom: 32,
+    paddingBottom: 94,
   },
   sceneHeader: {
     borderBottomWidth: 2,
@@ -1195,30 +1421,118 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   floorText: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   title: {
-    color: '#1f241e',
-    fontSize: 26,
+    color: STITCH_THEME.text,
+    fontSize: 25,
     lineHeight: 31,
     fontWeight: '900',
     marginTop: 4,
   },
   bodyText: {
-    color: '#252925',
+    color: STITCH_THEME.muted,
     fontSize: 17,
-    lineHeight: 25,
+    lineHeight: 27,
+  },
+  sceneCard: {
+    gap: 14,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(242,202,80,0.32)',
+    backgroundColor: STITCH_THEME.surface,
+  },
+  sceneDivider: {
+    height: 1,
+    backgroundColor: 'rgba(242,202,80,0.18)',
+  },
+  sceneArtwork: {
+    minHeight: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(242,202,80,0.22)',
+    backgroundColor: '#080a08',
+  },
+  sceneArtworkIcon: {
+    color: 'rgba(242,240,234,0.18)',
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '900',
+  },
+  sceneArtworkLabel: {
+    color: 'rgba(208,197,175,0.45)',
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+  },
+  coliseumRecord: {
+    gap: 12,
+    marginTop: 18,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(242,202,80,0.24)',
+    backgroundColor: STITCH_THEME.surfaceHigh,
+  },
+  coliseumHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+  coliseumLabel: {
+    color: STITCH_THEME.muted,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  coliseumValue: {
+    color: STITCH_THEME.primary,
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: '900',
+  },
+  coliseumPips: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  coliseumPip: {
+    flex: 1,
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(242,202,80,0.2)',
+    backgroundColor: STITCH_THEME.surfaceHighest,
+  },
+  filledColiseumPip: {
+    backgroundColor: STITCH_THEME.primary,
+    borderColor: STITCH_THEME.primary,
+  },
+  coliseumPipText: {
+    color: STITCH_THEME.primary,
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '900',
+  },
+  filledColiseumPipText: {
+    color: STITCH_THEME.onPrimary,
   },
   objectivePanel: {
     gap: 6,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#a8b78d',
-    borderRadius: 8,
-    backgroundColor: '#f3f7ee',
+    borderColor: 'rgba(242,202,80,0.25)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     marginBottom: 16,
   },
   objectiveHeader: {
@@ -1228,26 +1542,26 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   objectiveLabel: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   objectiveGoal: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 16,
     lineHeight: 21,
     fontWeight: '900',
   },
   objectiveMissing: {
-    color: '#6a4e22',
+    color: STITCH_THEME.primary,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
   },
   objectiveReady: {
-    color: '#21452f',
+    color: STITCH_THEME.primary,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '900',
@@ -1260,26 +1574,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#b9a56a',
-    borderRadius: 8,
-    backgroundColor: '#fff7df',
+    borderColor: 'rgba(242,202,80,0.35)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     marginBottom: 16,
   },
   contractBadgeLabel: {
-    color: '#61512a',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   contractBadgeValue: {
-    color: '#211d14',
+    color: STITCH_THEME.primary,
     fontSize: 18,
     lineHeight: 22,
     fontWeight: '900',
   },
   contractBadgeState: {
-    color: '#6a4e22',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '800',
@@ -1293,19 +1607,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#2f4f3d',
-    borderRadius: 8,
-    backgroundColor: '#eef3e7',
+    borderLeftColor: STITCH_THEME.primary,
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   outcomeTitle: {
-    color: '#2f4f3d',
+    color: STITCH_THEME.primary,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   outcomeLine: {
-    color: '#252925',
+    color: STITCH_THEME.text,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '800',
@@ -1349,25 +1663,25 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
+    borderColor: 'rgba(242,202,80,0.32)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   summaryKicker: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 11,
     lineHeight: 15,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   summaryValue: {
-    color: '#1f241e',
+    color: STITCH_THEME.primary,
     fontSize: 24,
     lineHeight: 29,
     fontWeight: '900',
   },
   summaryValueSmall: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '900',
@@ -1375,7 +1689,7 @@ const styles = StyleSheet.create({
   summaryDivider: {
     width: 1,
     alignSelf: 'stretch',
-    backgroundColor: '#d0c5ad',
+    backgroundColor: 'rgba(153,144,124,0.35)',
   },
   summarySaved: {
     flex: 1,
@@ -1385,29 +1699,33 @@ const styles = StyleSheet.create({
     marginTop: 22,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: '#d0c5ad',
+    borderTopColor: 'rgba(242,202,80,0.18)',
   },
   button: {
     minHeight: 48,
     justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#2f4f3d',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.primary,
     paddingHorizontal: 14,
     paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: STITCH_THEME.primaryDim,
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#7b6f5c',
+    backgroundColor: STITCH_THEME.surfaceHigh,
+    borderColor: 'rgba(242,202,80,0.35)',
     borderWidth: 1,
   },
   buttonText: {
-    color: '#fffaf0',
+    color: STITCH_THEME.onPrimary,
     fontSize: 16,
     lineHeight: 20,
     fontWeight: '800',
+    textAlign: 'center',
+    letterSpacing: 1,
   },
   secondaryButtonText: {
-    color: '#3d3327',
+    color: STITCH_THEME.text,
   },
   disabledButton: {
     opacity: 0.45,
@@ -1416,7 +1734,7 @@ const styles = StyleSheet.create({
     color: '#6f675a',
   },
   label: {
-    color: '#3d3327',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     fontWeight: '900',
     marginBottom: 8,
@@ -1425,10 +1743,10 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 50,
     borderWidth: 1,
-    borderColor: '#8b7d68',
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
-    color: '#1f241e',
+    borderColor: 'rgba(242,202,80,0.35)',
+    borderRadius: 0,
+    backgroundColor: '#090b09',
+    color: STITCH_THEME.text,
     fontSize: 18,
     fontWeight: '800',
     paddingHorizontal: 14,
@@ -1439,18 +1757,18 @@ const styles = StyleSheet.create({
     marginTop: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    borderRadius: 8,
-    backgroundColor: '#ebe2cf',
+    borderColor: 'rgba(242,202,80,0.35)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   setupPanel: {
     gap: 10,
     marginTop: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#a8b78d',
-    borderRadius: 8,
-    backgroundColor: '#f3f7ee',
+    borderColor: 'rgba(242,202,80,0.28)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   setupPanelHeader: {
     flexDirection: 'row',
@@ -1459,12 +1777,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   setupCount: {
-    color: '#56645c',
+    color: STITCH_THEME.primary,
     fontSize: 14,
     fontWeight: '900',
   },
   sectionLabel: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
@@ -1472,13 +1790,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   helperText: {
-    color: '#6a5f4f',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '700',
   },
   metaTitle: {
-    color: '#1f241e',
+    color: STITCH_THEME.primary,
     fontSize: 17,
     fontWeight: '900',
   },
@@ -1487,11 +1805,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 6,
     padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#20251f',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.background,
   },
   metaText: {
-    color: '#4d4539',
+    color: STITCH_THEME.muted,
     fontSize: 14,
     lineHeight: 19,
     fontWeight: '700',
@@ -1501,7 +1819,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: '#d0c5ad',
+    borderTopColor: 'rgba(242,202,80,0.18)',
   },
   utilityHeader: {
     minHeight: 36,
@@ -1511,7 +1829,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   utilityToggle: {
-    color: '#56645c',
+    color: STITCH_THEME.primary,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '900',
@@ -1520,13 +1838,13 @@ const styles = StyleSheet.create({
   mapSummary: {
     gap: 2,
     padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#ebe2cf',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     borderWidth: 1,
-    borderColor: '#c8b998',
+    borderColor: 'rgba(242,202,80,0.25)',
   },
   mapSummaryText: {
-    color: '#3d3327',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
@@ -1543,36 +1861,36 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 4,
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    backgroundColor: '#fffaf0',
+    borderColor: 'rgba(242,202,80,0.25)',
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   currentMapNode: {
-    borderColor: '#2f4f3d',
-    backgroundColor: '#e3eadb',
+    borderColor: STITCH_THEME.primary,
+    backgroundColor: '#272715',
   },
   clearedMapNode: {
-    borderColor: '#9cad76',
+    borderColor: 'rgba(242,202,80,0.45)',
   },
   selectedMapNode: {
-    borderColor: '#7c4d1e',
-    backgroundColor: '#f4e4c7',
+    borderColor: STITCH_THEME.primary,
+    backgroundColor: '#302a14',
   },
   mapNodeIcon: {
-    color: '#56645c',
+    color: STITCH_THEME.primary,
     fontSize: 16,
     lineHeight: 20,
     fontWeight: '900',
   },
   mapNodeName: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
   },
   mapNodeMeta: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 10,
     lineHeight: 14,
     fontWeight: '900',
@@ -1581,10 +1899,10 @@ const styles = StyleSheet.create({
   mapDetailPanel: {
     gap: 8,
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 0,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    backgroundColor: '#fffaf0',
+    borderColor: 'rgba(242,202,80,0.25)',
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   mapDetailHeader: {
     flexDirection: 'row',
@@ -1594,25 +1912,25 @@ const styles = StyleSheet.create({
   },
   mapDetailTitle: {
     flex: 1,
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '900',
   },
   mapDetailPill: {
-    color: '#3d3327',
+    color: STITCH_THEME.onPrimary,
     fontSize: 10,
     lineHeight: 14,
     fontWeight: '900',
     textTransform: 'uppercase',
     paddingVertical: 3,
     paddingHorizontal: 6,
-    borderRadius: 6,
-    backgroundColor: '#ebe2cf',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.primary,
     overflow: 'hidden',
   },
   mapDetailLine: {
-    color: '#3d3327',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 17,
     fontWeight: '800',
@@ -1623,18 +1941,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   mapChip: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 11,
     lineHeight: 15,
     fontWeight: '800',
     paddingVertical: 4,
     paddingHorizontal: 7,
-    borderRadius: 6,
-    backgroundColor: '#e8efd9',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHighest,
     overflow: 'hidden',
   },
   mapMutedText: {
-    color: '#726958',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 17,
     fontWeight: '700',
@@ -1649,24 +1967,24 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     borderWidth: 1,
-    borderColor: '#d0c5ad',
+    borderColor: 'rgba(242,202,80,0.25)',
   },
   currentMapRoom: {
-    borderColor: '#2f4f3d',
-    backgroundColor: '#e3eadb',
+    borderColor: STITCH_THEME.primary,
+    backgroundColor: '#272715',
   },
   mapRoomName: {
     flex: 1,
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '900',
   },
   mapRoomMeta: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '800',
@@ -1678,31 +1996,31 @@ const styles = StyleSheet.create({
   equipmentSlot: {
     padding: 10,
     borderWidth: 1,
-    borderColor: '#a8b78d',
-    borderRadius: 8,
-    backgroundColor: '#f3f7ee',
+    borderColor: 'rgba(242,202,80,0.25)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   equipmentSlotLabel: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 11,
     lineHeight: 15,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   equipmentName: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '900',
     textTransform: 'capitalize',
   },
   panelTitle: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 18,
     fontWeight: '900',
   },
   emptyText: {
-    color: '#5f5648',
+    color: STITCH_THEME.muted,
     fontSize: 14,
     fontWeight: '700',
   },
@@ -1716,9 +2034,9 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
+    borderColor: 'rgba(242,202,80,0.25)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   itemTextBlock: {
     flex: 1,
@@ -1730,16 +2048,16 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   itemName: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 15,
     fontWeight: '900',
   },
   statePill: {
-    color: '#4d4539',
-    backgroundColor: '#eee4d0',
-    borderColor: '#c8b998',
+    color: STITCH_THEME.muted,
+    backgroundColor: STITCH_THEME.surfaceHighest,
+    borderColor: 'rgba(242,202,80,0.24)',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 0,
     overflow: 'hidden',
     paddingHorizontal: 7,
     paddingVertical: 2,
@@ -1749,23 +2067,23 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   ownedPill: {
-    color: '#21452f',
-    backgroundColor: '#dfeadc',
-    borderColor: '#8eaa7a',
+    color: STITCH_THEME.primary,
+    backgroundColor: '#24220f',
+    borderColor: STITCH_THEME.primary,
   },
   affordablePill: {
-    color: '#4f361c',
-    backgroundColor: '#f1dfb7',
-    borderColor: '#b89550',
+    color: STITCH_THEME.primary,
+    backgroundColor: '#24220f',
+    borderColor: STITCH_THEME.primaryDim,
   },
   itemDescription: {
-    color: '#5f5648',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '700',
   },
   traitText: {
-    color: '#6a4e22',
+    color: STITCH_THEME.primary,
     fontSize: 12,
     lineHeight: 17,
     fontWeight: '800',
@@ -1776,7 +2094,7 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   gearComparison: {
-    color: '#2f4f3d',
+    color: STITCH_THEME.primary,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '900',
@@ -1792,18 +2110,18 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#c8b998',
+    borderTopColor: 'rgba(242,202,80,0.18)',
   },
   upgradeTextBlock: {
     flex: 1,
   },
   upgradeName: {
-    color: '#1f241e',
+    color: STITCH_THEME.text,
     fontSize: 15,
     fontWeight: '900',
   },
   upgradeDetail: {
-    color: '#5f5648',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '700',
@@ -1816,16 +2134,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#d0c5ad',
+    borderBottomColor: 'rgba(242,202,80,0.16)',
+    backgroundColor: STITCH_THEME.background,
   },
   toolbarText: {
-    color: '#3d3327',
+    color: STITCH_THEME.muted,
     fontSize: 14,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   saveNotice: {
-    color: '#56645c',
+    color: STITCH_THEME.primary,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '800',
@@ -1836,15 +2155,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: '#8f3d33',
+    borderColor: 'rgba(255,180,171,0.45)',
   },
   enemyName: {
-    color: '#5f241f',
+    color: STITCH_THEME.text,
     fontSize: 19,
     fontWeight: '900',
   },
   enemyHp: {
-    color: '#5f241f',
+    color: '#ffb4ab',
     fontSize: 15,
     fontWeight: '800',
     marginTop: 4,
@@ -1854,9 +2173,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#b86a42',
-    borderRadius: 8,
-    backgroundColor: '#fff1df',
+    borderColor: 'rgba(242,202,80,0.3)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     gap: 4,
   },
   intentHeader: {
@@ -1866,19 +2185,19 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   intentLabel: {
-    color: '#6a2f22',
+    color: STITCH_THEME.primary,
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   intentDanger: {
-    color: '#6a2f22',
+    color: '#ffb4ab',
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   intentText: {
-    color: '#332820',
+    color: STITCH_THEME.muted,
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '800',
@@ -1888,20 +2207,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderWidth: 1,
-    borderColor: '#8f3d33',
-    borderRadius: 8,
-    backgroundColor: '#fbe7df',
+    borderColor: 'rgba(255,180,171,0.45)',
+    borderRadius: 0,
+    backgroundColor: '#21110f',
     gap: 3,
   },
   pressureLabel: {
-    color: '#6a2f22',
+    color: '#ffb4ab',
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   pressureText: {
-    color: '#332820',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
@@ -1911,20 +2230,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 9,
     borderWidth: 1,
-    borderColor: '#506a5b',
-    borderRadius: 8,
-    backgroundColor: '#edf5ed',
+    borderColor: 'rgba(242,202,80,0.35)',
+    borderRadius: 0,
+    backgroundColor: '#202016',
     gap: 3,
   },
   bossAdvantageLabel: {
-    color: '#2f4f3d',
+    color: STITCH_THEME.primary,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   bossAdvantageText: {
-    color: '#263229',
+    color: STITCH_THEME.muted,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
@@ -1934,7 +2253,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   statusLabel: {
-    color: '#4d4539',
+    color: STITCH_THEME.muted,
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1945,11 +2264,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   statusChip: {
-    color: '#1f241e',
-    backgroundColor: '#d8e4cf',
-    borderColor: '#8eaa7a',
+    color: STITCH_THEME.primary,
+    backgroundColor: STITCH_THEME.surfaceHigh,
+    borderColor: 'rgba(242,202,80,0.35)',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 0,
     overflow: 'hidden',
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -1961,7 +2280,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: '#d0c5ad',
+    borderTopColor: 'rgba(242,202,80,0.18)',
   },
   abilityRow: {
     flexDirection: 'row',
@@ -1970,9 +2289,9 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#a8b78d',
-    borderRadius: 8,
-    backgroundColor: '#f3f7ee',
+    borderColor: 'rgba(242,202,80,0.25)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   abilitySelectRow: {
     flexDirection: 'row',
@@ -1981,19 +2300,19 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#c8b998',
-    borderRadius: 8,
-    backgroundColor: '#fffaf0',
+    borderColor: 'rgba(242,202,80,0.25)',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
   },
   selectedAbilityRow: {
-    borderColor: '#2f4f3d',
-    backgroundColor: '#e3eadb',
+    borderColor: STITCH_THEME.primary,
+    backgroundColor: '#272715',
   },
   log: {
     gap: 6,
   },
   logLine: {
-    color: '#56645c',
+    color: STITCH_THEME.muted,
     fontSize: 14,
     lineHeight: 18,
     fontWeight: '700',
@@ -2004,15 +2323,48 @@ const styles = StyleSheet.create({
   summaryPanel: {
     gap: 6,
     padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#ebe2cf',
+    borderRadius: 0,
+    backgroundColor: STITCH_THEME.surfaceHigh,
     borderWidth: 1,
-    borderColor: '#c8b998',
+    borderColor: 'rgba(242,202,80,0.3)',
   },
   summaryLine: {
-    color: '#3d3327',
+    color: STITCH_THEME.text,
     fontSize: 15,
     lineHeight: 20,
     fontWeight: '800',
+  },
+  bottomTrialNav: {
+    minHeight: 66,
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(242,202,80,0.25)',
+    backgroundColor: STITCH_THEME.surfaceHigh,
+  },
+  navTab: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  activeNavTab: {
+    backgroundColor: 'rgba(242,202,80,0.22)',
+    borderTopWidth: 2,
+    borderTopColor: STITCH_THEME.primary,
+  },
+  navIcon: {
+    color: STITCH_THEME.muted,
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: '900',
+  },
+  navLabel: {
+    color: STITCH_THEME.muted,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '900',
+  },
+  activeNavText: {
+    color: STITCH_THEME.primary,
   },
 });
