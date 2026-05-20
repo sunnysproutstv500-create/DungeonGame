@@ -214,6 +214,14 @@ floor9State.currentSceneId = 'floor9_saint_gate';
 const floor9View = runtime.getView(floor9State);
 assert(floor9View.objective && floor9View.objective.goal === 'Awaken Ancient Roots 2/3', 'smoke: Floor 9 runtime exposes Ancient Root objective', floor9View.objective);
 
+let floor10State = runtime.startNewRun({
+  name: 'Floor10Smoke',
+  playerPatch: { floor: 10, inventory: ['f10_win_1', 'f10_win_2', 'f10_win_3', 'f10_win_4', 'f10_win_5', 'f10_win_6'] },
+});
+floor10State.currentSceneId = 'floor10_arena_board';
+const floor10View = runtime.getView(floor10State);
+assert(floor10View.objective && floor10View.objective.goal === 'Win Coliseum Bouts 6/10', 'smoke: Floor 10 runtime exposes Coliseum Win objective', floor10View.objective);
+
 let floor2BossState = runtime.startNewRun({
   name: 'Floor2BossSmoke',
   playerPatch: { floor: 2, inventory: ['f2_tactical_readout'] },

@@ -6643,5 +6643,632 @@
         "nextScene": "the_end"
       }
     ]
+  },
+  "floor10_coliseum_antechamber": {
+    "id": "floor10_coliseum_antechamber",
+    "map": {
+      "x": 0,
+      "y": 114,
+      "name": "ANTE",
+      "tag": "safe",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 10 - Coliseum Antechamber",
+    "text": "The Coliseum Below waits under a ceiling of root-wrapped stone. The dungeon is no longer hiding its hunger; it has built seats for it. The rule is painted in gold across the gate: 10 wins open the Grand Arbiter.",
+    "choices": [
+      {
+        "text": "Rest on the contender bench.",
+        "effect": {
+          "heal": 190
+        },
+        "once": true,
+        "nextScene": "floor10_coliseum_antechamber"
+      },
+      {
+        "text": "Buy a large potion from the arena medic. (65 gold)",
+        "condition": {
+          "gold": 65
+        },
+        "effect": {
+          "spendGold": 65,
+          "giveItem": "large_potion"
+        },
+        "once": true,
+        "nextScene": "floor10_coliseum_antechamber"
+      },
+      {
+        "text": "Step to the Arena Board.",
+        "nextScene": "floor10_arena_board"
+      }
+    ]
+  },
+  "floor10_arena_board": {
+    "id": "floor10_arena_board",
+    "map": {
+      "x": 0,
+      "y": 115,
+      "name": "BOARD",
+      "tag": "event",
+      "connections": [
+        "floor10_coliseum_antechamber",
+        "floor10_bout_1",
+        "floor10_bout_2",
+        "floor10_bout_3",
+        "floor10_bout_4",
+        "floor10_bout_5",
+        "floor10_bout_6",
+        "floor10_bout_7",
+        "floor10_bout_8",
+        "floor10_bout_9",
+        "floor10_bout_10",
+        "floor10_final_gate"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 10 - Arena Board",
+    "text": "Bronze nameplates crawl across the board as the crowd changes its mind about who deserves to live. Ten champion bouts stand between you and the Grand Arbiter.",
+    "choices": [
+      {
+        "text": "claim the crowd favor by saluting the pit.",
+        "effect": {
+          "giveItem": "f10_crowd_favor",
+          "giveXP": 80
+        },
+        "once": true,
+        "nextScene": "floor10_arena_board"
+      },
+      {
+        "text": "study the Arbiter from old bout records.",
+        "effect": {
+          "giveItem": "f10_arena_intel",
+          "giveXP": 80
+        },
+        "once": true,
+        "nextScene": "floor10_arena_board"
+      },
+      {
+        "text": "swear on the blood sand before the crowd.",
+        "effect": {
+          "damage": 38,
+          "giveItem": "f10_blood_sand_oath"
+        },
+        "once": true,
+        "nextScene": "floor10_arena_board"
+      },
+      {
+        "text": "Bout 1: challenge Mirehand Korr.",
+        "nextScene": "floor10_bout_1"
+      },
+      {
+        "text": "Bout 2: challenge Velka of the Split Mask.",
+        "nextScene": "floor10_bout_2"
+      },
+      {
+        "text": "Bout 3: challenge Brassjaw Oren.",
+        "nextScene": "floor10_bout_3"
+      },
+      {
+        "text": "Bout 4: challenge Candle Knight.",
+        "nextScene": "floor10_bout_4"
+      },
+      {
+        "text": "Bout 5: challenge Sable Choir Twins.",
+        "nextScene": "floor10_bout_5"
+      },
+      {
+        "text": "Bout 6: challenge Red Ledger Mara.",
+        "nextScene": "floor10_bout_6"
+      },
+      {
+        "text": "Bout 7: challenge Old Thorn Brakus.",
+        "nextScene": "floor10_bout_7"
+      },
+      {
+        "text": "Bout 8: challenge Glass-Eye Toma.",
+        "nextScene": "floor10_bout_8"
+      },
+      {
+        "text": "Bout 9: challenge The Ninth Roar.",
+        "nextScene": "floor10_bout_9"
+      },
+      {
+        "text": "Bout 10: challenge Crownless Vey.",
+        "nextScene": "floor10_bout_10"
+      },
+      {
+        "text": "Approach the Final Gate.",
+        "nextScene": "floor10_final_gate"
+      }
+    ]
+  },
+  "floor10_final_gate": {
+    "id": "floor10_final_gate",
+    "map": {
+      "x": 0,
+      "y": 117,
+      "name": "GATE10",
+      "tag": "event",
+      "connections": [
+        "floor10_arena_board",
+        "floor10_boss"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 10 - Final Gate",
+    "text": "The final gate is a wall of raised weapons. Each Coliseum Win burns as a notch of light along the bars.",
+    "choices": [
+      {
+        "text": "Return to the Arena Board.",
+        "nextScene": "floor10_arena_board"
+      },
+      {
+        "text": "Present 10 Coliseum Wins and call the Grand Arbiter.",
+        "requires": {
+          "items": [
+            "f10_win_1",
+            "f10_win_2",
+            "f10_win_3",
+            "f10_win_4",
+            "f10_win_5",
+            "f10_win_6",
+            "f10_win_7",
+            "f10_win_8",
+            "f10_win_9",
+            "f10_win_10"
+          ]
+        },
+        "nextScene": "floor10_boss"
+      }
+    ]
+  },
+  "floor10_boss": {
+    "id": "floor10_boss",
+    "map": {
+      "x": 0,
+      "y": 118,
+      "name": "ARBIT",
+      "tag": "boss",
+      "connections": [
+        "floor10_final_gate",
+        "floor10_clear_room"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - The Grand Arbiter",
+    "text": "The Grand Arbiter descends through the roar, carrying a judge blade and a crown made from broken champion tags. It does not ask whether you are worthy. It asks whether the crowd is finished with you.",
+    "combat": {
+      "name": "The Grand Arbiter",
+      "hp": 520,
+      "attack": 70,
+      "defense": 25,
+      "xp": 1000,
+      "goldReward": 420,
+      "loot": [
+        "large_potion",
+        "grand_arbiter_crown"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "quick_strike",
+        "cleave",
+        "armor_break",
+        "battle_roar",
+        "sweeping_attack"
+      ],
+      "intro": "The Grand Arbiter raises the judge blade. The coliseum falls silent.",
+      "victoryText": "The judge blade breaks. For the first time, the crowd has no verdict.",
+      "advantages": [
+        {
+          "item": "f10_crowd_favor",
+          "attackDelta": -4,
+          "removeAbilities": [
+            "battle_roar"
+          ]
+        },
+        {
+          "item": "f10_arena_intel",
+          "defenseDelta": -6,
+          "removeAbilities": [
+            "quick_strike"
+          ]
+        },
+        {
+          "item": "f10_blood_sand_oath",
+          "hpDelta": -70,
+          "removeAbilities": [
+            "cleave"
+          ]
+        }
+      ]
+    },
+    "fleeScene": "floor10_final_gate",
+    "victoryScene": "floor10_clear_room"
+  },
+  "floor10_clear_room": {
+    "id": "floor10_clear_room",
+    "map": {
+      "x": 0,
+      "y": 119,
+      "name": "F10END",
+      "tag": "event",
+      "connections": [
+        "floor10_boss",
+        "the_end"
+      ]
+    },
+    "type": "event",
+    "title": "Floor 10 Clear - The Crowd Has No Verdict",
+    "text": "The Coliseum Below empties itself into silence. The Grand Arbiter is beaten, the crown is yours, and this is the end of the current arc. Whatever waits beneath this place will have to learn a new name for you.",
+    "choices": [
+      {
+        "text": "Stand alone in the coliseum. [FLOOR 10 COMPLETE]",
+        "nextScene": "the_end"
+      }
+    ]
+  },
+  "floor10_bout_1": {
+    "id": "floor10_bout_1",
+    "map": {
+      "x": -5,
+      "y": 116,
+      "name": "B1",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 1: Mirehand Korr",
+    "text": "The pit gates grind open for Bout 1. Mirehand Korr steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Mirehand Korr",
+      "hp": 255,
+      "attack": 47,
+      "defense": 17,
+      "xp": 284,
+      "goldReward": 84,
+      "loot": [
+        "f10_win_1",
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_bash",
+        "armor_break"
+      ],
+      "intro": "Mirehand Korr answers the bell for Bout 1.",
+      "victoryText": "Bout 1 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_2": {
+    "id": "floor10_bout_2",
+    "map": {
+      "x": -4,
+      "y": 116,
+      "name": "B2",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 2: Velka of the Split Mask",
+    "text": "The pit gates grind open for Bout 2. Velka of the Split Mask steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Velka of the Split Mask",
+      "hp": 250,
+      "attack": 49,
+      "defense": 15,
+      "xp": 308,
+      "goldReward": 93,
+      "loot": [
+        "f10_win_2",
+        "small_potion"
+      ],
+      "type": "trickster",
+      "abilities": [
+        "quick_strike",
+        "dodge"
+      ],
+      "intro": "Velka of the Split Mask answers the bell for Bout 2.",
+      "victoryText": "Bout 2 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_3": {
+    "id": "floor10_bout_3",
+    "map": {
+      "x": -3,
+      "y": 116,
+      "name": "B3",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 3: Brassjaw Oren",
+    "text": "The pit gates grind open for Bout 3. Brassjaw Oren steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Brassjaw Oren",
+      "hp": 270,
+      "attack": 51,
+      "defense": 16,
+      "xp": 332,
+      "goldReward": 102,
+      "loot": [
+        "f10_win_3",
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "cleave",
+        "battle_roar"
+      ],
+      "intro": "Brassjaw Oren answers the bell for Bout 3.",
+      "victoryText": "Bout 3 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_4": {
+    "id": "floor10_bout_4",
+    "map": {
+      "x": -2,
+      "y": 116,
+      "name": "B4",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 4: Candle Knight",
+    "text": "The pit gates grind open for Bout 4. The Candle Knight steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "The Candle Knight",
+      "hp": 285,
+      "attack": 50,
+      "defense": 19,
+      "xp": 356,
+      "goldReward": 111,
+      "loot": [
+        "f10_win_4",
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "shield_up",
+        "burning_strike"
+      ],
+      "intro": "The Candle Knight answers the bell for Bout 4.",
+      "victoryText": "Bout 4 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_5": {
+    "id": "floor10_bout_5",
+    "map": {
+      "x": -1,
+      "y": 116,
+      "name": "B5",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 5: Sable Choir Twins",
+    "text": "The pit gates grind open for Bout 5. Sable Choir Twins steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Sable Choir Twins",
+      "hp": 280,
+      "attack": 53,
+      "defense": 16,
+      "xp": 380,
+      "goldReward": 120,
+      "loot": [
+        "f10_win_5",
+        "small_potion"
+      ],
+      "type": "trickster",
+      "abilities": [
+        "sweeping_attack",
+        "weaken"
+      ],
+      "intro": "Sable Choir Twins answers the bell for Bout 5.",
+      "victoryText": "Bout 5 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_6": {
+    "id": "floor10_bout_6",
+    "map": {
+      "x": 0,
+      "y": 116,
+      "name": "B6",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 6: Red Ledger Mara",
+    "text": "The pit gates grind open for Bout 6. Red Ledger Mara steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Red Ledger Mara",
+      "hp": 295,
+      "attack": 55,
+      "defense": 17,
+      "xp": 404,
+      "goldReward": 129,
+      "loot": [
+        "f10_win_6",
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "armor_break",
+        "quick_strike"
+      ],
+      "intro": "Red Ledger Mara answers the bell for Bout 6.",
+      "victoryText": "Bout 6 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_7": {
+    "id": "floor10_bout_7",
+    "map": {
+      "x": 1,
+      "y": 116,
+      "name": "B7",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 7: Old Thorn Brakus",
+    "text": "The pit gates grind open for Bout 7. Old Thorn Brakus steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Old Thorn Brakus",
+      "hp": 310,
+      "attack": 54,
+      "defense": 20,
+      "xp": 428,
+      "goldReward": 138,
+      "loot": [
+        "f10_win_7",
+        "small_potion"
+      ],
+      "type": "defensive",
+      "abilities": [
+        "poison_hit",
+        "shield_bash"
+      ],
+      "intro": "Old Thorn Brakus answers the bell for Bout 7.",
+      "victoryText": "Bout 7 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_8": {
+    "id": "floor10_bout_8",
+    "map": {
+      "x": 2,
+      "y": 116,
+      "name": "B8",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 8: Glass-Eye Toma",
+    "text": "The pit gates grind open for Bout 8. Glass-Eye Toma steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Glass-Eye Toma",
+      "hp": 305,
+      "attack": 57,
+      "defense": 18,
+      "xp": 452,
+      "goldReward": 147,
+      "loot": [
+        "f10_win_8",
+        "small_potion"
+      ],
+      "type": "trickster",
+      "abilities": [
+        "dodge",
+        "sweeping_attack"
+      ],
+      "intro": "Glass-Eye Toma answers the bell for Bout 8.",
+      "victoryText": "Bout 8 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_9": {
+    "id": "floor10_bout_9",
+    "map": {
+      "x": 3,
+      "y": 116,
+      "name": "B9",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 9: The Ninth Roar",
+    "text": "The pit gates grind open for Bout 9. The Ninth Roar steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "The Ninth Roar",
+      "hp": 330,
+      "attack": 59,
+      "defense": 18,
+      "xp": 476,
+      "goldReward": 156,
+      "loot": [
+        "f10_win_9",
+        "large_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "battle_roar",
+        "cleave",
+        "quick_strike"
+      ],
+      "intro": "The Ninth Roar answers the bell for Bout 9.",
+      "victoryText": "Bout 9 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
+  },
+  "floor10_bout_10": {
+    "id": "floor10_bout_10",
+    "map": {
+      "x": 4,
+      "y": 116,
+      "name": "B10",
+      "tag": "combat",
+      "connections": [
+        "floor10_arena_board"
+      ]
+    },
+    "type": "combat",
+    "title": "Floor 10 - Bout 10: Crownless Vey",
+    "text": "The pit gates grind open for Bout 10. Crownless Vey steps into the sand with a champion's patience and a killer's timing.",
+    "combat": {
+      "name": "Crownless Vey",
+      "hp": 350,
+      "attack": 61,
+      "defense": 20,
+      "xp": 500,
+      "goldReward": 165,
+      "loot": [
+        "f10_win_10",
+        "small_potion"
+      ],
+      "type": "aggressive",
+      "abilities": [
+        "crushing_blow",
+        "armor_break",
+        "sweeping_attack"
+      ],
+      "intro": "Crownless Vey answers the bell for Bout 10.",
+      "victoryText": "Bout 10 is yours. The board brands another win into your record."
+    },
+    "fleeScene": "floor10_arena_board",
+    "victoryScene": "floor10_arena_board"
   }
 }

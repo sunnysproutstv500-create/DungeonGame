@@ -945,8 +945,8 @@ console.log('\n── Map System ──');
   // All mapped scenes have map coordinates
   {
     const mappedIds = Object.keys(scenes).filter(id => scenes[id].map);
-    mappedIds.length === 180
-      ? ok(`scene map data: ${mappedIds.length}/180 scenes have map coordinates`)
+    mappedIds.length === 195
+      ? ok(`scene map data: ${mappedIds.length}/195 scenes have map coordinates`)
       : fail('scene map data count', `got ${mappedIds.length}: ${mappedIds.join(', ')}`);
   }
 
@@ -2694,6 +2694,122 @@ console.log('\n── Floor 1 Expansion ──');
       : fail('runtime Floor 9 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
   }
 
+  // Floor 10: The Coliseum Below
+  {
+    [
+      'f10_win_1',
+      'f10_win_2',
+      'f10_win_3',
+      'f10_win_4',
+      'f10_win_5',
+      'f10_win_6',
+      'f10_win_7',
+      'f10_win_8',
+      'f10_win_9',
+      'f10_win_10',
+      'f10_crowd_favor',
+      'f10_arena_intel',
+      'f10_blood_sand_oath',
+      'grand_arbiter_crown',
+    ].forEach(itemId => {
+      items[itemId]
+        ? ok(`floor10 item exists: ${itemId}`)
+        : fail(`floor10 item missing: ${itemId}`);
+    });
+
+    const safe = scenes['floor10_coliseum_antechamber'];
+    safe?.map?.tag === 'safe' && /Coliseum Below|10 wins|Grand Arbiter/i.test(safe?.text || '')
+      ? ok('floor10_coliseum_antechamber: safe start introduces the coliseum circuit')
+      : fail('floor10_coliseum_antechamber missing safe intro', JSON.stringify(safe));
+
+    (safe?.choices || []).some(choice => choice.nextScene === 'floor10_arena_board')
+      ? ok('floor10_coliseum_antechamber: opens the Arena Board')
+      : fail('floor10_coliseum_antechamber arena board choice missing', JSON.stringify(safe?.choices));
+
+    const boutRooms = Array.from({ length: 10 }, (_, index) => `floor10_bout_${index + 1}`);
+    const floor10Rooms = ['floor10_coliseum_antechamber', 'floor10_arena_board', ...boutRooms, 'floor10_final_gate', 'floor10_boss', 'floor10_clear_room'];
+    floor10Rooms.every(id => scenes[id])
+      ? ok('floor10 coliseum below: safe room, board, ten bouts, gate, boss, and clear room exist')
+      : fail('floor10 coliseum below missing rooms', floor10Rooms.filter(id => !scenes[id]).join(', '));
+
+    boutRooms.every((sceneId, index) => scenes[sceneId]?.combat?.loot?.includes(`f10_win_${index + 1}`) && scenes[sceneId]?.victoryScene === 'floor10_arena_board')
+      ? ok('floor10 coliseum below: each mini-boss bout awards a unique Coliseum Win and returns to board')
+      : fail('floor10 bout rewards missing', JSON.stringify(boutRooms.map((sceneId, index) => ({ sceneId, win: `f10_win_${index + 1}`, loot: scenes[sceneId]?.combat?.loot, victoryScene: scenes[sceneId]?.victoryScene }))));
+
+    const board = scenes['floor10_arena_board'];
+    boutRooms.every(sceneId => (board?.choices || []).some(choice => choice.nextScene === sceneId))
+      ? ok('floor10 arena board: offers all ten mini-boss bouts')
+      : fail('floor10 arena board bout choices missing', JSON.stringify(board?.choices));
+
+    ['f10_crowd_favor', 'f10_arena_intel', 'f10_blood_sand_oath'].every(itemId => (board?.choices || []).some(choice => choice.effect?.giveItem === itemId))
+      ? ok('floor10 arena board: between-fight choices award final-boss advantages')
+      : fail('floor10 arena board advantage choices missing', JSON.stringify(board?.choices));
+
+    const gateChoice = (scenes['floor10_final_gate']?.choices || []).find(choice => choice.nextScene === 'floor10_boss');
+    Array.from({ length: 10 }, (_, index) => `f10_win_${index + 1}`).every(itemId => gateChoice?.requires?.items?.includes(itemId))
+      ? ok('floor10 final gate: requires all ten Coliseum Wins')
+      : fail('floor10 final gate requirements missing', JSON.stringify(gateChoice));
+
+    const boss = scenes['floor10_boss'];
+    boss?.map?.tag === 'boss' &&
+      boss.combat?.name === 'The Grand Arbiter' &&
+      boss.combat?.loot?.includes('grand_arbiter_crown') &&
+      boss.victoryScene === 'floor10_clear_room'
+      ? ok('floor10 boss: Grand Arbiter drops unique crown and clears the coliseum')
+      : fail('floor10 boss definition missing', JSON.stringify(boss));
+
+    const advantageItems = (boss?.combat?.advantages || []).map(advantage => advantage.item);
+    ['f10_crowd_favor', 'f10_arena_intel', 'f10_blood_sand_oath'].every(itemId => advantageItems.includes(itemId))
+      ? ok('floor10 boss: coliseum advantages weaken the Grand Arbiter')
+      : fail('floor10 boss advantages missing', JSON.stringify(boss?.combat?.advantages));
+
+    scenes['floor10_clear_room']?.choices?.some(choice => choice.nextScene === 'the_end') &&
+      /end of the current arc|Grand Arbiter|Coliseum/i.test(scenes['floor10_clear_room']?.text || '')
+      ? ok('floor10 clear room: ends the current arc after the Grand Arbiter')
+      : fail('floor10 clear room ending missing', scenes['floor10_clear_room']?.text);
+  }
+
+  {
+    function chooseByText(state, textPattern) {
+      const view = runtime.getView(state);
+      const index = view.choices.findIndex(choice => textPattern.test(choice.text));
+      if (index < 0) throw new Error(`Floor 10 choice not found: ${textPattern}`);
+      return runtime.dispatch(state, { type: 'choose_scene_option', index }).state;
+    }
+
+    function winCombat(state) {
+      let next = state;
+      for (let i = 0; i < 60 && runtime.getView(next).mode === 'combat'; i += 1) {
+        next = runtime.dispatch(next, { type: 'combat_attack' }).state;
+      }
+      return next;
+    }
+
+    let run = runtime.startNewRun({
+      name: 'ColiseumRunner',
+      playerPatch: { floor: 10, hp: 2600, maxHp: 2600, attack: 2600, defense: 260, gold: 1000 },
+    });
+    run.currentSceneId = 'floor10_coliseum_antechamber';
+
+    run = chooseByText(run, /Arena Board/);
+    run = chooseByText(run, /claim the crowd favor/);
+    run = chooseByText(run, /study the Arbiter/);
+    run = chooseByText(run, /swear on the blood sand/);
+    for (let i = 1; i <= 10; i += 1) {
+      run = chooseByText(run, new RegExp(`Bout ${i}:`));
+      run = winCombat(run);
+    }
+    run = chooseByText(run, /Final Gate/);
+    run = chooseByText(run, /Present 10 Coliseum Wins/);
+    run = winCombat(run);
+
+    run.currentSceneId === 'floor10_clear_room' &&
+      Array.from({ length: 10 }, (_, index) => `f10_win_${index + 1}`).every(itemId => run.player.inventory.includes(itemId)) &&
+      ['f10_crowd_favor', 'f10_arena_intel', 'f10_blood_sand_oath', 'grand_arbiter_crown'].every(itemId => run.player.inventory.includes(itemId))
+      ? ok('runtime Floor 10 full playthrough: ten mini-boss wins unlock and clear the Grand Arbiter')
+      : fail('runtime Floor 10 full playthrough failed', JSON.stringify({ scene: run.currentSceneId, inventory: run.player.inventory }));
+  }
+
   {
     const marketState = runtime.startNewRun({
       name: 'MarketPolishProbe',
@@ -3390,6 +3506,7 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
   const f7 = generateFloor(7);
   const f8 = generateFloor(8);
   const f9 = generateFloor(9);
+  const f10 = generateFloor(10);
 
   f1 && f1.floor === 1 && Array.isArray(f1.excludedRooms)
     ? ok('generateFloor: floor 1 uses real generator')
@@ -3427,9 +3544,13 @@ console.log('\n── Section 16: Run Lifecycle / Floor Progression ──');
     ? ok('generateFloor: floor 9 uses real Root Cathedral generator')
     : fail('generateFloor floor 9 real config', JSON.stringify(f9));
 
-  MAX_IMPLEMENTED_FLOOR === 9
-    ? ok('run lifecycle: max implemented floor includes Floor 9')
-    : fail('MAX_IMPLEMENTED_FLOOR should be 9', `got ${MAX_IMPLEMENTED_FLOOR}`);
+  f10 && f10.floor === 10 && f10.placeholder !== true && Array.isArray(f10.excludedRooms) && f10.safeRoom === 'floor10_coliseum_antechamber'
+    ? ok('generateFloor: floor 10 uses real Coliseum Below generator')
+    : fail('generateFloor floor 10 real config', JSON.stringify(f10));
+
+  MAX_IMPLEMENTED_FLOOR === 10
+    ? ok('run lifecycle: max implemented floor includes Floor 10')
+    : fail('MAX_IMPLEMENTED_FLOOR should be 10', `got ${MAX_IMPLEMENTED_FLOOR}`);
 }
 
 {
@@ -3830,18 +3951,48 @@ console.log('\n── Section 17: Mobile Runtime API ──');
   floor9FinishState.currentSceneId = 'the_end';
   const floor9FinishResult = runtime.dispatch(floor9FinishState, { type: 'complete_floor' });
   const floor9Event = floor9FinishResult.events.find(event => event.type === 'floor_completed');
-  const floor9RunEndEvent = floor9FinishResult.events.find(event => event.type === 'run_ended');
 
   floor9Event?.completedFloor === 9 && floor9Event?.nextFloor === 10 && floor9Event?.currencyReward === 135
     ? ok('runtime.complete_floor: Floor 9 completion awards Floor 9 meta event')
     : fail('runtime.complete_floor Floor 9 reward event', JSON.stringify(floor9FinishResult.events));
 
-  floor9FinishResult.state.player.runEnded === true &&
-    floor9FinishResult.state.player.currentRunActive === false &&
-    floor9RunEndEvent?.summary?.reason === 'floor_under_construction' &&
-    /Floor 10/i.test(floor9RunEndEvent.summary.endingReached || '')
-    ? ok('runtime.complete_floor: Floor 9 handoff ends at Floor 10 under construction')
+  floor9FinishResult.state.currentSceneId === 'floor10_coliseum_antechamber' &&
+    floor9FinishResult.state.floorConfig.placeholder !== true &&
+    floor9FinishResult.state.player.runEnded !== true
+    ? ok('runtime.complete_floor: Floor 9 handoff enters Floor 10 Coliseum Below')
     : fail('runtime.complete_floor Floor 9 handoff', JSON.stringify({ player: floor9FinishResult.state.player, events: floor9FinishResult.events }));
+
+  const floor10ObjectiveProbe = runtime.startNewRun({
+    name: 'Floor10Reader',
+    playerPatch: { floor: 10, inventory: ['f10_win_1', 'f10_win_2', 'f10_win_3', 'f10_win_4'] },
+  });
+  floor10ObjectiveProbe.currentSceneId = 'floor10_arena_board';
+  const floor10ObjectiveView = runtime.getView(floor10ObjectiveProbe);
+
+  floor10ObjectiveView.objective?.route === 'coliseum-below' &&
+    floor10ObjectiveView.objective.goal === 'Win Coliseum Bouts 4/10' &&
+    floor10ObjectiveView.objective.missing.includes('Bout 5 Win') &&
+    floor10ObjectiveView.objective.missing.includes('Bout 10 Win')
+    ? ok('runtime Floor 10 objective: tracks Coliseum Wins before the final gate')
+    : fail('runtime Floor 10 objective missing', JSON.stringify(floor10ObjectiveView.objective));
+
+  const floor10FinishState = runtime.startNewRun({ name: 'Floor10Finisher' });
+  floor10FinishState.player.floor = 10;
+  floor10FinishState.currentSceneId = 'the_end';
+  const floor10FinishResult = runtime.dispatch(floor10FinishState, { type: 'complete_floor' });
+  const floor10Event = floor10FinishResult.events.find(event => event.type === 'floor_completed');
+  const floor10RunEndEvent = floor10FinishResult.events.find(event => event.type === 'run_ended');
+
+  floor10Event?.completedFloor === 10 && floor10Event?.nextFloor === 11 && floor10Event?.currencyReward === 150
+    ? ok('runtime.complete_floor: Floor 10 completion awards Floor 10 meta event')
+    : fail('runtime.complete_floor Floor 10 reward event', JSON.stringify(floor10FinishResult.events));
+
+  floor10FinishResult.state.player.runEnded === true &&
+    floor10FinishResult.state.player.currentRunActive === false &&
+    floor10RunEndEvent?.summary?.reason === 'floor_under_construction' &&
+    /Floor 11/i.test(floor10RunEndEvent.summary.endingReached || '')
+    ? ok('runtime.complete_floor: Floor 10 handoff ends at Floor 11 under construction')
+    : fail('runtime.complete_floor Floor 10 handoff', JSON.stringify({ player: floor10FinishResult.state.player, events: floor10FinishResult.events }));
 }
 
 console.log('\n── Section 18: Runtime Combat Actions ──');

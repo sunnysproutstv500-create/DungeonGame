@@ -80,6 +80,19 @@ const PROGRESS_ITEMS = {
   f9_glass_boon: 'Glass Boon secured for the Buried Saint fight.',
   f9_blood_boon: 'Blood Boon secured for the Buried Saint fight.',
   f9_ash_boon: 'Ash Boon secured for the Buried Saint fight.',
+  f10_win_1: 'Coliseum Win 1 recorded.',
+  f10_win_2: 'Coliseum Win 2 recorded.',
+  f10_win_3: 'Coliseum Win 3 recorded.',
+  f10_win_4: 'Coliseum Win 4 recorded.',
+  f10_win_5: 'Coliseum Win 5 recorded.',
+  f10_win_6: 'Coliseum Win 6 recorded.',
+  f10_win_7: 'Coliseum Win 7 recorded.',
+  f10_win_8: 'Coliseum Win 8 recorded.',
+  f10_win_9: 'Coliseum Win 9 recorded.',
+  f10_win_10: 'Coliseum Win 10 recorded.',
+  f10_crowd_favor: 'Crowd Favor secured for the Grand Arbiter fight.',
+  f10_arena_intel: 'Arena Intel secured for the Grand Arbiter fight.',
+  f10_blood_sand_oath: 'Blood Sand Oath secured for the Grand Arbiter fight.',
 };
 
 function getProgressMessageForItem(itemId) {
@@ -307,6 +320,19 @@ function buildObjective(player) {
     return {
       route: 'root-cathedral',
       goal: ready ? 'Challenge the Buried Saint' : `Awaken Ancient Roots ${completed}/3`,
+      missing,
+      ready,
+    };
+  }
+
+  if ((player.floor || 1) === 10) {
+    const required = Array.from({ length: 10 }, (_, index) => [`f10_win_${index + 1}`, `Bout ${index + 1} Win`]);
+    const missing = required.filter(([itemId]) => !hasItem(player, itemId)).map(([, label]) => label);
+    const completed = required.length - missing.length;
+    const ready = missing.length === 0;
+    return {
+      route: 'coliseum-below',
+      goal: ready ? 'Challenge the Grand Arbiter' : `Win Coliseum Bouts ${completed}/10`,
       missing,
       ready,
     };

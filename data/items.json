@@ -797,5 +797,103 @@
     "type": "relic",
     "effect": "none",
     "value": 0
+  },
+  "f10_win_1": {
+    "id": "f10_win_1",
+    "name": "Coliseum Win 1",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_2": {
+    "id": "f10_win_2",
+    "name": "Coliseum Win 2",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_3": {
+    "id": "f10_win_3",
+    "name": "Coliseum Win 3",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_4": {
+    "id": "f10_win_4",
+    "name": "Coliseum Win 4",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_5": {
+    "id": "f10_win_5",
+    "name": "Coliseum Win 5",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_6": {
+    "id": "f10_win_6",
+    "name": "Coliseum Win 6",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_7": {
+    "id": "f10_win_7",
+    "name": "Coliseum Win 7",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_8": {
+    "id": "f10_win_8",
+    "name": "Coliseum Win 8",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_9": {
+    "id": "f10_win_9",
+    "name": "Coliseum Win 9",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_win_10": {
+    "id": "f10_win_10",
+    "name": "Coliseum Win 10",
+    "type": "key_item",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_crowd_favor": {
+    "id": "f10_crowd_favor",
+    "name": "Crowd Favor",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_arena_intel": {
+    "id": "f10_arena_intel",
+    "name": "Arena Intel",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "f10_blood_sand_oath": {
+    "id": "f10_blood_sand_oath",
+    "name": "Blood Sand Oath",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
+  },
+  "grand_arbiter_crown": {
+    "id": "grand_arbiter_crown",
+    "name": "Grand Arbiter Crown",
+    "type": "relic",
+    "effect": "none",
+    "value": 0
   }
 }
