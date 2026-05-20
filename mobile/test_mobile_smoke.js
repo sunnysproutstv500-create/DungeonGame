@@ -23,6 +23,14 @@ function makeStorage() {
 
 const storage = makeStorage();
 const appSource = fs.readFileSync(path.join(__dirname, 'App.js'), 'utf8');
+const appConfig = JSON.parse(fs.readFileSync(path.join(__dirname, 'app.json'), 'utf8'));
+const cliSource = fs.readFileSync(path.join(__dirname, '..', 'index.js'), 'utf8');
+assert(appConfig.expo.name === 'Trial of Ten Worlds', 'smoke: Expo app name uses new story title');
+assert(appSource.includes('Trial of Ten Worlds'), 'smoke: mobile home screen uses new story title');
+assert(appSource.includes('Ten worlds. One survivor.'), 'smoke: mobile home screen uses new tagline');
+assert(!appSource.includes('Dungeon Depths'), 'smoke: mobile app no longer uses old title');
+assert(cliSource.includes('TRIAL OF TEN WORLDS'), 'smoke: terminal intro uses new story title');
+assert(cliSource.includes('Ten worlds. One survivor.'), 'smoke: terminal intro uses new tagline');
 assert(appSource.includes('function RunSetupPanel'), 'smoke: start screen uses a combined Run Setup panel');
 assert(appSource.includes('function CollapsiblePanel'), 'smoke: run utility sections are collapsible');
 assert(appSource.includes('function HomeScreen'), 'smoke: app has a dedicated game home screen');

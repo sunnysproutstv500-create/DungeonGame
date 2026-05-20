@@ -1,7 +1,7 @@
 {
   "name": "litrpg-engine",
   "version": "1.0.0",
-  "description": "A text-based LitRPG dungeon engine",
+  "description": "A text-based interdimensional LitRPG trial engine",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

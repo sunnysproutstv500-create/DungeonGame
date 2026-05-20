@@ -276,10 +276,10 @@ function finishRun(player, options = {}) {
 
 function main() {
   console.log('\n' + '═'.repeat(60));
-  console.log('  DUNGEON DEPTHS — INTERDIMENSIONAL COMPETITION');
+  console.log('  TRIAL OF TEN WORLDS');
   console.log('═'.repeat(60));
   console.log(`
-  Ten worlds. One dungeon. Ten floors. Two survivors.
+  Ten worlds. One survivor.
 
   You are Earth's representative — the last hope of your world.
   The Overseers have built a gauntlet to determine which worlds
@@ -569,7 +569,7 @@ function main() {
     }
   }
 
-  console.log('\n  Thanks for playing Dungeon Depths!\n');
+  console.log('\n  Thanks for playing Trial of Ten Worlds!\n');
 }
 
 main();

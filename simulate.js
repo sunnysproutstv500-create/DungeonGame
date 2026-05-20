@@ -98,7 +98,7 @@ let currentSceneId = 'start_room';
 const visitCount = {};
 
 console.log('\n' + '='.repeat(60));
-console.log('  DUNGEON DEPTHS — Full Playthrough Simulation');
+console.log('  TRIAL OF TEN WORLDS - Full Playthrough Simulation');
 console.log('='.repeat(60));
 console.log('  Player: Kael | Mode: smart-play AI\n');
 

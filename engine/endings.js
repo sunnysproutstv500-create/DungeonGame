@@ -100,7 +100,7 @@ function showEnding(type) {
   }
 
   console.log(LINE);
-  console.log('\n  Thanks for playing DUNGEON DEPTHS — Interdimensional Competition\n');
+  console.log('\n  Thanks for playing TRIAL OF TEN WORLDS\n');
 }
 
 module.exports = { showEnding, determineEnding };

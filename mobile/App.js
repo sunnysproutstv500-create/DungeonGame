@@ -693,9 +693,9 @@ function HomeScreen({ meta, savedRun, onStartNew, onContinue }) {
     <View style={styles.homeScreen}>
       <View style={styles.homeFrame}>
         <View style={styles.homeHero}>
-          <Text style={styles.homeEyebrow}>LitRPG Expedition</Text>
-          <Text style={styles.homeTitle}>Dungeon Depths</Text>
-          <Text style={styles.homeSubtitle}>Descend, adapt, and bring something back.</Text>
+          <Text style={styles.homeEyebrow}>Earth-001 Enters the Gauntlet</Text>
+          <Text style={styles.homeTitle}>Trial of Ten Worlds</Text>
+          <Text style={styles.homeSubtitle}>Ten worlds. One survivor.</Text>
         </View>
 
         <View style={styles.homeStatusRow}>

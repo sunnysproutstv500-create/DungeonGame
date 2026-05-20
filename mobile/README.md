@@ -1,6 +1,6 @@
-# Dungeon Depths Mobile
+# Trial of Ten Worlds Mobile
 
-Expo shell for the text-based LitRPG runtime.
+Expo shell for the text-based interdimensional LitRPG runtime.
 
 ## Commands
 

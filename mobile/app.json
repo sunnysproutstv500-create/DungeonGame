@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Dungeon Depths",
-    "slug": "dungeon-depths",
+    "name": "Trial of Ten Worlds",
+    "slug": "trial-of-ten-worlds",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -9,11 +9,11 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.jojen.dungeondepths",
+      "bundleIdentifier": "com.jojen.trialoftenworlds",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.jojen.dungeondepths",
+      "package": "com.jojen.trialoftenworlds",
       "adaptiveIcon": {
         "backgroundColor": "#f5f1e8"
       }
