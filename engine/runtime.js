@@ -385,6 +385,41 @@ function sceneBelongsToFloor(id, floor) {
   return !/^floor\d+_/.test(id);
 }
 
+function uniqueValues(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function describeKnownRewards(scene) {
+  const rewards = [];
+  if (scene?.combat) {
+    if (scene.combat.xp) rewards.push(`${scene.combat.xp} XP`);
+    if (scene.combat.goldReward) rewards.push(`${scene.combat.goldReward} gold`);
+    for (const itemId of scene.combat.loot || []) rewards.push(getItemName(itemId));
+  }
+  for (const choice of scene?.choices || []) {
+    const effect = choice.effect || {};
+    if (effect.giveItem) rewards.push(getItemName(effect.giveItem));
+    if (Array.isArray(effect.giveItems)) rewards.push(...effect.giveItems.map(getItemName));
+    if (effect.giveXP) rewards.push(`${effect.giveXP} XP`);
+    if (effect.giveGold) rewards.push(`${effect.giveGold} gold`);
+    if (effect.completeContract) rewards.push('contract credit');
+  }
+  return uniqueValues(rewards);
+}
+
+function describeKnownRequirements(scene) {
+  const requirements = [];
+  for (const choice of scene?.choices || []) {
+    if (choice.requires?.item) requirements.push(getItemName(choice.requires.item));
+    if (Array.isArray(choice.requires?.items)) requirements.push(...choice.requires.items.map(getItemName));
+    if (choice.requires?.route) requirements.push(`${choice.requires.route} route`);
+    if (choice.condition?.contractsCompleted !== undefined) requirements.push(`${choice.condition.contractsCompleted}/5 contracts`);
+    if (choice.condition?.gold !== undefined) requirements.push(`${choice.condition.gold} gold`);
+    if (choice.condition?.level !== undefined) requirements.push(`level ${choice.condition.level}`);
+  }
+  return uniqueValues(requirements);
+}
+
 function buildMapProgress(state) {
   const floor = state.player.floor || 1;
   const mapState = getFloorMap(state.player, floor);
@@ -396,21 +431,36 @@ function buildMapProgress(state) {
   }
 
   const totalRooms = Object.entries(SCENES).filter(([id, scene]) => scene.map && sceneBelongsToFloor(id, floor)).length;
-  const rooms = [...discovered]
+  const explored = [...visited].filter(id => discovered.has(id) || id === state.currentSceneId);
+  const rooms = explored
     .map(id => {
       const scene = SCENES[id];
       if (!scene?.map) return null;
+      const knownConnections = (scene.map.connections || [])
+        .filter(connId => visited.has(connId) && SCENES[connId]?.map && sceneBelongsToFloor(connId, floor))
+        .map(connId => ({
+          id: connId,
+          name: SCENES[connId].title,
+          shortName: SCENES[connId].map.name || connId,
+          tag: SCENES[connId].map.tag || 'event',
+        }));
       return {
         id,
         name: scene.title,
         shortName: scene.map.name || id,
         tag: scene.map.tag || 'event',
+        x: scene.map.x,
+        y: scene.map.y,
         visited: visited.has(id),
         cleared: state.player.clearedRooms?.[id] === true,
         current: id === state.currentSceneId,
+        knownConnections,
+        knownRewards: describeKnownRewards(scene),
+        knownRequirements: describeKnownRequirements(scene),
       };
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => (a.y - b.y) || (a.x - b.x) || a.name.localeCompare(b.name));
 
   return {
     floor,

@@ -73,6 +73,11 @@ assert(appSource.includes('function ContractBadge'), 'smoke: run screen renders 
 assert(appSource.includes('view.contractProgress'), 'smoke: contract badge comes from runtime view');
 assert(appSource.includes('Contracts'), 'smoke: contract badge labels contract progress');
 assert(appSource.includes('function MapProgressPanel'), 'smoke: run screen renders map progress panel');
+assert(appSource.includes('selectedMapRoomId'), 'smoke: map supports selecting explored rooms for detail');
+assert(appSource.includes('styles.mapNodeCanvas'), 'smoke: map renders explored rooms as a full node canvas');
+assert(appSource.includes('knownConnections'), 'smoke: map room details show known connections');
+assert(appSource.includes('knownRewards'), 'smoke: map room details show known rewards');
+assert(appSource.includes('knownRequirements'), 'smoke: map room details show locked requirements');
 assert(appSource.includes('Risk:'), 'smoke: choice rows expose risk labels');
 assert(appSource.includes('Reward:'), 'smoke: choice rows expose reward labels');
 

@@ -4812,6 +4812,32 @@ console.log('\n── Section 18: Runtime Combat Actions ──');
 }
 
 {
+  const state = runtime.startNewRun({
+    name: 'DetailedMapReader',
+    playerPatch: { floor: 10, inventory: ['f10_win_1'] },
+  });
+  state.currentSceneId = 'floor10_arena_board';
+  state.player.mapData = {
+    10: {
+      discovered: ['floor10_coliseum_antechamber', 'floor10_arena_board', 'floor10_bout_1', 'floor10_bout_7', 'floor10_final_gate'],
+      visited: ['floor10_coliseum_antechamber', 'floor10_arena_board', 'floor10_bout_1', 'floor10_final_gate'],
+    },
+  };
+  state.player.clearedRooms = { floor10_bout_1: true };
+  const view = runtime.getView(state);
+  const bout1 = view.mapProgress.rooms.find(room => room.id === 'floor10_bout_1');
+  const finalGate = view.mapProgress.rooms.find(room => room.id === 'floor10_final_gate');
+
+  !view.mapProgress.rooms.some(room => room.id === 'floor10_bout_7') &&
+    bout1?.cleared === true &&
+    bout1?.knownRewards?.some(reward => /Coliseum Win 1/.test(reward)) &&
+    bout1?.knownConnections?.some(connection => connection.id === 'floor10_arena_board') &&
+    finalGate?.knownRequirements?.some(requirement => /Coliseum Win 10/.test(requirement))
+    ? ok('runtime map progress: hides unexplored rooms and exposes explored room details')
+    : fail('runtime detailed map progress', JSON.stringify(view.mapProgress));
+}
+
+{
   const baseState = runtime.startNewRun({
     name: 'PatternReader',
     playerPatch: { floor: 2, inventory: [] },

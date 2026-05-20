@@ -397,24 +397,93 @@ function ContractBadge({ contractProgress }) {
 }
 
 function MapProgressPanel({ mapProgress }) {
+  const [selectedMapRoomId, setSelectedMapRoomId] = useState(null);
   if (!mapProgress) return null;
-  const visibleRooms = (mapProgress.rooms || []).filter(room => room.visited || room.current).slice(-6);
+  const exploredRooms = (mapProgress.rooms || []).filter(room => room.visited || room.current);
+  const currentRoom = exploredRooms.find(room => room.current);
+  const selectedMapRoom =
+    exploredRooms.find(room => room.id === selectedMapRoomId) ||
+    currentRoom ||
+    exploredRooms[0] ||
+    null;
+  const hiddenCount = Math.max(0, (mapProgress.discoveredCount || 0) - exploredRooms.length);
+  const tagIcon = tag => {
+    if (tag === 'safe') return 'S';
+    if (tag === 'boss') return 'B';
+    if (tag === 'combat') return '!';
+    if (tag === 'treasure') return '$';
+    if (tag === 'secret') return '?';
+    return '*';
+  };
   return (
     <CollapsiblePanel title="Map" count={`${mapProgress.visitedCount}/${mapProgress.totalRooms}`} initiallyOpen={false}>
       <View style={styles.mapSummary}>
         <Text style={styles.mapSummaryText}>Current: {mapProgress.currentRoom}</Text>
         <Text style={styles.mapSummaryText}>
-          Seen {mapProgress.discoveredCount} | Visited {mapProgress.visitedCount}
+          Explored {exploredRooms.length}/{mapProgress.totalRooms} | Hidden {hiddenCount}
         </Text>
       </View>
-      <View style={styles.mapRoomList}>
-        {visibleRooms.map(room => (
-          <View key={room.id} style={[styles.mapRoomRow, room.current && styles.currentMapRoom]}>
-            <Text style={styles.mapRoomName}>{room.shortName}</Text>
-            <Text style={styles.mapRoomMeta}>{room.current ? 'Here' : room.cleared ? 'Cleared' : room.tag}</Text>
-          </View>
-        ))}
+      <View style={styles.mapNodeCanvas}>
+        {exploredRooms.map(room => {
+          const selected = selectedMapRoom?.id === room.id;
+          return (
+            <TouchableOpacity
+              accessibilityRole="button"
+              key={room.id}
+              onPress={() => setSelectedMapRoomId(room.id)}
+              style={[
+                styles.mapNode,
+                room.current && styles.currentMapNode,
+                room.cleared && styles.clearedMapNode,
+                selected && styles.selectedMapNode,
+              ]}
+            >
+              <Text style={styles.mapNodeIcon}>{tagIcon(room.tag)}</Text>
+              <Text style={styles.mapNodeName}>{room.shortName}</Text>
+              <Text style={styles.mapNodeMeta}>{room.current ? 'Here' : room.cleared ? 'Cleared' : room.tag}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
+      {selectedMapRoom && (
+        <View style={styles.mapDetailPanel}>
+          <View style={styles.mapDetailHeader}>
+            <Text style={styles.mapDetailTitle}>{selectedMapRoom.name}</Text>
+            <Text style={styles.mapDetailPill}>{selectedMapRoom.current ? 'Current' : selectedMapRoom.cleared ? 'Cleared' : selectedMapRoom.tag}</Text>
+          </View>
+          <Text style={styles.mapDetailLine}>Type: {selectedMapRoom.tag}</Text>
+          <Text style={styles.mapDetailLine}>Known connections:</Text>
+          <View style={styles.mapChipRow}>
+            {(selectedMapRoom.knownConnections || []).length > 0 ? (
+              selectedMapRoom.knownConnections.map(connection => (
+                <Text key={connection.id} style={styles.mapChip}>{connection.shortName}</Text>
+              ))
+            ) : (
+              <Text style={styles.mapMutedText}>None explored yet</Text>
+            )}
+          </View>
+          <Text style={styles.mapDetailLine}>Known rewards:</Text>
+          <View style={styles.mapChipRow}>
+            {(selectedMapRoom.knownRewards || []).length > 0 ? (
+              selectedMapRoom.knownRewards.map(reward => (
+                <Text key={reward} style={styles.mapChip}>{reward}</Text>
+              ))
+            ) : (
+              <Text style={styles.mapMutedText}>No known rewards</Text>
+            )}
+          </View>
+          <Text style={styles.mapDetailLine}>Known requirements:</Text>
+          <View style={styles.mapChipRow}>
+            {(selectedMapRoom.knownRequirements || []).length > 0 ? (
+              selectedMapRoom.knownRequirements.map(requirement => (
+                <Text key={requirement} style={styles.mapChip}>{requirement}</Text>
+              ))
+            ) : (
+              <Text style={styles.mapMutedText}>None known</Text>
+            )}
+          </View>
+        </View>
+      )}
     </CollapsiblePanel>
   );
 }
@@ -1461,6 +1530,114 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '800',
+  },
+  mapNodeCanvas: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  mapNode: {
+    width: '31%',
+    minWidth: 86,
+    minHeight: 82,
+    justifyContent: 'space-between',
+    gap: 4,
+    padding: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#c8b998',
+    backgroundColor: '#fffaf0',
+  },
+  currentMapNode: {
+    borderColor: '#2f4f3d',
+    backgroundColor: '#e3eadb',
+  },
+  clearedMapNode: {
+    borderColor: '#9cad76',
+  },
+  selectedMapNode: {
+    borderColor: '#7c4d1e',
+    backgroundColor: '#f4e4c7',
+  },
+  mapNodeIcon: {
+    color: '#56645c',
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '900',
+  },
+  mapNodeName: {
+    color: '#1f241e',
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '900',
+  },
+  mapNodeMeta: {
+    color: '#56645c',
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  mapDetailPanel: {
+    gap: 8,
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#c8b998',
+    backgroundColor: '#fffaf0',
+  },
+  mapDetailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  mapDetailTitle: {
+    flex: 1,
+    color: '#1f241e',
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '900',
+  },
+  mapDetailPill: {
+    color: '#3d3327',
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    borderRadius: 6,
+    backgroundColor: '#ebe2cf',
+    overflow: 'hidden',
+  },
+  mapDetailLine: {
+    color: '#3d3327',
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '800',
+  },
+  mapChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  mapChip: {
+    color: '#1f241e',
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '800',
+    paddingVertical: 4,
+    paddingHorizontal: 7,
+    borderRadius: 6,
+    backgroundColor: '#e8efd9',
+    overflow: 'hidden',
+  },
+  mapMutedText: {
+    color: '#726958',
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '700',
   },
   mapRoomList: {
     gap: 6,
