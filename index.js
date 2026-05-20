@@ -191,7 +191,7 @@ function upgradeMenu() {
   console.log('\n  -= UPGRADE SHOP =-');
 
   while (true) {
-    console.log(`\n  Currency: ${meta.currency}`);
+    console.log(`\n  Echoes: ${meta.currency}`);
     UPGRADES.forEach((u, i) =>
       console.log(`  ${i + 1}) ${u.label}  (cost: ${u.cost})  [owned: ${meta.upgrades[u.stat]}]`)
     );
@@ -208,13 +208,13 @@ function upgradeMenu() {
 
     if (idx >= 0 && idx < UPGRADES.length) {
       const u = UPGRADES[idx];
-      if (meta.currency < u.cost) { console.log(`  Not enough currency. (need ${u.cost})`); continue; }
+      if (meta.currency < u.cost) { console.log(`  Not enough Echoes. (need ${u.cost})`); continue; }
       meta.currency -= u.cost; meta.upgrades[u.stat] += 1; saveMeta(meta);
       console.log(`  Purchased: ${u.label}`);
     } else if (idx >= offset && idx < offset + ABILITY_UNLOCKS.length) {
       const a = ABILITY_UNLOCKS[idx - offset];
       if (meta.unlockedAbilities.includes(a.id)) { console.log('  Already unlocked.'); continue; }
-      if (meta.currency < a.cost) { console.log(`  Not enough currency. (need ${a.cost})`); continue; }
+      if (meta.currency < a.cost) { console.log(`  Not enough Echoes. (need ${a.cost})`); continue; }
       meta.currency -= a.cost; meta.unlockedAbilities.push(a.id); saveMeta(meta);
       console.log(`  Unlocked: ${a.label}`);
     } else {
@@ -369,7 +369,7 @@ function main() {
 
       console.log(formatFloorTransition(result));
       console.log(`  World Rank: #${player.worldRank}  |  Run Score: ${player.runScore}`);
-      console.log(`  Floor clear currency: +${result.currencyReward} (Total: ${meta.currency})\n`);
+      console.log(`  Floor clear Echoes: +${result.currencyReward} (Total: ${meta.currency})\n`);
 
       floorConfig = generateFloor(player.floor);
       saveGame({ player, currentSceneId, floorConfig });
@@ -440,7 +440,7 @@ function main() {
       if (result === 'defeat') {
         const earned = player.level * 5;
         const meta = addCurrency(earned);
-        console.log(`  You earned ${earned} currency. (Total: ${meta.currency})`);
+        console.log(`  You earned ${earned} Echoes. (Total: ${meta.currency})`);
         player.worldRank = Math.min(10, player.worldRank + 2);
         currentSceneId = 'game_over';
         player.hp = 0;

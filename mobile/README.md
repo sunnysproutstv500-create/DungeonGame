@@ -47,8 +47,8 @@ npm.cmd run preview:web
 The app imports the shared engine runtime from `../engine/runtime.js`.
 
 Current mobile flow:
-- pre-run setup with character name and meta points
-- persistent meta points
+- pre-run setup with character name and Echoes
+- persistent Echoes
 - buy HP/ATK/DEF/PER upgrades
 - choose a class before starting a run
 - choose up to two unlocked abilities before starting a run

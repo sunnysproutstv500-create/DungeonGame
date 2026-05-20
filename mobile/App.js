@@ -95,9 +95,9 @@ function StatusRow({ label, effects }) {
 function MetaPanel({ meta, onBuyUpgrade }) {
   return (
     <View style={styles.metaPanel}>
-      <Text style={styles.metaTitle}>Meta Progress</Text>
+      <Text style={styles.metaTitle}>Echo Progress</Text>
       <View style={styles.metaGrid}>
-        <Stat label="POINTS" value={meta.currency} />
+        <Stat label="ECHOES" value={meta.currency} />
         <Stat label="HP+" value={meta.upgrades.hp} />
         <Stat label="ATK+" value={meta.upgrades.atk} />
         <Stat label="DEF+" value={meta.upgrades.def} />
@@ -135,7 +135,7 @@ function AbilityUnlockPanel({ meta, options, onBuyAbility }) {
     <View style={styles.setupPanel}>
       <View style={styles.setupPanelHeader}>
         <Text style={styles.metaTitle}>Ability Unlocks</Text>
-        <Text style={styles.setupCount}>{meta.currency} points</Text>
+        <Text style={styles.setupCount}>{meta.currency} Echoes</Text>
       </View>
       <View style={styles.itemList}>
         {options.unlocks.map(ability => {
@@ -275,10 +275,10 @@ function formatEvent(event) {
   if (event.type === 'gear_trait' && event.traitId === 'flee_bonus') return `${event.name}: improved escape`;
   if (event.type === 'run_ended') return 'Run ended';
   if (event.type === 'floor_completed') return `Floor ${event.completedFloor} cleared`;
-  if (event.type === 'meta_awarded') return `Meta points +${event.amount}`;
+  if (event.type === 'meta_awarded') return `Echoes +${event.amount}`;
   if (event.type === 'upgrade_purchased') return `Purchased ${event.stat.toUpperCase()}+`;
   if (event.type === 'ability_unlocked') return `Unlocked ${event.name || event.abilityId}`;
-  if (event.type === 'not_enough_currency') return 'Not enough meta points';
+  if (event.type === 'not_enough_currency') return 'Not enough Echoes';
   if (event.type === 'already_unlocked') return 'Ability already unlocked';
   if (event.type === 'ability_not_in_class') return 'Ability is not available for this class';
   if (event.type === 'save_created') return `Saved at ${event.scene}`;
@@ -700,7 +700,7 @@ function HomeScreen({ meta, savedRun, onStartNew, onContinue }) {
 
         <View style={styles.homeStatusRow}>
           <View style={styles.homeStatusChip}>
-            <Text style={styles.homeStatusLabel}>Meta Points</Text>
+            <Text style={styles.homeStatusLabel}>Echoes</Text>
             <Text style={styles.homeStatusValue}>{meta.currency}</Text>
           </View>
           <View style={styles.homeStatusChip}>
@@ -735,7 +735,7 @@ function SetupScreen({ playerName, onChangeName, meta, savedRun, setupOptions, s
       </View>
       <View style={styles.startSummary}>
         <View>
-          <Text style={styles.summaryKicker}>Meta Points</Text>
+          <Text style={styles.summaryKicker}>Echoes</Text>
           <Text style={styles.summaryValue}>{meta.currency}</Text>
         </View>
         <View style={styles.summaryDivider} />
@@ -766,7 +766,7 @@ function SetupScreen({ playerName, onChangeName, meta, savedRun, setupOptions, s
         />
       </CollapsiblePanel>
 
-      <CollapsiblePanel title="Meta Upgrades" count={meta.currency} initiallyOpen={false}>
+      <CollapsiblePanel title="Echo Upgrades" count={meta.currency} initiallyOpen={false}>
         <MetaPanel meta={meta} onBuyUpgrade={onBuyUpgrade} />
         <AbilityUnlockPanel meta={meta} options={setupOptions} onBuyAbility={onBuyAbility} />
       </CollapsiblePanel>
@@ -803,8 +803,8 @@ function RunEndedPanel({ view, meta, runRewards, onMenu }) {
           <Text style={styles.summaryLine}>Floors cleared: {view.player.runStats.floorsCleared}</Text>
           <Text style={styles.summaryLine}>Enemies defeated: {view.player.runStats.enemiesDefeated}</Text>
           <Text style={styles.summaryLine}>Ending: {view.player.runStats.endingReached}</Text>
-          <Text style={styles.summaryLine}>Meta earned: {runRewards.metaEarned}</Text>
-          <Text style={styles.summaryLine}>Total meta points: {meta.currency}</Text>
+          <Text style={styles.summaryLine}>Echoes earned: {runRewards.metaEarned}</Text>
+          <Text style={styles.summaryLine}>Total Echoes: {meta.currency}</Text>
           <Text style={styles.summaryLine}>Reward bonus: +{rewardBonus}</Text>
         </View>
       )}

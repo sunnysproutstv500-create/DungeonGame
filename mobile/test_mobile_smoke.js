@@ -41,10 +41,12 @@ assert(appSource.includes('styles.playerStats'), 'smoke: player header uses comp
 assert(appSource.includes('Character'), 'smoke: start screen groups character setup');
 assert(appSource.includes('styles.startSummary'), 'smoke: start screen uses compact summary panel');
 assert(appSource.includes('Class & Abilities'), 'smoke: start screen collapses class and ability setup');
-assert(appSource.includes('Meta Upgrades'), 'smoke: start screen collapses meta upgrade setup');
+assert(appSource.includes('Echo Upgrades'), 'smoke: start screen collapses Echo upgrade setup');
 assert(appSource.includes('styles.startActionBar'), 'smoke: start screen keeps run actions grouped at bottom');
-assert(appSource.includes('Meta earned:'), 'smoke: run summary shows meta earned');
-assert(appSource.includes('Total meta points:'), 'smoke: run summary shows total meta points');
+assert(appSource.includes('Echoes earned:'), 'smoke: run summary shows Echoes earned');
+assert(appSource.includes('Total Echoes:'), 'smoke: run summary shows total Echoes');
+assert(!appSource.includes('Meta Points'), 'smoke: player-facing currency no longer says Meta Points');
+assert(!appSource.includes('meta points'), 'smoke: player-facing currency no longer says meta points');
 assert(appSource.includes('Reward bonus:'), 'smoke: run summary shows reward bonus');
 assert(appSource.includes('Unequip one ability to equip another.'), 'smoke: ability picker explains full loadout');
 assert(appSource.includes("loadoutFull ? 'Full' : 'Equip'"), 'smoke: full ability loadout uses clear disabled button label');
