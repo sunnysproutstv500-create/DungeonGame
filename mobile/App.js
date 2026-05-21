@@ -31,6 +31,7 @@ const STITCH_THEME = {
   outline: '#4d4635',
   danger: '#8b1a12',
 };
+const STATUS_BAR_OFFSET = StatusBar.currentHeight || 0;
 
 function Stat({ label, value }) {
   return (
@@ -80,7 +81,7 @@ function HpVitalityBar({ player }) {
   );
 }
 
-function BottomTrialNav({ active = 'Scene' }) {
+function BottomTrialNav({ active = 'Scene', onSelect }) {
   const tabs = [
     ['Scene', '☷'],
     ['Inventory', '▣'],
@@ -92,10 +93,15 @@ function BottomTrialNav({ active = 'Scene' }) {
       {tabs.map(([label, icon]) => {
         const selected = label === active;
         return (
-          <View key={label} style={[styles.navTab, selected && styles.activeNavTab]}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            key={label}
+            onPress={() => onSelect?.(label)}
+            style={[styles.navTab, selected && styles.activeNavTab]}
+          >
             <Text style={[styles.navIcon, selected && styles.activeNavText]}>{icon}</Text>
             <Text style={[styles.navLabel, selected && styles.activeNavText]}>{label}</Text>
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>
@@ -931,6 +937,64 @@ function RunEndedPanel({ view, meta, runRewards, onMenu }) {
   );
 }
 
+function RunTabContent({
+  activeRunTab,
+  view,
+  meta,
+  runRewards,
+  events,
+  setupOptions,
+  onAction,
+  onUseItem,
+  onEquipItem,
+  onBuyUpgrade,
+  onBuyAbility,
+  onMenu,
+}) {
+  if (view.runEnded) {
+    return <RunEndedPanel view={view} meta={meta} runRewards={runRewards} onMenu={onMenu} />;
+  }
+
+  if (activeRunTab === 'Map') {
+    return (
+      <>
+        <ObjectivePanel objective={view.objective} />
+        <ContractBadge contractProgress={view.contractProgress} />
+        <MapProgressPanel mapProgress={view.mapProgress} />
+      </>
+    );
+  }
+
+  if (activeRunTab === 'Inventory') {
+    return (
+      <>
+        <EquipmentPanel equipmentItems={view.equipmentItems} />
+        <InventoryPanel items={view.items} onUseItem={onUseItem} onEquipItem={onEquipItem} />
+      </>
+    );
+  }
+
+  if (activeRunTab === 'Upgrades') {
+    return (
+      <>
+        <MetaPanel meta={meta} onBuyUpgrade={onBuyUpgrade} />
+        <AbilityUnlockPanel meta={meta} options={setupOptions} onBuyAbility={onBuyAbility} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      {view.mode === 'combat' ? (
+        <CombatPanel view={view} onAction={onAction} events={events} />
+      ) : (
+        <ScenePanel view={view} onAction={onAction} events={events} />
+      )}
+      <EventLog events={events} />
+    </>
+  );
+}
+
 module.exports = function App() {
   const initialMeta = useMemo(() => saveStore.loadMeta(), []);
   const [meta, setMeta] = useState(initialMeta);
@@ -940,6 +1004,7 @@ module.exports = function App() {
   const [selectedAbilityIds, setSelectedAbilityIds] = useState(() => runtime.getRunSetupOptions(initialMeta).selectedAbilityIds);
   const [menuScreen, setMenuScreen] = useState('home');
   const [gameState, setGameState] = useState(null);
+  const [activeRunTab, setActiveRunTab] = useState('Scene');
   const [savedRun, setSavedRun] = useState(() => saveStore.loadSavedRun());
   const [events, setEvents] = useState([]);
   const [saveNotice, setSaveNotice] = useState('');
@@ -998,6 +1063,7 @@ module.exports = function App() {
 
   const startRun = name => {
     setGameState(runtime.startNewRun({ name, meta, classId: selectedClassId, selectedAbilityIds }));
+    setActiveRunTab('Scene');
     setEvents([]);
     setSaveNotice('');
     setRunRewards({ metaEarned: 0 });
@@ -1015,6 +1081,7 @@ module.exports = function App() {
   const continueSavedRun = () => {
     if (!savedRun) return;
     setGameState(runtime.hydrateRun(savedRun));
+    setActiveRunTab('Scene');
     setSaveNotice(`Loaded: ${savedRun.currentSceneId}`);
     setEvents([{ type: 'save_loaded', scene: savedRun.currentSceneId }]);
   };
@@ -1077,7 +1144,7 @@ module.exports = function App() {
   if (!gameState) {
     return (
       <SafeAreaView style={menuScreen === 'home' ? styles.homeSafe : styles.safe}>
-        <StatusBar barStyle={menuScreen === 'home' ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle="light-content" backgroundColor={STITCH_THEME.background} translucent={false} />
         {menuScreen === 'home' ? (
           <HomeScreen
             meta={meta}
@@ -1113,7 +1180,7 @@ module.exports = function App() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor={STITCH_THEME.surfaceHigh} translucent={false} />
       <View style={styles.shell}>
         <TrialTopBar title={`Floor ${view.floor} - ${view.scene.title}`} player={view.player} meta={meta} />
         <HpVitalityBar player={view.player} />
@@ -1125,25 +1192,22 @@ module.exports = function App() {
           <ActionButton label="Save Run" onPress={saveRun} tone="secondary" disabled={view.runEnded} />
         </View>
         <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-          {!view.runEnded && <ObjectivePanel objective={view.objective} />}
-          {!view.runEnded && <ContractBadge contractProgress={view.contractProgress} />}
-          {!view.runEnded && <MapProgressPanel mapProgress={view.mapProgress} />}
-          {view.runEnded ? (
-            <RunEndedPanel view={view} meta={meta} runRewards={runRewards} onMenu={returnToMenu} />
-          ) : view.mode === 'combat' ? (
-            <CombatPanel view={view} onAction={dispatch} events={events} />
-          ) : (
-            <ScenePanel view={view} onAction={dispatch} events={events} />
-          )}
-          <EquipmentPanel equipmentItems={view.equipmentItems} />
-          <InventoryPanel
-            items={view.items}
+          <RunTabContent
+            activeRunTab={activeRunTab}
+            view={view}
+            meta={meta}
+            runRewards={runRewards}
+            events={events}
+            setupOptions={setupOptions}
+            onAction={dispatch}
             onUseItem={itemId => dispatch({ type: 'use_item', itemId })}
             onEquipItem={itemId => dispatch({ type: 'equip_item', itemId })}
+            onBuyUpgrade={buyUpgrade}
+            onBuyAbility={buyAbility}
+            onMenu={returnToMenu}
           />
-          <EventLog events={events} />
         </ScrollView>
-        <BottomTrialNav active={view.runEnded ? 'Upgrades' : view.mode === 'combat' ? 'Scene' : 'Scene'} />
+        <BottomTrialNav active={view.runEnded ? 'Upgrades' : activeRunTab} onSelect={setActiveRunTab} />
       </View>
     </SafeAreaView>
   );
@@ -1153,10 +1217,12 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: STITCH_THEME.background,
+    paddingTop: STATUS_BAR_OFFSET,
   },
   homeSafe: {
     flex: 1,
     backgroundColor: STITCH_THEME.background,
+    paddingTop: STATUS_BAR_OFFSET,
   },
   shell: {
     flex: 1,
@@ -1249,13 +1315,13 @@ const styles = StyleSheet.create({
     backgroundColor: STITCH_THEME.surface,
   },
   trialTopBar: {
-    minHeight: 62,
+    minHeight: 54,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(242,202,80,0.22)',
     backgroundColor: STITCH_THEME.surfaceHigh,
@@ -1268,21 +1334,21 @@ const styles = StyleSheet.create({
   },
   trialIcon: {
     color: STITCH_THEME.primary,
-    fontSize: 18,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 20,
     fontWeight: '900',
   },
   trialTitle: {
     flex: 1,
     color: STITCH_THEME.primary,
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: 16,
+    lineHeight: 21,
     fontWeight: '900',
   },
   trialMetaBlock: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 7,
   },
   trialMetaColumn: {
     alignItems: 'flex-end',
@@ -1310,13 +1376,13 @@ const styles = StyleSheet.create({
   },
   trialDivider: {
     width: 1,
-    height: 30,
+    height: 26,
     backgroundColor: 'rgba(153,144,124,0.3)',
   },
   hpPanel: {
     gap: 6,
-    paddingHorizontal: 18,
-    paddingTop: 14,
+    paddingHorizontal: 14,
+    paddingTop: 8,
     paddingBottom: 8,
     backgroundColor: STITCH_THEME.background,
   },
@@ -1398,8 +1464,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 18,
-    paddingBottom: 94,
+    padding: 12,
+    paddingBottom: 76,
   },
   sceneHeader: {
     borderBottomWidth: 2,
@@ -1439,8 +1505,8 @@ const styles = StyleSheet.create({
     lineHeight: 27,
   },
   sceneCard: {
-    gap: 14,
-    padding: 24,
+    gap: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(242,202,80,0.32)',
     backgroundColor: STITCH_THEME.surface,
@@ -1450,7 +1516,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(242,202,80,0.18)',
   },
   sceneArtwork: {
-    minHeight: 160,
+    minHeight: 118,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
@@ -2335,7 +2401,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   bottomTrialNav: {
-    minHeight: 66,
+    minHeight: 58,
     flexDirection: 'row',
     borderTopWidth: 1,
     borderTopColor: 'rgba(242,202,80,0.25)',

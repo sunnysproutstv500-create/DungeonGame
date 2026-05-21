@@ -35,6 +35,11 @@ assert(appSource.includes('STITCH_THEME'), 'smoke: mobile app has Stitch visual 
 assert(appSource.includes('function TrialTopBar'), 'smoke: run screens use Stitch-style trial top bar');
 assert(appSource.includes('function HpVitalityBar'), 'smoke: run screens use Stitch-style HP vitality bar');
 assert(appSource.includes('function BottomTrialNav'), 'smoke: run screens use Stitch-style bottom nav');
+assert(appSource.includes('activeRunTab'), 'smoke: bottom nav controls the active run tab');
+assert(appSource.includes('setActiveRunTab'), 'smoke: bottom nav can change active run tab');
+assert(appSource.includes('onSelect'), 'smoke: bottom nav exposes press handlers');
+assert(appSource.includes('STATUS_BAR_OFFSET'), 'smoke: app reserves space for phone status bar');
+assert(appSource.includes('translucent={false}'), 'smoke: status bar is non-translucent on device');
 assert(appSource.includes('COLISEUM RECORD'), 'smoke: scene screen can show Coliseum record tracker');
 assert(appSource.includes('Echo Archive'), 'smoke: upgrades screen uses Stitch Echo Archive naming');
 assert(appSource.includes("CHOOSE EARTH'S LOADOUT"), 'smoke: setup screen uses Stitch loadout framing');
